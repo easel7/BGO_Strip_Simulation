@@ -1,0 +1,15 @@
+Root/Electron_PowerLaw.root
+Root/Proton_PowerLaw.root
+Root/Deuteron_PowerLaw.root
+Root/Helium3_PowerLaw.root
+Root/Helium4_PowerLaw.root
+Root/Carbon_PowerLaw.root
+
+Weight/Electron_PowerLaw.root
+Weight/Proton_PowerLaw.root
+Weight/Deuteron_PowerLaw.root
+Weight/Helium3_PowerLaw.root
+Weight/Helium4_PowerLaw.root
+Weight/Carbon_PowerLaw.root
+
+.DS_Store

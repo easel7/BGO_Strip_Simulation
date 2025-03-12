@@ -1,0 +1,19 @@
+/run/initialize
+/analysis/setFileName ../Root/Proton_PowerLaw
+/gps/particle proton
+/gps/ene/type Pow
+/gps/ene/min 10 GeV
+/gps/ene/max 4000 GeV
+/gps/ene/alpha -1
+
+/gps/pos/type Plane
+/gps/pos/shape Square
+/gps/pos/halfx 10 cm
+/gps/pos/halfy 10 cm
+/gps/pos/centre 0. 0. -214.2 mm
+
+/gps/direction 0 0 1
+
+/run/printProgress 1000
+/run/beamOn 1000000
+

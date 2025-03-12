@@ -1,0 +1,16 @@
+/run/initialize
+/analysis/setFileName ../Root/Deuteron_80GeV
+/gps/particle deuteron
+/gps/ene/type Mono
+/gps/ene/mono 80 GeV
+
+/gps/pos/type Plane
+/gps/pos/shape Square
+/gps/pos/halfx 10 cm
+/gps/pos/halfy 10 cm
+/gps/pos/centre 0. 0. -214.2 mm
+
+/gps/direction 0 0 1
+
+/run/printProgress 1000
+/run/beamOn 10000

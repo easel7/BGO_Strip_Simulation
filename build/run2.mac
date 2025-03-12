@@ -1,0 +1,34 @@
+# Macro file for example B4
+#
+# To be run preferably in batch, without graphics:
+# % exampleB4[a,b,c,d]  -m run2.mac
+#
+# Produce Histograms and Ntuples
+#
+#/run/numberOfThreads 4
+#/control/cout/ignoreThreadsExcept 0
+#
+# reduce the verbosity level for EM and hadronic physics
+#/process/em/verbose 0
+#/process/had/verbose 0
+#
+/run/initialize
+#
+# Default kinemtics:  
+# electron 300 MeV in direction (0.,0.,1.)
+# 10000 events
+#
+/gps/particle proton
+/gps/ene/type Mono
+/gps/ene/mono 500 GeV
+
+/gps/pos/type Plane
+/gps/pos/shape Square
+/gps/pos/halfx 10 cm
+/gps/pos/halfy 10 cm
+/gps/pos/centre 0. 0. -214.2 mm
+
+/gps/direction 0 0 1
+
+/run/printProgress 1000
+/run/beamOn 10000
