@@ -60,7 +60,7 @@ EQUALS = =
 CMAKE_SOURCE_DIR = /Users/xiongzheng/software/B4
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/xiongzheng/software/B4/B4c
+CMAKE_BINARY_DIR = /Users/xiongzheng/software/B4/B4e
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/xiongzheng/software/B4/B4c/CMakeFiles /Users/xiongzheng/software/B4/B4c//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/xiongzheng/software/B4/B4e/CMakeFiles /Users/xiongzheng/software/B4/B4e//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/xiongzheng/software/B4/B4c/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/xiongzheng/software/B4/B4e/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -156,17 +156,17 @@ exampleB4b/fast:
 .PHONY : exampleB4b/fast
 
 #=============================================================================
-# Target rules for targets named exampleB4c
+# Target rules for targets named exampleB4e
 
 # Build rule for target.
-exampleB4c: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 exampleB4c
-.PHONY : exampleB4c
+exampleB4e: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 exampleB4e
+.PHONY : exampleB4e
 
 # fast build rule for target.
-exampleB4c/fast:
-	$(MAKE) $(MAKESILENT) -f B4c/CMakeFiles/exampleB4c.dir/build.make B4c/CMakeFiles/exampleB4c.dir/build
-.PHONY : exampleB4c/fast
+exampleB4e/fast:
+	$(MAKE) $(MAKESILENT) -f B4e/CMakeFiles/exampleB4e.dir/build.make B4e/CMakeFiles/exampleB4e.dir/build
+.PHONY : exampleB4e/fast
 
 #=============================================================================
 # Target rules for targets named exampleB4d
@@ -192,7 +192,7 @@ help:
 	@echo "... B4"
 	@echo "... exampleB4a"
 	@echo "... exampleB4b"
-	@echo "... exampleB4c"
+	@echo "... exampleB4e"
 	@echo "... exampleB4d"
 .PHONY : help
 

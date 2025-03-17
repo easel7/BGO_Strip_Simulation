@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4c/src/DetectorConstruction.cc
-/// \brief Implementation of the B4c::DetectorConstruction class
+/// \file B4/B4e/src/DetectorConstruction.cc
+/// \brief Implementation of the B4e::DetectorConstruction class
 
 #include "DetectorConstruction.hh"
 
@@ -45,7 +45,7 @@
 #include "G4SystemOfUnits.hh"
 #include "G4VisAttributes.hh"
 
-namespace B4c
+namespace B4e
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -100,6 +100,10 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   G4double gapThickness = 0.5 * mm;
   G4double calorSizeXY = 60. * cm;
 
+  G4double barSizeX = 25. * mm;
+  G4double barSizeY = 600. * mm;
+  G4int fNofBars = 24;  // 每层 24 根 bars
+
   auto layerThickness = absoThickness + gapThickness;
   auto calorThickness = fNofLayers * layerThickness;
   SetCalorThickness(calorThickness);
@@ -132,7 +136,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                                    G4ThreeVector(),  // at (0,0,0)
                                    worldLV,  // its logical volume
                                    "World",  // its name
-                                   nullptr,  // its mother  volume
+                                   nullptr,  // its mother  volumezc
                                    false,  // no boolean operation
                                    0,  // copy number
                                    fCheckOverlaps);  // checking overlaps
@@ -176,21 +180,44 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   //
   // Absorber
   //
-  auto absorberS = new G4Box("Abso",  // its name
-                             calorSizeXY / 2, calorSizeXY / 2, absoThickness / 2);  // its size
+  // auto absorberS = new G4Box("Abso",  // its name
+  //                            barWidth / 2, barLength / 2, barHeight / 2);  // its size
 
-  auto absorberLV = new G4LogicalVolume(absorberS,  // its solid
-                                        absorberMaterial,  // its material
-                                        "AbsoLV");  // its name
+  // auto absorberLV = new G4LogicalVolume(absorberS,  // its solid
+  //                                       absorberMaterial,  // its material
+  //                                       "AbsoLV");  // its name
 
-  fAbsorberPV = new G4PVPlacement(nullptr,  // no rotation
-                    G4ThreeVector(0., 0., -gapThickness / 2),  // its position
-                    absorberLV,  // its logical volume
-                    "Abso",  // its name
-                    layerLV,  // its mother  volume
-                    false,  // no boolean operation
-                    0,  // copy number
-                    fCheckOverlaps);  // checking overlaps
+  // fAbsorberPV = new G4PVPlacement(nullptr,  // no rotation
+  //                   G4ThreeVector(0., 0., -gapThickness / 2),  // its position
+  //                   absorberLV,  // its logical volume
+  //                   "Abso",  // its name
+  //                   layerLV,  // its mother  volume
+  //                   false,  // no boolean operation
+  //                   0,  // copy number
+  //                   fCheckOverlaps);  // checking overlaps
+
+  
+  auto barX_S = new G4Box("BarX", barSizeX / 2, barSizeY / 2, absoThickness / 2);
+  auto barY_S = new G4Box("BarY", barSizeY / 2, barSizeX / 2, absoThickness / 2);
+  
+  auto barX_LV = new G4LogicalVolume(barX_S, absorberMaterial, "BarX_LV");
+  auto barY_LV = new G4LogicalVolume(barY_S, absorberMaterial, "BarY_LV");
+  
+  for (G4int layerIndex = 0; layerIndex < fNofLayers; layerIndex++) {
+      G4LogicalVolume* currentLayerLV = new G4LogicalVolume(layerS, defaultMaterial, "LayerLV");
+      G4LogicalVolume* barLV = (layerIndex % 2 == 0) ? barX_LV : barY_LV;
+  
+      new G4PVReplica("Bar", barLV, currentLayerLV, (layerIndex % 2 == 0) ? kXAxis : kYAxis, fNofBars, barSizeX);
+      
+      new G4PVPlacement(nullptr, 
+                        G4ThreeVector(0, 0, -calorThickness / 2 + (layerIndex + 0.5) * layerThickness),
+                        currentLayerLV, 
+                        "Layer", 
+                        calorLV, 
+                        false, 
+                        layerIndex, 
+                        fCheckOverlaps);
+  }
 
   //
   // Gap
@@ -267,4 +294,4 @@ void DetectorConstruction::ConstructSDandField()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-}  // namespace B4c
+}  // namespace B4e

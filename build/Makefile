@@ -57,10 +57,10 @@ RM = /opt/homebrew/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /Users/xiongzheng/software/B4/B4c
+CMAKE_SOURCE_DIR = /Users/xiongzheng/software/B4/B4e
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/xiongzheng/software/B4/B4c/build
+CMAKE_BINARY_DIR = /Users/xiongzheng/software/B4/B4e/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/xiongzheng/software/B4/B4c/build/CMakeFiles /Users/xiongzheng/software/B4/B4c/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/xiongzheng/software/B4/B4e/build/CMakeFiles /Users/xiongzheng/software/B4/B4e/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/xiongzheng/software/B4/B4c/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/xiongzheng/software/B4/B4e/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -117,48 +117,48 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named exampleB4c
+# Target rules for targets named exampleB4e
 
 # Build rule for target.
-exampleB4c: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 exampleB4c
-.PHONY : exampleB4c
+exampleB4e: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 exampleB4e
+.PHONY : exampleB4e
 
 # fast build rule for target.
-exampleB4c/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/build
-.PHONY : exampleB4c/fast
+exampleB4e/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/build
+.PHONY : exampleB4e/fast
 
-exampleB4c.o: exampleB4c.cc.o
-.PHONY : exampleB4c.o
+exampleB4e.o: exampleB4e.cc.o
+.PHONY : exampleB4e.o
 
 # target to build an object file
-exampleB4c.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/exampleB4c.cc.o
-.PHONY : exampleB4c.cc.o
+exampleB4e.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/exampleB4e.cc.o
+.PHONY : exampleB4e.cc.o
 
-exampleB4c.i: exampleB4c.cc.i
-.PHONY : exampleB4c.i
+exampleB4e.i: exampleB4e.cc.i
+.PHONY : exampleB4e.i
 
 # target to preprocess a source file
-exampleB4c.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/exampleB4c.cc.i
-.PHONY : exampleB4c.cc.i
+exampleB4e.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/exampleB4e.cc.i
+.PHONY : exampleB4e.cc.i
 
-exampleB4c.s: exampleB4c.cc.s
-.PHONY : exampleB4c.s
+exampleB4e.s: exampleB4e.cc.s
+.PHONY : exampleB4e.s
 
 # target to generate assembly for a file
-exampleB4c.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/exampleB4c.cc.s
-.PHONY : exampleB4c.cc.s
+exampleB4e.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/exampleB4e.cc.s
+.PHONY : exampleB4e.cc.s
 
 src/ActionInitialization.o: src/ActionInitialization.cc.o
 .PHONY : src/ActionInitialization.o
 
 # target to build an object file
 src/ActionInitialization.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/ActionInitialization.cc.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/ActionInitialization.cc.o
 .PHONY : src/ActionInitialization.cc.o
 
 src/ActionInitialization.i: src/ActionInitialization.cc.i
@@ -166,7 +166,7 @@ src/ActionInitialization.i: src/ActionInitialization.cc.i
 
 # target to preprocess a source file
 src/ActionInitialization.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/ActionInitialization.cc.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/ActionInitialization.cc.i
 .PHONY : src/ActionInitialization.cc.i
 
 src/ActionInitialization.s: src/ActionInitialization.cc.s
@@ -174,7 +174,7 @@ src/ActionInitialization.s: src/ActionInitialization.cc.s
 
 # target to generate assembly for a file
 src/ActionInitialization.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/ActionInitialization.cc.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/ActionInitialization.cc.s
 .PHONY : src/ActionInitialization.cc.s
 
 src/CalorHit.o: src/CalorHit.cc.o
@@ -182,7 +182,7 @@ src/CalorHit.o: src/CalorHit.cc.o
 
 # target to build an object file
 src/CalorHit.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/CalorHit.cc.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/CalorHit.cc.o
 .PHONY : src/CalorHit.cc.o
 
 src/CalorHit.i: src/CalorHit.cc.i
@@ -190,7 +190,7 @@ src/CalorHit.i: src/CalorHit.cc.i
 
 # target to preprocess a source file
 src/CalorHit.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/CalorHit.cc.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/CalorHit.cc.i
 .PHONY : src/CalorHit.cc.i
 
 src/CalorHit.s: src/CalorHit.cc.s
@@ -198,7 +198,7 @@ src/CalorHit.s: src/CalorHit.cc.s
 
 # target to generate assembly for a file
 src/CalorHit.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/CalorHit.cc.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/CalorHit.cc.s
 .PHONY : src/CalorHit.cc.s
 
 src/CalorimeterSD.o: src/CalorimeterSD.cc.o
@@ -206,7 +206,7 @@ src/CalorimeterSD.o: src/CalorimeterSD.cc.o
 
 # target to build an object file
 src/CalorimeterSD.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/CalorimeterSD.cc.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/CalorimeterSD.cc.o
 .PHONY : src/CalorimeterSD.cc.o
 
 src/CalorimeterSD.i: src/CalorimeterSD.cc.i
@@ -214,7 +214,7 @@ src/CalorimeterSD.i: src/CalorimeterSD.cc.i
 
 # target to preprocess a source file
 src/CalorimeterSD.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/CalorimeterSD.cc.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/CalorimeterSD.cc.i
 .PHONY : src/CalorimeterSD.cc.i
 
 src/CalorimeterSD.s: src/CalorimeterSD.cc.s
@@ -222,7 +222,7 @@ src/CalorimeterSD.s: src/CalorimeterSD.cc.s
 
 # target to generate assembly for a file
 src/CalorimeterSD.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/CalorimeterSD.cc.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/CalorimeterSD.cc.s
 .PHONY : src/CalorimeterSD.cc.s
 
 src/DetectorConstruction.o: src/DetectorConstruction.cc.o
@@ -230,7 +230,7 @@ src/DetectorConstruction.o: src/DetectorConstruction.cc.o
 
 # target to build an object file
 src/DetectorConstruction.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/DetectorConstruction.cc.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.o
 .PHONY : src/DetectorConstruction.cc.o
 
 src/DetectorConstruction.i: src/DetectorConstruction.cc.i
@@ -238,7 +238,7 @@ src/DetectorConstruction.i: src/DetectorConstruction.cc.i
 
 # target to preprocess a source file
 src/DetectorConstruction.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/DetectorConstruction.cc.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.i
 .PHONY : src/DetectorConstruction.cc.i
 
 src/DetectorConstruction.s: src/DetectorConstruction.cc.s
@@ -246,7 +246,7 @@ src/DetectorConstruction.s: src/DetectorConstruction.cc.s
 
 # target to generate assembly for a file
 src/DetectorConstruction.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/DetectorConstruction.cc.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.s
 .PHONY : src/DetectorConstruction.cc.s
 
 src/EventAction.o: src/EventAction.cc.o
@@ -254,7 +254,7 @@ src/EventAction.o: src/EventAction.cc.o
 
 # target to build an object file
 src/EventAction.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/EventAction.cc.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/EventAction.cc.o
 .PHONY : src/EventAction.cc.o
 
 src/EventAction.i: src/EventAction.cc.i
@@ -262,7 +262,7 @@ src/EventAction.i: src/EventAction.cc.i
 
 # target to preprocess a source file
 src/EventAction.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/EventAction.cc.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/EventAction.cc.i
 .PHONY : src/EventAction.cc.i
 
 src/EventAction.s: src/EventAction.cc.s
@@ -270,7 +270,7 @@ src/EventAction.s: src/EventAction.cc.s
 
 # target to generate assembly for a file
 src/EventAction.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/EventAction.cc.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/EventAction.cc.s
 .PHONY : src/EventAction.cc.s
 
 src/PrimaryGeneratorAction.o: src/PrimaryGeneratorAction.cc.o
@@ -278,7 +278,7 @@ src/PrimaryGeneratorAction.o: src/PrimaryGeneratorAction.cc.o
 
 # target to build an object file
 src/PrimaryGeneratorAction.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/PrimaryGeneratorAction.cc.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.o
 .PHONY : src/PrimaryGeneratorAction.cc.o
 
 src/PrimaryGeneratorAction.i: src/PrimaryGeneratorAction.cc.i
@@ -286,7 +286,7 @@ src/PrimaryGeneratorAction.i: src/PrimaryGeneratorAction.cc.i
 
 # target to preprocess a source file
 src/PrimaryGeneratorAction.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/PrimaryGeneratorAction.cc.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.i
 .PHONY : src/PrimaryGeneratorAction.cc.i
 
 src/PrimaryGeneratorAction.s: src/PrimaryGeneratorAction.cc.s
@@ -294,7 +294,7 @@ src/PrimaryGeneratorAction.s: src/PrimaryGeneratorAction.cc.s
 
 # target to generate assembly for a file
 src/PrimaryGeneratorAction.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/PrimaryGeneratorAction.cc.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.s
 .PHONY : src/PrimaryGeneratorAction.cc.s
 
 src/RunAction.o: src/RunAction.cc.o
@@ -302,7 +302,7 @@ src/RunAction.o: src/RunAction.cc.o
 
 # target to build an object file
 src/RunAction.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/RunAction.cc.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/RunAction.cc.o
 .PHONY : src/RunAction.cc.o
 
 src/RunAction.i: src/RunAction.cc.i
@@ -310,7 +310,7 @@ src/RunAction.i: src/RunAction.cc.i
 
 # target to preprocess a source file
 src/RunAction.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/RunAction.cc.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/RunAction.cc.i
 .PHONY : src/RunAction.cc.i
 
 src/RunAction.s: src/RunAction.cc.s
@@ -318,7 +318,7 @@ src/RunAction.s: src/RunAction.cc.s
 
 # target to generate assembly for a file
 src/RunAction.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/RunAction.cc.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/RunAction.cc.s
 .PHONY : src/RunAction.cc.s
 
 src/SteppingAction.o: src/SteppingAction.cc.o
@@ -326,7 +326,7 @@ src/SteppingAction.o: src/SteppingAction.cc.o
 
 # target to build an object file
 src/SteppingAction.cc.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/SteppingAction.cc.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/SteppingAction.cc.o
 .PHONY : src/SteppingAction.cc.o
 
 src/SteppingAction.i: src/SteppingAction.cc.i
@@ -334,7 +334,7 @@ src/SteppingAction.i: src/SteppingAction.cc.i
 
 # target to preprocess a source file
 src/SteppingAction.cc.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/SteppingAction.cc.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/SteppingAction.cc.i
 .PHONY : src/SteppingAction.cc.i
 
 src/SteppingAction.s: src/SteppingAction.cc.s
@@ -342,7 +342,7 @@ src/SteppingAction.s: src/SteppingAction.cc.s
 
 # target to generate assembly for a file
 src/SteppingAction.cc.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4c.dir/build.make CMakeFiles/exampleB4c.dir/src/SteppingAction.cc.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/SteppingAction.cc.s
 .PHONY : src/SteppingAction.cc.s
 
 # Help Target
@@ -353,10 +353,10 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... exampleB4c"
-	@echo "... exampleB4c.o"
-	@echo "... exampleB4c.i"
-	@echo "... exampleB4c.s"
+	@echo "... exampleB4e"
+	@echo "... exampleB4e.o"
+	@echo "... exampleB4e.i"
+	@echo "... exampleB4e.s"
 	@echo "... src/ActionInitialization.o"
 	@echo "... src/ActionInitialization.i"
 	@echo "... src/ActionInitialization.s"

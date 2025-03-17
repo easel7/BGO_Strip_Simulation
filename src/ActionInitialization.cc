@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4c/src/ActionInitialization.cc
-/// \brief Implementation of the B4c::ActionInitialization class
+/// \file B4/B4e/src/ActionInitialization.cc
+/// \brief Implementation of the B4e::ActionInitialization class
 
 #include "ActionInitialization.hh"
 #include "DetectorConstruction.hh"
@@ -36,7 +36,7 @@
 
 using namespace B4;
 
-namespace B4c
+namespace B4e
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -65,4 +65,4 @@ void ActionInitialization::Build() const
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-}  // namespace B4c
+}  // namespace B4e

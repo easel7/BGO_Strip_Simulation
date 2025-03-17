@@ -24,15 +24,15 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4c/include/ActionInitialization.hh
-/// \brief Definition of the B4c::ActionInitialization class
+/// \file B4/B4e/include/ActionInitialization.hh
+/// \brief Definition of the B4e::ActionInitialization class
 
-#ifndef B4cActionInitialization_h
-#define B4cActionInitialization_h 1
+#ifndef B4eActionInitialization_h
+#define B4eActionInitialization_h 1
 
 #include "G4VUserActionInitialization.hh"
 
-namespace B4c
+namespace B4e
 {
 
 /// Action initialization class.
@@ -52,6 +52,6 @@ class ActionInitialization : public G4VUserActionInitialization
     DetectorConstruction* fDetConstruction = nullptr;
 };
 
-}  // namespace B4c
+}  // namespace B4e
 
 #endif

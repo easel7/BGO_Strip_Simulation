@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4c/src/CalorimeterSD.cc
-/// \brief Implementation of the B4c::CalorimeterSD class
+/// \file B4/B4e/src/CalorimeterSD.cc
+/// \brief Implementation of the B4e::CalorimeterSD class
 
 #include "CalorimeterSD.hh"
 
@@ -33,7 +33,7 @@
 #include "G4SDManager.hh"
 #include "G4Step.hh"
 
-namespace B4c
+namespace B4e
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -115,4 +115,4 @@ void CalorimeterSD::EndOfEvent(G4HCofThisEvent*)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-}  // namespace B4c
+}  // namespace B4e

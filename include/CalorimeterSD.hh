@@ -24,11 +24,11 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4c/include/CalorimeterSD.hh
-/// \brief Definition of the B4c::CalorimeterSD class
+/// \file B4/B4e/include/CalorimeterSD.hh
+/// \brief Definition of the B4e::CalorimeterSD class
 
-#ifndef B4cCalorimeterSD_h
-#define B4cCalorimeterSD_h 1
+#ifndef B4eCalorimeterSD_h
+#define B4eCalorimeterSD_h 1
 
 #include "CalorHit.hh"
 
@@ -39,7 +39,7 @@ class G4Step;
 class G4HCofThisEvent;
 class G4TouchableHistory;
 
-namespace B4c
+namespace B4e
 {
 
 /// Calorimeter sensitive detector class
@@ -66,7 +66,7 @@ class CalorimeterSD : public G4VSensitiveDetector
     G4int fNofCells = 0;
 };
 
-}  // namespace B4c
+}  // namespace B4e
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

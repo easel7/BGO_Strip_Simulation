@@ -38,7 +38,7 @@
 #include "G4Step.hh"
 #include "globals.hh"
 
-namespace B4c
+namespace B4e
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

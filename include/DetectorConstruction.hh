@@ -24,11 +24,11 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4c/include/DetectorConstruction.hh
-/// \brief Definition of the B4c::DetectorConstruction class
+/// \file B4/B4e/include/DetectorConstruction.hh
+/// \brief Definition of the B4e::DetectorConstruction class
 
-#ifndef B4cDetectorConstruction_h
-#define B4cDetectorConstruction_h 1
+#ifndef B4eDetectorConstruction_h
+#define B4eDetectorConstruction_h 1
 
 #include "G4VUserDetectorConstruction.hh"
 #include "G4SystemOfUnits.hh"
@@ -38,7 +38,7 @@
 class G4VPhysicalVolume;
 class G4GlobalMagFieldMessenger;
 
-namespace B4c
+namespace B4e
 {
 
 /// Detector construction class to define materials and geometry.
@@ -108,7 +108,7 @@ inline const G4VPhysicalVolume* DetectorConstruction::GetGapPV() const
   return fGapPV;
 }
 
-}  // namespace B4c
+}  // namespace B4e
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

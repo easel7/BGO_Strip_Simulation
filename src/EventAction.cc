@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4c/src/EventAction.cc
-/// \brief Implementation of the B4c::EventAction class
+/// \file B4/B4e/src/EventAction.cc
+/// \brief Implementation of the B4e::EventAction class
 
 #include "EventAction.hh"
 
@@ -42,7 +42,7 @@
 #include "G4RunManager.hh"
 #include <iomanip>
 
-namespace B4c
+namespace B4e
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -159,4 +159,4 @@ void EventAction::EndOfEventAction(const G4Event* event)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-}  // namespace B4c
+}  // namespace B4e

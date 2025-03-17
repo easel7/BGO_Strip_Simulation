@@ -24,11 +24,11 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4c/include/CalorHit.hh
-/// \brief Definition of the B4c::CalorHit class
+/// \file B4/B4e/include/CalorHit.hh
+/// \brief Definition of the B4e::CalorHit class
 
-#ifndef B4cCalorHit_h
-#define B4cCalorHit_h 1
+#ifndef B4eCalorHit_h
+#define B4eCalorHit_h 1
 
 #include "G4Allocator.hh"
 #include "G4THitsCollection.hh"
@@ -37,7 +37,7 @@
 #include "G4VHit.hh"
 #include "globals.hh"
 
-namespace B4c
+namespace B4e
 {
 
 /// Calorimeter hit class
@@ -118,7 +118,7 @@ inline G4double CalorHit::GetTrackLength() const
   return fTrackLength;
 }
 
-}  // namespace B4c
+}  // namespace B4e
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

@@ -24,11 +24,11 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4c/include/EventAction.hh
-/// \brief Definition of the B4c::EventAction class
+/// \file B4/B4e/include/EventAction.hh
+/// \brief Definition of the B4e::EventAction class
 
-#ifndef B4cEventAction_h
-#define B4cEventAction_h 1
+#ifndef B4eEventAction_h
+#define B4eEventAction_h 1
 
 #include "G4UserEventAction.hh"
 
@@ -38,7 +38,7 @@
 
 class G4Event;
 
-namespace B4c
+namespace B4e
 {
 
 /// Event action class
@@ -106,7 +106,7 @@ class EventAction : public G4UserEventAction
     G4int fHadronicTag=-1; 
 };
 
-}  // namespace B4c
+}  // namespace B4e
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
