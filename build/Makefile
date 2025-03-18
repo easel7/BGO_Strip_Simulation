@@ -225,6 +225,30 @@ src/CalorimeterSD.cc.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/CalorimeterSD.cc.s
 .PHONY : src/CalorimeterSD.cc.s
 
+src/CellParameterisation.o: src/CellParameterisation.cc.o
+.PHONY : src/CellParameterisation.o
+
+# target to build an object file
+src/CellParameterisation.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.o
+.PHONY : src/CellParameterisation.cc.o
+
+src/CellParameterisation.i: src/CellParameterisation.cc.i
+.PHONY : src/CellParameterisation.i
+
+# target to preprocess a source file
+src/CellParameterisation.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.i
+.PHONY : src/CellParameterisation.cc.i
+
+src/CellParameterisation.s: src/CellParameterisation.cc.s
+.PHONY : src/CellParameterisation.s
+
+# target to generate assembly for a file
+src/CellParameterisation.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.s
+.PHONY : src/CellParameterisation.cc.s
+
 src/DetectorConstruction.o: src/DetectorConstruction.cc.o
 .PHONY : src/DetectorConstruction.o
 
@@ -366,6 +390,9 @@ help:
 	@echo "... src/CalorimeterSD.o"
 	@echo "... src/CalorimeterSD.i"
 	@echo "... src/CalorimeterSD.s"
+	@echo "... src/CellParameterisation.o"
+	@echo "... src/CellParameterisation.i"
+	@echo "... src/CellParameterisation.s"
 	@echo "... src/DetectorConstruction.o"
 	@echo "... src/DetectorConstruction.i"
 	@echo "... src/DetectorConstruction.s"

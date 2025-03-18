@@ -128,10 +128,24 @@ CMakeFiles/exampleB4e.dir/src/CalorimeterSD.cc.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/exampleB4e.dir/src/CalorimeterSD.cc.s"
 	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/xiongzheng/software/B4/B4e/src/CalorimeterSD.cc -o CMakeFiles/exampleB4e.dir/src/CalorimeterSD.cc.s
 
+CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.o: CMakeFiles/exampleB4e.dir/flags.make
+CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.o: /Users/xiongzheng/software/B4/B4e/src/CellParameterisation.cc
+CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.o: CMakeFiles/exampleB4e.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.o"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.o -MF CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.o.d -o CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.o -c /Users/xiongzheng/software/B4/B4e/src/CellParameterisation.cc
+
+CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.i"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/xiongzheng/software/B4/B4e/src/CellParameterisation.cc > CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.i
+
+CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.s"
+	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/xiongzheng/software/B4/B4e/src/CellParameterisation.cc -o CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.s
+
 CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.o: CMakeFiles/exampleB4e.dir/flags.make
 CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.o: /Users/xiongzheng/software/B4/B4e/src/DetectorConstruction.cc
 CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.o: CMakeFiles/exampleB4e.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.o"
 	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.o -MF CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.o.d -o CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.o -c /Users/xiongzheng/software/B4/B4e/src/DetectorConstruction.cc
 
 CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.i: cmake_force
@@ -145,7 +159,7 @@ CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.s: cmake_force
 CMakeFiles/exampleB4e.dir/src/EventAction.cc.o: CMakeFiles/exampleB4e.dir/flags.make
 CMakeFiles/exampleB4e.dir/src/EventAction.cc.o: /Users/xiongzheng/software/B4/B4e/src/EventAction.cc
 CMakeFiles/exampleB4e.dir/src/EventAction.cc.o: CMakeFiles/exampleB4e.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/exampleB4e.dir/src/EventAction.cc.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/exampleB4e.dir/src/EventAction.cc.o"
 	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/exampleB4e.dir/src/EventAction.cc.o -MF CMakeFiles/exampleB4e.dir/src/EventAction.cc.o.d -o CMakeFiles/exampleB4e.dir/src/EventAction.cc.o -c /Users/xiongzheng/software/B4/B4e/src/EventAction.cc
 
 CMakeFiles/exampleB4e.dir/src/EventAction.cc.i: cmake_force
@@ -159,7 +173,7 @@ CMakeFiles/exampleB4e.dir/src/EventAction.cc.s: cmake_force
 CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.o: CMakeFiles/exampleB4e.dir/flags.make
 CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.o: /Users/xiongzheng/software/B4/B4e/src/PrimaryGeneratorAction.cc
 CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.o: CMakeFiles/exampleB4e.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.o"
 	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.o -MF CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.o.d -o CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.o -c /Users/xiongzheng/software/B4/B4e/src/PrimaryGeneratorAction.cc
 
 CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.i: cmake_force
@@ -173,7 +187,7 @@ CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.s: cmake_force
 CMakeFiles/exampleB4e.dir/src/RunAction.cc.o: CMakeFiles/exampleB4e.dir/flags.make
 CMakeFiles/exampleB4e.dir/src/RunAction.cc.o: /Users/xiongzheng/software/B4/B4e/src/RunAction.cc
 CMakeFiles/exampleB4e.dir/src/RunAction.cc.o: CMakeFiles/exampleB4e.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/exampleB4e.dir/src/RunAction.cc.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/exampleB4e.dir/src/RunAction.cc.o"
 	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/exampleB4e.dir/src/RunAction.cc.o -MF CMakeFiles/exampleB4e.dir/src/RunAction.cc.o.d -o CMakeFiles/exampleB4e.dir/src/RunAction.cc.o -c /Users/xiongzheng/software/B4/B4e/src/RunAction.cc
 
 CMakeFiles/exampleB4e.dir/src/RunAction.cc.i: cmake_force
@@ -187,7 +201,7 @@ CMakeFiles/exampleB4e.dir/src/RunAction.cc.s: cmake_force
 CMakeFiles/exampleB4e.dir/src/SteppingAction.cc.o: CMakeFiles/exampleB4e.dir/flags.make
 CMakeFiles/exampleB4e.dir/src/SteppingAction.cc.o: /Users/xiongzheng/software/B4/B4e/src/SteppingAction.cc
 CMakeFiles/exampleB4e.dir/src/SteppingAction.cc.o: CMakeFiles/exampleB4e.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/exampleB4e.dir/src/SteppingAction.cc.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/exampleB4e.dir/src/SteppingAction.cc.o"
 	/Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/exampleB4e.dir/src/SteppingAction.cc.o -MF CMakeFiles/exampleB4e.dir/src/SteppingAction.cc.o.d -o CMakeFiles/exampleB4e.dir/src/SteppingAction.cc.o -c /Users/xiongzheng/software/B4/B4e/src/SteppingAction.cc
 
 CMakeFiles/exampleB4e.dir/src/SteppingAction.cc.i: cmake_force
@@ -204,6 +218,7 @@ exampleB4e_OBJECTS = \
 "CMakeFiles/exampleB4e.dir/src/ActionInitialization.cc.o" \
 "CMakeFiles/exampleB4e.dir/src/CalorHit.cc.o" \
 "CMakeFiles/exampleB4e.dir/src/CalorimeterSD.cc.o" \
+"CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.o" \
 "CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.o" \
 "CMakeFiles/exampleB4e.dir/src/EventAction.cc.o" \
 "CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.o" \
@@ -217,6 +232,7 @@ exampleB4e: CMakeFiles/exampleB4e.dir/exampleB4e.cc.o
 exampleB4e: CMakeFiles/exampleB4e.dir/src/ActionInitialization.cc.o
 exampleB4e: CMakeFiles/exampleB4e.dir/src/CalorHit.cc.o
 exampleB4e: CMakeFiles/exampleB4e.dir/src/CalorimeterSD.cc.o
+exampleB4e: CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.o
 exampleB4e: CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.o
 exampleB4e: CMakeFiles/exampleB4e.dir/src/EventAction.cc.o
 exampleB4e: CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.o
@@ -264,7 +280,7 @@ exampleB4e: /Users/xiongzheng/software/build/geant4-v11.3.0-install/lib/libG4glo
 exampleB4e: /Users/xiongzheng/software/build/geant4-v11.3.0-install/lib/libG4clhep.dylib
 exampleB4e: /Users/xiongzheng/software/build/geant4-v11.3.0-install/lib/libG4ptl.3.0.0.dylib
 exampleB4e: CMakeFiles/exampleB4e.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Linking CXX executable exampleB4e"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX executable exampleB4e"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/exampleB4e.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

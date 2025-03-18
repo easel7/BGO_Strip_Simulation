@@ -68,7 +68,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   if (volume != fDetConstruction->GetAbsorberPV()) return;
   G4ThreeVector position = step->GetPostStepPoint()->GetPosition(); // G4cout << "Position X: " << position.x() << G4endl; G4cout << "Position Y: " << position.y() << G4endl;  G4cout << "Position Z: " << position.z() << G4endl;
   G4double interactionDepth = position.z() + fDetConstruction->GetCalorThickness() / 2;  // Depth in detector G4cout << "Depth Z: " << position.z() + fDetConstruction->GetCalorThickness() / 2  << G4endl;
-  G4int interactionLayer = step->GetPreStepPoint()->GetTouchableHandle()->GetCopyNumber(1);  // Layer number, while GetCopyNumber(depth=1) find its mother volume G4cout << "Layer: " << step->GetPreStepPoint()->GetTouchableHandle()->GetCopyNumber(1) << G4endl;
+  G4int interactionLayer = step->GetPreStepPoint()->GetTouchableHandle()->GetCopyNumber() / 24;  // Layer number, while GetCopyNumber(depth=0) find its copynumber, 
   G4int nSecondaries = step->GetSecondaryInCurrentStep()->size();
   G4ProcessType processType = process->GetProcessType();
   G4int processSubType = process->GetProcessSubType();

@@ -95,12 +95,10 @@ void EventAction::EndOfEventAction(const G4Event* event)
   // Get hits collections IDs (only once)
   if (fAbsHCID == -1) {
     fAbsHCID = G4SDManager::GetSDMpointer()->GetCollectionID("AbsorberHitsCollection");
-    fGapHCID = G4SDManager::GetSDMpointer()->GetCollectionID("GapHitsCollection");
   }
 
   // Get hits collections
   auto absoHC = GetHitsCollection(fAbsHCID, event);
-  auto gapHC  = GetHitsCollection(fGapHCID, event);
 
   // Get primary particle information
   const G4PrimaryParticle* primary = event->GetPrimaryVertex(0)->GetPrimary();  
@@ -133,26 +131,29 @@ void EventAction::EndOfEventAction(const G4Event* event)
   analysisManager->FillNtupleIColumn(0, particleID);
   analysisManager->FillNtupleDColumn(1, energy / CLHEP::GeV);
 
-  for (int i = 0; i < absoHC->entries(); ++i) 
+  G4cout << "Total HitCollection Entries !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<< absoHC->entries() << G4endl;
+
+  for (int i = 0; i < absoHC->entries(); ++i) // 336 bar + 14 Layer + 1 Total 
   {
     auto absoperHit = (*absoHC)[i];
     if (absoperHit) {
       // Get energy deposition and layer number for this hit  Fill ntuple for each layer's energy deposit
+
+      G4cout << "id = " <<  i << " Edep " << absoperHit->GetEdep() / CLHEP::GeV << G4endl;
       analysisManager->FillNtupleDColumn(i+2, absoperHit->GetEdep() / CLHEP::GeV);     // Energy deposit in this layer
-      analysisManager->FillNtupleDColumn(i+17, absoperHit->GetTrackLength() / CLHEP::m);       // Layer number
-      // index == absoHC->entries()-1 return the total value
+      analysisManager->FillNtupleDColumn(i+353, absoperHit->GetTrackLength() / CLHEP::m);       // Layer number
     }
   }
-  // G4cout << "fInteractionDepth = " << fInteractionDepth << G4endl;
-  analysisManager->FillNtupleDColumn(32, fInteractionDepth); // First Interaction Depth
-  analysisManager->FillNtupleIColumn(33, fInteractionLayer); // First Interaction Layer
-  analysisManager->FillNtupleIColumn(34, fSecondaries);      // First Interaction No Secondaries
-  analysisManager->FillNtupleIColumn(35, fInteractionType);  // First Interaction Type
+  // // G4cout << "fInteractionDepth = " << fInteractionDepth << G4endl;
+  // analysisManager->FillNtupleDColumn(32, fInteractionDepth); // First Interaction Depth
+  // analysisManager->FillNtupleIColumn(33, fInteractionLayer); // First Interaction Layer
+  // analysisManager->FillNtupleIColumn(34, fSecondaries);      // First Interaction No Secondaries
+  // analysisManager->FillNtupleIColumn(35, fInteractionType);  // First Interaction Type
 
-  analysisManager->FillNtupleDColumn(36, fHadrInteractionDepth); // First Hadronic Interaction Depth
-  analysisManager->FillNtupleIColumn(37, fHadrInteractionLayer); // First Hadronic Interaction Layer
-  analysisManager->FillNtupleIColumn(38, fHadrSecondaries);      // First Hadronic Interaction No Secondaries
-  analysisManager->FillNtupleIColumn(39, fHadronicTag);          // First Hadronic Type
+  // analysisManager->FillNtupleDColumn(36, fHadrInteractionDepth); // First Hadronic Interaction Depth
+  // analysisManager->FillNtupleIColumn(37, fHadrInteractionLayer); // First Hadronic Interaction Layer
+  // analysisManager->FillNtupleIColumn(38, fHadrSecondaries);      // First Hadronic Interaction No Secondaries
+  // analysisManager->FillNtupleIColumn(39, fHadronicTag);          // First Hadronic Type
 
   analysisManager->AddNtupleRow();
 }

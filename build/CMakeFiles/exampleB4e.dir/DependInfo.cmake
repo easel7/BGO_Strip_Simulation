@@ -12,6 +12,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/Users/xiongzheng/software/B4/B4e/src/ActionInitialization.cc" "CMakeFiles/exampleB4e.dir/src/ActionInitialization.cc.o" "gcc" "CMakeFiles/exampleB4e.dir/src/ActionInitialization.cc.o.d"
   "/Users/xiongzheng/software/B4/B4e/src/CalorHit.cc" "CMakeFiles/exampleB4e.dir/src/CalorHit.cc.o" "gcc" "CMakeFiles/exampleB4e.dir/src/CalorHit.cc.o.d"
   "/Users/xiongzheng/software/B4/B4e/src/CalorimeterSD.cc" "CMakeFiles/exampleB4e.dir/src/CalorimeterSD.cc.o" "gcc" "CMakeFiles/exampleB4e.dir/src/CalorimeterSD.cc.o.d"
+  "/Users/xiongzheng/software/B4/B4e/src/CellParameterisation.cc" "CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.o" "gcc" "CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.o.d"
   "/Users/xiongzheng/software/B4/B4e/src/DetectorConstruction.cc" "CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.o" "gcc" "CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.o.d"
   "/Users/xiongzheng/software/B4/B4e/src/EventAction.cc" "CMakeFiles/exampleB4e.dir/src/EventAction.cc.o" "gcc" "CMakeFiles/exampleB4e.dir/src/EventAction.cc.o.d"
   "/Users/xiongzheng/software/B4/B4e/src/PrimaryGeneratorAction.cc" "CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.o" "gcc" "CMakeFiles/exampleB4e.dir/src/PrimaryGeneratorAction.cc.o.d"

@@ -29,13 +29,17 @@
 
 #include "DetectorConstruction.hh"
 
+#include "CellParameterisation.hh"
 #include "CalorimeterSD.hh"
+#include "Constants.hh"
 
 #include "G4AutoDelete.hh"
 #include "G4Box.hh"
 #include "G4Colour.hh"
 #include "G4GlobalMagFieldMessenger.hh"
 #include "G4LogicalVolume.hh"
+#include "G4PVParameterised.hh"
+#include "G4SubtractionSolid.hh"
 #include "G4Material.hh"
 #include "G4NistManager.hh"
 #include "G4PVPlacement.hh"
@@ -77,11 +81,6 @@ void DetectorConstruction::DefineMaterials()
   G4double density;
   new G4Material("liquidArgon", z = 18., a = 39.95 * g / mole, density = 1.390 * g / cm3);
   // The argon by NIST Manager is a gas with a different density
-
-  // Vacuum
-  new G4Material("Galactic", z = 1., a = 1.01 * g / mole, density = universe_mean_density,
-                 kStateGas, 2.73 * kelvin, 3.e-18 * pascal);
-
   G4Material* BGO = G4NistManager::Instance()->FindOrBuildMaterial("G4_BGO");
 
   G4cout << "Defined BGO material: " << *BGO << G4endl;
@@ -158,86 +157,25 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
                     worldLV,  // its mother  volume
                     false,  // no boolean operation
                     0,  // copy number
-                    fCheckOverlaps);  // checking overlaps
-
-  //
-  // Layer
-  //
-  auto layerS = new G4Box("Layer",  // its name
-                          calorSizeXY / 2, calorSizeXY / 2, layerThickness / 2);  // its size
-
-  auto layerLV = new G4LogicalVolume(layerS,  // its solid
-                                     defaultMaterial,  // its material
-                                     "Layer");  // its name
-
-  new G4PVReplica("Layer",  // its name
-                  layerLV,  // its logical volume
-                  calorLV,  // its mother
-                  kZAxis,  // axis of replication
-                  fNofLayers,  // number of replica
-                  layerThickness);  // witdth of replica
-
+                    fCheckOverlaps);  // checking overlap
   //
   // Absorber
   //
-  // auto absorberS = new G4Box("Abso",  // its name
-  //                            barWidth / 2, barLength / 2, barHeight / 2);  // its size
+  auto absorberS = new G4Box("Abso",  // its name
+                barSizeX / 2, barSizeY / 2, absoThickness / 2);  // its size
 
-  // auto absorberLV = new G4LogicalVolume(absorberS,  // its solid
-  //                                       absorberMaterial,  // its material
-  //                                       "AbsoLV");  // its name
+  auto absorberLV = new G4LogicalVolume(absorberS,  // its solid
+                                        absorberMaterial,  // its material
+                                        "AbsoLV");  // its name
 
-  // fAbsorberPV = new G4PVPlacement(nullptr,  // no rotation
-  //                   G4ThreeVector(0., 0., -gapThickness / 2),  // its position
-  //                   absorberLV,  // its logical volume
-  //                   "Abso",  // its name
-  //                   layerLV,  // its mother  volume
-  //                   false,  // no boolean operation
-  //                   0,  // copy number
-  //                   fCheckOverlaps);  // checking overlaps
+  G4VPVParameterisation* cellParam = new CellParameterisation();
 
-  
-  auto barX_S = new G4Box("BarX", barSizeX / 2, barSizeY / 2, absoThickness / 2);
-  auto barY_S = new G4Box("BarY", barSizeY / 2, barSizeX / 2, absoThickness / 2);
-  
-  auto barX_LV = new G4LogicalVolume(barX_S, absorberMaterial, "BarX_LV");
-  auto barY_LV = new G4LogicalVolume(barY_S, absorberMaterial, "BarY_LV");
-  
-  for (G4int layerIndex = 0; layerIndex < fNofLayers; layerIndex++) {
-      G4LogicalVolume* currentLayerLV = new G4LogicalVolume(layerS, defaultMaterial, "LayerLV");
-      G4LogicalVolume* barLV = (layerIndex % 2 == 0) ? barX_LV : barY_LV;
-  
-      new G4PVReplica("Bar", barLV, currentLayerLV, (layerIndex % 2 == 0) ? kXAxis : kYAxis, fNofBars, barSizeX);
-      
-      new G4PVPlacement(nullptr, 
-                        G4ThreeVector(0, 0, -calorThickness / 2 + (layerIndex + 0.5) * layerThickness),
-                        currentLayerLV, 
-                        "Layer", 
-                        calorLV, 
-                        false, 
-                        layerIndex, 
-                        fCheckOverlaps);
-  }
-
-  //
-  // Gap
-  //
-  auto gapS = new G4Box("Gap",  // its name
-                        calorSizeXY / 2, calorSizeXY / 2, gapThickness / 2);  // its size
-
-  auto gapLV = new G4LogicalVolume(gapS,  // its solid
-                                   gapMaterial,  // its material
-                                   "GapLV");  // its name
-
-  fGapPV = new G4PVPlacement(nullptr,  // no rotation
-                    G4ThreeVector(0., 0., absoThickness / 2),  // its position
-                    gapLV,  // its logical volume
-                    "Gap",  // its name
-                    layerLV,  // its mother  volume
-                    false,  // no boolean operation
-                    0,  // copy number
-                    fCheckOverlaps);  // checking overlaps
-
+  fAbsorberPV = new G4PVParameterised("AbsoLV",    // its name
+                                      absorberLV,  // its logical volume
+                                      calorLV, 
+                                      kXAxis, 
+                                      kNofEmCells,
+                                      cellParam);
   //
   // print parameters
   //
@@ -250,8 +188,9 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
   //
   // Visualization attributes
   //
-  worldLV->SetVisAttributes(G4VisAttributes::GetInvisible());
-  calorLV->SetVisAttributes(G4VisAttributes(G4Colour::White()));
+  worldLV->SetVisAttributes(G4VisAttributes(G4Colour::White()));
+  absorberLV->SetVisAttributes(G4VisAttributes(G4Colour::Yellow()));
+  // gapLV->SetVisAttributes(G4VisAttributes(G4Colour::Red()));
 
   //
   // Always return the physical World
@@ -268,13 +207,9 @@ void DetectorConstruction::ConstructSDandField()
   //
   // Sensitive detectors
   //
-  auto absoSD = new CalorimeterSD("AbsorberSD", "AbsorberHitsCollection", fNofLayers);
+  auto absoSD = new CalorimeterSD("AbsorberSD", "AbsorberHitsCollection", kNofEmCells);
   G4SDManager::GetSDMpointer()->AddNewDetector(absoSD);
   SetSensitiveDetector("AbsoLV", absoSD);
-
-  auto gapSD = new CalorimeterSD("GapSD", "GapHitsCollection", fNofLayers);
-  G4SDManager::GetSDMpointer()->AddNewDetector(gapSD);
-  SetSensitiveDetector("GapLV", gapSD);
 
   //
   // Magnetic field

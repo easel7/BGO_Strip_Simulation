@@ -85,12 +85,12 @@ clean: CMakeFiles/exampleB4e.dir/clean
 CMakeFiles/exampleB4e.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10 "Built target exampleB4e"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11 "Built target exampleB4e"
 .PHONY : CMakeFiles/exampleB4e.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/exampleB4e.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/xiongzheng/software/B4/B4e/build/CMakeFiles 10
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/xiongzheng/software/B4/B4e/build/CMakeFiles 11
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/exampleB4e.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/xiongzheng/software/B4/B4e/build/CMakeFiles 0
 .PHONY : CMakeFiles/exampleB4e.dir/rule
@@ -102,7 +102,7 @@ exampleB4e: CMakeFiles/exampleB4e.dir/rule
 # codegen rule for target.
 CMakeFiles/exampleB4e.dir/codegen:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/exampleB4e.dir/build.make CMakeFiles/exampleB4e.dir/codegen
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10 "Finished codegen for target exampleB4e"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/xiongzheng/software/B4/B4e/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11 "Finished codegen for target exampleB4e"
 .PHONY : CMakeFiles/exampleB4e.dir/codegen
 
 # clean rule for target.

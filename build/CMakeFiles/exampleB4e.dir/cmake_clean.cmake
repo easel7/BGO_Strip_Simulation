@@ -7,6 +7,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/exampleB4e.dir/src/CalorHit.cc.o.d"
   "CMakeFiles/exampleB4e.dir/src/CalorimeterSD.cc.o"
   "CMakeFiles/exampleB4e.dir/src/CalorimeterSD.cc.o.d"
+  "CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.o"
+  "CMakeFiles/exampleB4e.dir/src/CellParameterisation.cc.o.d"
   "CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.o"
   "CMakeFiles/exampleB4e.dir/src/DetectorConstruction.cc.o.d"
   "CMakeFiles/exampleB4e.dir/src/EventAction.cc.o"
