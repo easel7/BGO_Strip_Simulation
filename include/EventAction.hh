@@ -24,21 +24,26 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4e/include/EventAction.hh
-/// \brief Definition of the B4e::EventAction class
+/// \file B4/B4/include/EventAction.hh
+/// \brief Definition of the B4::EventAction class
 
-#ifndef B4eEventAction_h
-#define B4eEventAction_h 1
+#ifndef B4EventAction_h
+#define B4EventAction_h 1
 
 #include "G4UserEventAction.hh"
+
+#include "Constants.hh"
 
 #include "CalorHit.hh"
 
 #include "globals.hh"
 
+#include <array>
+#include <vector>
+
 class G4Event;
 
-namespace B4e
+namespace B4
 {
 
 /// Event action class
@@ -83,6 +88,13 @@ class EventAction : public G4UserEventAction
     void SetHadrTag(G4int Tag) { fHadronicTag = Tag; }
     G4int GetHadrTag() const { return fHadronicTag; }
 
+    std::vector<G4double>& GetEmCalEdep() { return fCalEdep; }
+    std::vector<G4double>& GetEmCalLeng() { return fCalLeng; }
+
+    std::vector<G4int>&    GetLayerHits() { return fLayHits; }
+    std::vector<G4double>& GetLayerEdep() { return fLayEdep; }
+    std::vector<G4double>& GetLayerLeng() { return fLayLeng; }
+
   private:
     // methods
     CalorHitsCollection* GetHitsCollection(G4int hcID, const G4Event* event) const;
@@ -104,9 +116,15 @@ class EventAction : public G4UserEventAction
     G4int fHadrSecondaries = -1;
 
     G4int fHadronicTag=-1; 
+
+    std::vector<G4double> fCalEdep{ std::vector<G4double>(kNofEmCells, 0.) };
+    std::vector<G4double> fCalLeng{ std::vector<G4double>(kNofEmCells, 0.) };
+    std::vector<G4int>    fLayHits{ std::vector<G4int>   (kNofEmLayers, 0) };
+    std::vector<G4double> fLayEdep{ std::vector<G4double>(kNofEmLayers, 0.) };
+    std::vector<G4double> fLayLeng{ std::vector<G4double>(kNofEmLayers, 0.) };
 };
 
-}  // namespace B4e
+}  // namespace B4
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

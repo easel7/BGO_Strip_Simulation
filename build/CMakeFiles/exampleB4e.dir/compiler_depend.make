@@ -2444,6 +2444,7 @@ CMakeFiles/exampleB4e.dir/src/ActionInitialization.cc.o: /Users/xiongzheng/softw
   /Library/Developer/CommandLineTools/usr/lib/clang/16/include/stdint.h \
   /Users/xiongzheng/software/B4/B4e/include/ActionInitialization.hh \
   /Users/xiongzheng/software/B4/B4e/include/CalorHit.hh \
+  /Users/xiongzheng/software/B4/B4e/include/Constants.hh \
   /Users/xiongzheng/software/B4/B4e/include/DetectorConstruction.hh \
   /Users/xiongzheng/software/B4/B4e/include/EventAction.hh \
   /Users/xiongzheng/software/B4/B4e/include/PrimaryGeneratorAction.hh \
@@ -7932,6 +7933,7 @@ CMakeFiles/exampleB4e.dir/src/EventAction.cc.o: /Users/xiongzheng/software/B4/B4
   /Library/Developer/CommandLineTools/usr/lib/clang/16/include/stddef.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/16/include/stdint.h \
   /Users/xiongzheng/software/B4/B4e/include/CalorHit.hh \
+  /Users/xiongzheng/software/B4/B4e/include/Constants.hh \
   /Users/xiongzheng/software/B4/B4e/include/EventAction.hh \
   /Users/xiongzheng/software/B4/B4e/include/RunAction.hh \
   /Users/xiongzheng/software/build/geant4-v11.3.0-install/include/Geant4/CLHEP/Geometry/BasicVector3D.h \
@@ -10484,6 +10486,7 @@ CMakeFiles/exampleB4e.dir/src/RunAction.cc.o: /Users/xiongzheng/software/B4/B4e/
   /Library/Developer/CommandLineTools/usr/lib/clang/16/include/stddef.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/16/include/stdint.h \
   /Users/xiongzheng/software/B4/B4e/include/CalorHit.hh \
+  /Users/xiongzheng/software/B4/B4e/include/Constants.hh \
   /Users/xiongzheng/software/B4/B4e/include/EventAction.hh \
   /Users/xiongzheng/software/B4/B4e/include/RunAction.hh \
   /Users/xiongzheng/software/build/geant4-v11.3.0-install/include/Geant4/CLHEP/Geometry/BasicVector3D.h \
@@ -11808,6 +11811,7 @@ CMakeFiles/exampleB4e.dir/src/SteppingAction.cc.o: /Users/xiongzheng/software/B4
   /Library/Developer/CommandLineTools/usr/lib/clang/16/include/stddef.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/16/include/stdint.h \
   /Users/xiongzheng/software/B4/B4e/include/CalorHit.hh \
+  /Users/xiongzheng/software/B4/B4e/include/Constants.hh \
   /Users/xiongzheng/software/B4/B4e/include/DetectorConstruction.hh \
   /Users/xiongzheng/software/B4/B4e/include/EventAction.hh \
   /Users/xiongzheng/software/B4/B4e/include/SteppingAction.hh \
@@ -12072,8 +12076,6 @@ CMakeFiles/exampleB4e.dir/src/SteppingAction.cc.o: /Users/xiongzheng/software/B4
 
 /Users/xiongzheng/software/build/geant4-v11.3.0-install/include/Geant4/G4BooleanSolid.hh:
 
-/Users/xiongzheng/software/B4/B4e/include/Constants.hh:
-
 /Users/xiongzheng/software/B4/B4e/src/CellParameterisation.cc:
 
 /Users/xiongzheng/software/build/geant4-v11.3.0-install/include/Geant4/G4VReadOutGeometry.hh:
@@ -12097,6 +12099,8 @@ CMakeFiles/exampleB4e.dir/src/SteppingAction.cc.o: /Users/xiongzheng/software/B4
 /Users/xiongzheng/software/B4/B4e/include/RunAction.hh:
 
 /Users/xiongzheng/software/B4/B4e/include/EventAction.hh:
+
+/Users/xiongzheng/software/B4/B4e/include/Constants.hh:
 
 /Users/xiongzheng/software/B4/B4e/include/CalorHit.hh:
 

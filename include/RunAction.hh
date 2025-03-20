@@ -24,7 +24,7 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4e/include/RunAction.hh
+/// \file B4/B4/include/RunAction.hh
 /// \brief Definition of the B4::RunAction class
 
 #ifndef B4RunAction_h
@@ -37,32 +37,19 @@ class G4Run;
 namespace B4
 {
 
-/// Run action class
-///
-/// It accumulates statistic and computes dispersion of the energy deposit
-/// and track lengths of charged particles with use of analysis tools:
-/// H1D histograms are created in BeginOfRunAction() for the following
-/// physics quantities:
-/// - Edep in absorber
-/// - Edep in gap
-/// - Track length in absorber
-/// - Track length in gap
-/// The same values are also saved in the ntuple.
-/// The histograms and ntuple are saved in the output file in a format
-/// according to a specified file extension.
-///
-/// In EndOfRunAction(), the accumulated statistic and computed
-/// dispersion is printed.
-///
+class EventAction;
 
 class RunAction : public G4UserRunAction
 {
   public:
-    RunAction();
+  RunAction(EventAction* eventAction);
     ~RunAction() override = default;
 
     void BeginOfRunAction(const G4Run*) override;
     void EndOfRunAction(const G4Run*) override;
+
+    private:
+    EventAction* fEventAction = nullptr;
 };
 
 }  // namespace B4

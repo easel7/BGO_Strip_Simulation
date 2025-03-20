@@ -34,7 +34,7 @@
 
 class G4Step;
 
-namespace B4e
+namespace B4
 {
 class DetectorConstruction;
 class EventAction;
@@ -58,7 +58,7 @@ class SteppingAction : public G4UserSteppingAction
     EventAction* fEventAction = nullptr;
 };
 
-}  // namespace B4e
+}  // namespace B4
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

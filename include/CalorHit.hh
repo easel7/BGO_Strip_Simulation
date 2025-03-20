@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4e/include/CalorHit.hh
-/// \brief Definition of the B4e::CalorHit class
+/// \file B4/B4/include/CalorHit.hh
+/// \brief Definition of the B4::CalorHit class
 
 #ifndef B4eCalorHit_h
 #define B4eCalorHit_h 1
@@ -37,7 +37,7 @@
 #include "G4VHit.hh"
 #include "globals.hh"
 
-namespace B4e
+namespace B4
 {
 
 /// Calorimeter hit class
@@ -73,7 +73,7 @@ class CalorHit : public G4VHit
   private:
     G4double fEdep = 0.;  ///< Energy deposit in the sensitive volume
     G4double fTrackLength = 0.;  ///< Track length in the  sensitive volume
-    G4int fLayerNumber = 0.;  ///< At which layer 
+
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -118,7 +118,8 @@ inline G4double CalorHit::GetTrackLength() const
   return fTrackLength;
 }
 
-}  // namespace B4e
+
+}  // namespace B4
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

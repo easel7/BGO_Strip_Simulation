@@ -40,7 +40,7 @@
 
 class G4VPhysicalVolume;
 
-namespace B4e
+namespace B4
 {
 
 /// EM Calorimeter cell parameterisation

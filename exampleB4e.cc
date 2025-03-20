@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 //
-/// \file exampleB4e.cc
-/// \brief Main program of the B4e example
+/// \file exampleB4.cc
+/// \brief Main program of the B4 example
 
 #include "ActionInitialization.hh"
 #include "DetectorConstruction.hh"
@@ -46,7 +46,7 @@ namespace
 void PrintUsage()
 {
   G4cerr << " Usage: " << G4endl;
-  G4cerr << " exampleB4e [-m macro ] [-u UIsession] [-t nThreads] [-vDefault]" << G4endl;
+  G4cerr << " exampleB4 [-m macro ] [-u UIsession] [-t nThreads] [-vDefault]" << G4endl;
   G4cerr << "   note: -t option is available only for multi-threaded mode." << G4endl;
 }
 }  // namespace
@@ -115,7 +115,7 @@ int main(int argc, char** argv)
 
   // Set mandatory initialization classes
   //
-  auto detConstruction = new B4e::DetectorConstruction();
+  auto detConstruction = new B4::DetectorConstruction();
   runManager->SetUserInitialization(detConstruction);
 
   auto physicsList = new FTFP_BERT;
@@ -125,7 +125,7 @@ int main(int argc, char** argv)
   // auto* physList = factory.GetReferencePhysList("FTFP_BERT_EMZ");
   // runManager->SetUserInitialization(physList);
 
-  auto actionInitialization = new B4e::ActionInitialization(detConstruction);
+  auto actionInitialization = new B4::ActionInitialization(detConstruction);
   runManager->SetUserInitialization(actionInitialization);
 
   // Initialize visualization

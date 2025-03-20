@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4e/src/EventAction.cc
-/// \brief Implementation of the B4e::EventAction class
+/// \file B4/B4/src/EventAction.cc
+/// \brief Implementation of the B4::EventAction class
 
 #include "EventAction.hh"
 
@@ -42,7 +42,10 @@
 #include "G4RunManager.hh"
 #include <iomanip>
 
-namespace B4e
+using std::array;
+using std::vector;
+
+namespace B4
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -86,6 +89,7 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/)
     fHadrInteractionLayer = -1;
     fHadrSecondaries = -1;
     fHadronicTag=-1; 
+    // fBars =-1;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -115,49 +119,76 @@ void EventAction::EndOfEventAction(const G4Event* event)
   G4double energy = primary->GetKineticEnergy();
   // G4cout << "!! particleName: " << particleName << " ,Kinetic Energy = " << energy << "MeV" << G4endl;
 
-  // Print per event (modulo n)
   auto eventID = event->GetEventID();
-
-  G4RunManager* rm = G4RunManager::GetRunManager(); 
-  auto printModulo = rm->GetPrintProgress();
-  
-  if ((printModulo > 0) && (eventID % printModulo == 0)) {
-    G4cout << "--> End of event: " << eventID << "\n" << G4endl;
-  }
 
   // Fill histograms, ntuple
   // get analysis manager
   auto analysisManager = G4AnalysisManager::Instance();
   analysisManager->FillNtupleIColumn(0, particleID);
   analysisManager->FillNtupleDColumn(1, energy / CLHEP::GeV);
+  analysisManager->FillNtupleDColumn(2, fInteractionDepth); // First Interaction Depth
+  analysisManager->FillNtupleIColumn(3, fInteractionLayer); // First Interaction Layer
+  analysisManager->FillNtupleIColumn(4, fSecondaries);      // First Interaction No Secondaries
+  analysisManager->FillNtupleIColumn(5, fInteractionType);  // First Interaction Type
 
-  G4cout << "Total HitCollection Entries !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<< absoHC->entries() << G4endl;
+  analysisManager->FillNtupleDColumn(6, fHadrInteractionDepth); // First Hadronic Interaction Depth
+  analysisManager->FillNtupleIColumn(7, fHadrInteractionLayer); // First Hadronic Interaction Layer
+  analysisManager->FillNtupleIColumn(8, fHadrSecondaries);      // First Hadronic Interaction No Secondaries
+  analysisManager->FillNtupleIColumn(9, fHadronicTag);          // First Hadronic Type
 
-  for (int i = 0; i < absoHC->entries(); ++i) // 336 bar + 14 Layer + 1 Total 
+  int     HitsArray[15] = {0};
+  double  EdepArray[15] = {0};
+  double  LengArray[15] = {0};
+
+  // G4cout << "Total HitCollection Entries !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<< absoHC->entries() << G4endl;
+  for (int i = 0; i < absoHC->entries() - 15 ; ++i) // 336 bar + 14 Layer + 1 Total 
   {
     auto absoperHit = (*absoHC)[i];
-    if (absoperHit) {
-      // Get energy deposition and layer number for this hit  Fill ntuple for each layer's energy deposit
-
-      G4cout << "id = " <<  i << " Edep " << absoperHit->GetEdep() / CLHEP::GeV << G4endl;
-      analysisManager->FillNtupleDColumn(i+2, absoperHit->GetEdep() / CLHEP::GeV);     // Energy deposit in this layer
-      analysisManager->FillNtupleDColumn(i+353, absoperHit->GetTrackLength() / CLHEP::m);       // Layer number
+    if (absoperHit) 
+    {
+      // G4cout << "id = " <<  i << " Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
+      fCalEdep[i] = absoperHit->GetEdep() / CLHEP::GeV;  // 给Vector赋值
+      fCalLeng[i] = absoperHit->GetTrackLength() / CLHEP::m;  // 给Vector赋值
+      if( fCalEdep[i] > 0 || fCalLeng[i] > 0)
+      {
+        HitsArray[int(i/24)] += 1;
+        EdepArray[int(i/24)] += fCalEdep[i];
+        LengArray[int(i/24)] += fCalLeng[i];
+      }
     }
   }
-  // // G4cout << "fInteractionDepth = " << fInteractionDepth << G4endl;
-  // analysisManager->FillNtupleDColumn(32, fInteractionDepth); // First Interaction Depth
-  // analysisManager->FillNtupleIColumn(33, fInteractionLayer); // First Interaction Layer
-  // analysisManager->FillNtupleIColumn(34, fSecondaries);      // First Interaction No Secondaries
-  // analysisManager->FillNtupleIColumn(35, fInteractionType);  // First Interaction Type
+  
+  for (int i = 0; i < 14; ++i) // 336 bar + 14 Layer + 1 Total 
+  {
+    auto absoperHit = (*absoHC)[absoHC->entries() - 15 + i];
+    if (absoperHit) 
+    {
+      // G4cout << "Layer = " <<  i << " Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
+      fLayEdep[i] = absoperHit->GetEdep() / CLHEP::GeV;  // 给Vector赋值
+      fLayLeng[i] = absoperHit->GetTrackLength() / CLHEP::m;  // 给Vector赋值
+      // G4cout << "Check Layer = " <<  i << " Edep " << EdepArray[i] << " GeV, Length " << LengArray[i] << " m, Fire Bars " << HitsArray[i] << G4endl;
+      HitsArray[14] += HitsArray[i];
+      EdepArray[14] += EdepArray[i];
+      LengArray[14] += LengArray[i];
+    }
+  }
+  auto absoperHit = (*absoHC)[absoHC->entries()-1];
+  // G4cout << "Total Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
+  // G4cout << "Check Total Edep " << EdepArray[14] << " GeV, Length " << LengArray[14] << " m, Fire Bars " << HitsArray[14] << G4endl;
 
-  // analysisManager->FillNtupleDColumn(36, fHadrInteractionDepth); // First Hadronic Interaction Depth
-  // analysisManager->FillNtupleIColumn(37, fHadrInteractionLayer); // First Hadronic Interaction Layer
-  // analysisManager->FillNtupleIColumn(38, fHadrSecondaries);      // First Hadronic Interaction No Secondaries
-  // analysisManager->FillNtupleIColumn(39, fHadronicTag);          // First Hadronic Type
-
+  analysisManager->FillNtupleIColumn(15, HitsArray[14]); 
+  analysisManager->FillNtupleDColumn(16, EdepArray[14]);      
+  analysisManager->FillNtupleDColumn(17, LengArray[14]);          
   analysisManager->AddNtupleRow();
+
+  // Print per event (modulo n)
+  G4RunManager* rm = G4RunManager::GetRunManager(); 
+  auto printModulo = rm->GetPrintProgress();
+  if ((printModulo > 0) && (eventID % printModulo == 0)) {
+    G4cout << "--> End of event: " << eventID << "\n" << G4endl;
+  }
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-}  // namespace B4e
+}  // namespace B4

@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4e/src/DetectorConstruction.cc
-/// \brief Implementation of the B4e::DetectorConstruction class
+/// \file B4/B4/src/DetectorConstruction.cc
+/// \brief Implementation of the B4::DetectorConstruction class
 
 #include "DetectorConstruction.hh"
 
@@ -49,7 +49,7 @@
 #include "G4SystemOfUnits.hh"
 #include "G4VisAttributes.hh"
 
-namespace B4e
+namespace B4
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -229,4 +229,4 @@ void DetectorConstruction::ConstructSDandField()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-}  // namespace B4e
+}  // namespace B4

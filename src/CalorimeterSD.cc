@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4e/src/CalorimeterSD.cc
-/// \brief Implementation of the B4e::CalorimeterSD class
+/// \file B4/B4/src/CalorimeterSD.cc
+/// \brief Implementation of the B4::CalorimeterSD class
 
 #include "CalorimeterSD.hh"
 
@@ -33,7 +33,7 @@
 #include "G4SDManager.hh"
 #include "G4Step.hh"
 
-namespace B4e
+namespace B4
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -71,12 +71,12 @@ G4bool CalorimeterSD::ProcessHits(G4Step* step, G4TouchableHistory*)
 
   // step length
   G4double stepLength = 0.;
+  G4int fireTag = 0;
+
   if (step->GetTrack()->GetDefinition()->GetPDGCharge() != 0.) {
     stepLength = step->GetStepLength();
   }
-
   if (edep == 0. && stepLength == 0.) return false;
-
   auto touchable = (step->GetPreStepPoint()->GetTouchable());
 
   // Get calorimeter cell id
@@ -89,9 +89,10 @@ G4bool CalorimeterSD::ProcessHits(G4Step* step, G4TouchableHistory*)
     msg << "Cannot access hit " << cellID;
     G4Exception("CalorimeterSD::ProcessHits()", "MyCode0004", FatalException, msg);
   }
-
+    // Add values
+  hit->Add(edep, stepLength); 
   // Get hit for total accounting
-  auto hitTotal = (*fHitsCollection)[fHitsCollection->entries() - 1];
+  auto hitTotal = (*fHitsCollection)[fHitsCollection->entries() - 1];   hitTotal->Add(edep, stepLength);
   // Get hit for total accounting
   auto hitLayer0  = (*fHitsCollection)[fHitsCollection->entries() - 15]; if(cellID / 24 ==0  ) {hitLayer0 ->Add(edep, stepLength); }
   auto hitLayer1  = (*fHitsCollection)[fHitsCollection->entries() - 14]; if(cellID / 24 ==1  ) {hitLayer1 ->Add(edep, stepLength); }
@@ -108,9 +109,6 @@ G4bool CalorimeterSD::ProcessHits(G4Step* step, G4TouchableHistory*)
   auto hitLayer12 = (*fHitsCollection)[fHitsCollection->entries() -  3]; if(cellID / 24 ==12 ) {hitLayer12->Add(edep, stepLength); }
   auto hitLayer13 = (*fHitsCollection)[fHitsCollection->entries() -  2]; if(cellID / 24 ==13 ) {hitLayer13->Add(edep, stepLength); }
 
-  // Add values
-  hit->Add(edep, stepLength);
-  hitTotal->Add(edep, stepLength);
   return true;
 }
 
@@ -129,4 +127,4 @@ void CalorimeterSD::EndOfEvent(G4HCofThisEvent*)
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-}  // namespace B4e
+}  // namespace B4

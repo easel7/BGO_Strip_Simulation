@@ -35,7 +35,7 @@
 #include "G4ThreeVector.hh"
 #include "G4VPhysicalVolume.hh"
 
-namespace B4e
+namespace B4
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

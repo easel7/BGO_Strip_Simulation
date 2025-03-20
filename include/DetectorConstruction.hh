@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4e/include/DetectorConstruction.hh
-/// \brief Definition of the B4e::DetectorConstruction class
+/// \file B4/B4/include/DetectorConstruction.hh
+/// \brief Definition of the B4::DetectorConstruction class
 
 #ifndef B4eDetectorConstruction_h
 #define B4eDetectorConstruction_h 1
@@ -38,7 +38,7 @@
 class G4VPhysicalVolume;
 class G4GlobalMagFieldMessenger;
 
-namespace B4e
+namespace B4
 {
 
 /// Detector construction class to define materials and geometry.
@@ -108,7 +108,7 @@ inline const G4VPhysicalVolume* DetectorConstruction::GetGapPV() const
   return fGapPV;
 }
 
-}  // namespace B4e
+}  // namespace B4
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 

@@ -32,7 +32,7 @@
 
 #include "globals.hh"
 
-namespace B4e
+namespace B4
 {
 
 constexpr G4int kNofEmColumns = 24;

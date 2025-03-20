@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4e/src/CalorHit.cc
-/// \brief Implementation of the B4e::CalorHit class
+/// \file B4/B4/src/CalorHit.cc
+/// \brief Implementation of the B4::CalorHit class
 
 #include "CalorHit.hh"
 
@@ -33,7 +33,7 @@
 
 #include <iomanip>
 
-namespace B4e
+namespace B4
 {
 
 G4ThreadLocal G4Allocator<CalorHit>* CalorHitAllocator = nullptr;
@@ -55,4 +55,4 @@ void CalorHit::Print()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-}  // namespace B4e
+}  // namespace B4

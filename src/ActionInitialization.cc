@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4e/src/ActionInitialization.cc
-/// \brief Implementation of the B4e::ActionInitialization class
+/// \file B4/B4/src/ActionInitialization.cc
+/// \brief Implementation of the B4::ActionInitialization class
 
 #include "ActionInitialization.hh"
 #include "DetectorConstruction.hh"
@@ -36,7 +36,7 @@
 
 using namespace B4;
 
-namespace B4e
+namespace B4
 {
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -49,7 +49,9 @@ ActionInitialization::ActionInitialization(DetectorConstruction* detConstruction
 
 void ActionInitialization::BuildForMaster() const
 {
-  SetUserAction(new RunAction);
+
+  auto eventAction = new EventAction;
+  SetUserAction(new RunAction(eventAction));
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -57,12 +59,13 @@ void ActionInitialization::BuildForMaster() const
 void ActionInitialization::Build() const
 {
   SetUserAction(new PrimaryGeneratorAction);
-  SetUserAction(new RunAction);
   auto eventAction = new EventAction;
   SetUserAction(eventAction);
+
+  SetUserAction(new RunAction(eventAction));
   SetUserAction(new SteppingAction(fDetConstruction, eventAction));
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-}  // namespace B4e
+}  // namespace B4

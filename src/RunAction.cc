@@ -24,7 +24,7 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4e/src/RunAction.cc
+/// \file B4/B4/src/RunAction.cc
 /// \brief Implementation of the B4::RunAction class
 
 #include "RunAction.hh"
@@ -41,7 +41,7 @@ namespace B4
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-RunAction::RunAction()
+RunAction::RunAction(B4::EventAction* eventAction) : fEventAction(eventAction)
 { // Default filename
   // set printing event number per each event
   G4RunManager::GetRunManager()->SetPrintProgress(1);
@@ -51,80 +51,34 @@ RunAction::RunAction()
   // file extension.
   auto analysisManager = G4AnalysisManager::Instance();
   analysisManager->SetDefaultFileType("root");
-  // Create directories
-  // analysisManager->SetHistoDirectoryName("histograms");
-  // analysisManager->SetNtupleDirectoryName("ntuple");
   analysisManager->SetVerboseLevel(1);
   analysisManager->SetNtupleMerging(true);
   analysisManager->SetFileName("B4");
-  // Note: merging ntuples is available only with Root output
+  // Creating 2D histograms
+  analysisManager->CreateH2("Chamber1 XY", "Drift Chamber 1 X vs Z",  50, -1000., 1000, 50, -300., 300.);
+  analysisManager->CreateH2("Chamber2 XY", "Drift Chamber 2 Y vs Z",  50, -1500., 1500, 50, -300., 300.);
   analysisManager->CreateNtuple("B4", "Edep and TrackL");
   analysisManager->CreateNtupleIColumn("Particle");
   analysisManager->CreateNtupleDColumn("Energy"); // (MeV)
-  for(int ii = 0; ii < 14; ii++)
-  {
-      for(int jj = 0 ; jj <24 ; jj++)
-      {
-          analysisManager->CreateNtupleDColumn(Form("L%d_B%d_E",ii,jj));
-      }
-  }
-  for(int ii = 0; ii < 14; ii++)
-  {
-    analysisManager->CreateNtupleDColumn(Form("L%d_E",ii));
-  }
-  analysisManager->CreateNtupleDColumn("Total_E");
-  for(int ii = 0; ii < 14; ii++)
-  {
-      for(int jj = 0 ; jj <24 ; jj++)
-      {
-          analysisManager->CreateNtupleDColumn(Form("L%d_B%d_L",ii,jj));
-      }
-  }
-  for(int ii = 0; ii < 14; ii++)
-  {
-    analysisManager->CreateNtupleDColumn(Form("L%d_L",ii));
-  }
-  analysisManager->CreateNtupleDColumn("Total_L");
-  
-  // 
-  // analysisManager->CreateNtupleDColumn("L1_E");
-  // analysisManager->CreateNtupleDColumn("L2_E");
-  // analysisManager->CreateNtupleDColumn("L3_E");
-  // analysisManager->CreateNtupleDColumn("L4_E");
-  // analysisManager->CreateNtupleDColumn("L5_E");
-  // analysisManager->CreateNtupleDColumn("L6_E");
-  // analysisManager->CreateNtupleDColumn("L7_E");
-  // analysisManager->CreateNtupleDColumn("L8_E");
-  // analysisManager->CreateNtupleDColumn("L9_E");
-  // analysisManager->CreateNtupleDColumn("L10_E");
-  // analysisManager->CreateNtupleDColumn("L11_E");
-  // analysisManager->CreateNtupleDColumn("L12_E");
-  // analysisManager->CreateNtupleDColumn("L13_E");
-  // analysisManager->CreateNtupleDColumn("Total_E");
-  // analysisManager->CreateNtupleDColumn("L0_L"); 
-  // analysisManager->CreateNtupleDColumn("L1_L");
-  // analysisManager->CreateNtupleDColumn("L2_L");
-  // analysisManager->CreateNtupleDColumn("L3_L");
-  // analysisManager->CreateNtupleDColumn("L4_L");
-  // analysisManager->CreateNtupleDColumn("L5_L");
-  // analysisManager->CreateNtupleDColumn("L6_L");
-  // analysisManager->CreateNtupleDColumn("L7_L");
-  // analysisManager->CreateNtupleDColumn("L8_L");
-  // analysisManager->CreateNtupleDColumn("L9_L");
-  // analysisManager->CreateNtupleDColumn("L10_L");
-  // analysisManager->CreateNtupleDColumn("L11_L");
-  // analysisManager->CreateNtupleDColumn("L12_L");
-  // analysisManager->CreateNtupleDColumn("L13_L");
-  // analysisManager->CreateNtupleDColumn("Total_L");
-  // analysisManager->CreateNtupleDColumn("First_Depth"); // Depth ()
-  // analysisManager->CreateNtupleIColumn("First_Layer"); // Layer (0,1,2...)
-  // analysisManager->CreateNtupleIColumn("First_Second"); // Number of Secondaries
-  // analysisManager->CreateNtupleIColumn("First_Type"); // Type (0-EM, 1-HD, 2-Others)
-  // analysisManager->CreateNtupleDColumn("First_Had_Depth"); // Depth ()
-  // analysisManager->CreateNtupleIColumn("First_Had_Layer"); // Layer (0,1,2...)
-  // analysisManager->CreateNtupleIColumn("First_Had_Second");  // Number of Secondaries
-  // analysisManager->CreateNtupleIColumn("First_Had_Type");    // -1 initial; 0 exclude Inelasitc ; 1 -Inelastic 
+  analysisManager->CreateNtupleDColumn("First_Depth"); // Depth ()
+  analysisManager->CreateNtupleIColumn("First_Layer"); // Layer (0,1,2...)
+  analysisManager->CreateNtupleIColumn("First_Second"); // Number of Secondaries
+  analysisManager->CreateNtupleIColumn("First_Type"); // Type (0-EM, 1-HD, 2-Others)
+  analysisManager->CreateNtupleDColumn("First_Had_Depth"); // Depth ()
+  analysisManager->CreateNtupleIColumn("First_Had_Layer"); // Layer (0,1,2...)
+  analysisManager->CreateNtupleIColumn("First_Had_Second");  // Number of Secondaries
+  analysisManager->CreateNtupleIColumn("First_Had_Type");    // -1 initial; 0 exclude Inelasitc ; 1 -Inelastic 
 
+  analysisManager->CreateNtupleIColumn("LayerHitsVector"  , fEventAction->GetLayerHits()); 
+  analysisManager->CreateNtupleDColumn("LayerEnergyVector", fEventAction->GetLayerEdep());
+  analysisManager->CreateNtupleDColumn("LayerLengthVector", fEventAction->GetLayerLeng());
+
+  analysisManager->CreateNtupleDColumn("BarEnergyVector", fEventAction->GetEmCalEdep());
+  analysisManager->CreateNtupleDColumn("BarLengthVector", fEventAction->GetEmCalLeng());
+
+  analysisManager->CreateNtupleIColumn("Nhits");
+  analysisManager->CreateNtupleDColumn("Total_E");
+  analysisManager->CreateNtupleDColumn("Total_L");
   analysisManager->FinishNtuple();
 }
 

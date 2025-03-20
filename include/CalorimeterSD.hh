@@ -24,8 +24,8 @@
 // ********************************************************************
 //
 //
-/// \file B4/B4e/include/CalorimeterSD.hh
-/// \brief Definition of the B4e::CalorimeterSD class
+/// \file B4/B4/include/CalorimeterSD.hh
+/// \brief Definition of the B4::CalorimeterSD class
 
 #ifndef B4eCalorimeterSD_h
 #define B4eCalorimeterSD_h 1
@@ -39,7 +39,7 @@ class G4Step;
 class G4HCofThisEvent;
 class G4TouchableHistory;
 
-namespace B4e
+namespace B4
 {
 
 /// Calorimeter sensitive detector class
@@ -66,7 +66,7 @@ class CalorimeterSD : public G4VSensitiveDetector
     G4int fNofCells = 0;
 };
 
-}  // namespace B4e
+}  // namespace B4
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
