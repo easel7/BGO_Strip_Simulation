@@ -55,8 +55,8 @@ RunAction::RunAction(B4::EventAction* eventAction) : fEventAction(eventAction)
   analysisManager->SetNtupleMerging(true);
   analysisManager->SetFileName("B4");
   // Creating 2D histograms
-  analysisManager->CreateH2("Chamber1 XY", "Drift Chamber 1 X vs Z",  50, -1000., 1000, 50, -300., 300.);
-  analysisManager->CreateH2("Chamber2 XY", "Drift Chamber 2 Y vs Z",  50, -1500., 1500, 50, -300., 300.);
+  // analysisManager->CreateH2("Chamber1 XY", "Drift Chamber 1 X vs Z",  50, -1000., 1000, 50, -300., 300.);
+  // analysisManager->CreateH2("Chamber2 XY", "Drift Chamber 2 Y vs Z",  50, -1500., 1500, 50, -300., 300.);
   analysisManager->CreateNtuple("B4", "Edep and TrackL");
   analysisManager->CreateNtupleIColumn("Particle");
   analysisManager->CreateNtupleDColumn("Energy"); // (MeV)

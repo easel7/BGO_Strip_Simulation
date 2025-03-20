@@ -18,6 +18,7 @@
 # electron 300 MeV in direction (0.,0.,1.)
 # 10000 events
 #
+/analysis/setFileName Test
 /gps/particle proton
 /gps/ene/type Pow
 /gps/ene/min 10 GeV
