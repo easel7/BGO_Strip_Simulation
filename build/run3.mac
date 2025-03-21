@@ -19,11 +19,8 @@
 # 10000 events
 #
 /analysis/setFileName Test
-/gps/particle proton
-/gps/ene/type Pow
-/gps/ene/min 10 GeV
-/gps/ene/max 1000 GeV
-/gps/ene/alpha -2.7
+/gps/ene/type Mono
+/gps/ene/mono 100 GeV
 
 /gps/pos/type Plane
 /gps/pos/shape Square
@@ -34,4 +31,4 @@
 /gps/direction 0 0 1
 
 /run/printProgress 1000
-/run/beamOn 1
+/run/beamOn 100

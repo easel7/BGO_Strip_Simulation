@@ -55,8 +55,7 @@ RunAction::RunAction(B4::EventAction* eventAction) : fEventAction(eventAction)
   analysisManager->SetNtupleMerging(true);
   analysisManager->SetFileName("B4");
   // Creating 2D histograms
-  // analysisManager->CreateH2("Chamber1 XY", "Drift Chamber 1 X vs Z",  50, -1000., 1000, 50, -300., 300.);
-  // analysisManager->CreateH2("Chamber2 XY", "Drift Chamber 2 Y vs Z",  50, -1500., 1500, 50, -300., 300.);
+
   analysisManager->CreateNtuple("B4", "Edep and TrackL");
   analysisManager->CreateNtupleIColumn("Particle");
   analysisManager->CreateNtupleDColumn("Energy"); // (MeV)
@@ -68,14 +67,14 @@ RunAction::RunAction(B4::EventAction* eventAction) : fEventAction(eventAction)
   analysisManager->CreateNtupleIColumn("First_Had_Layer"); // Layer (0,1,2...)
   analysisManager->CreateNtupleIColumn("First_Had_Second");  // Number of Secondaries
   analysisManager->CreateNtupleIColumn("First_Had_Type");    // -1 initial; 0 exclude Inelasitc ; 1 -Inelastic 
-
-  analysisManager->CreateNtupleIColumn("LayerHitsVector"  , fEventAction->GetLayerHits()); 
-  analysisManager->CreateNtupleDColumn("LayerEnergyVector", fEventAction->GetLayerEdep());
-  analysisManager->CreateNtupleDColumn("LayerLengthVector", fEventAction->GetLayerLeng());
-
-  analysisManager->CreateNtupleDColumn("BarEnergyVector", fEventAction->GetEmCalEdep());
-  analysisManager->CreateNtupleDColumn("BarLengthVector", fEventAction->GetEmCalLeng());
-
+  // Creating ntuple
+  if (fEventAction) {
+    analysisManager->CreateNtupleIColumn("LayerHitsVector"  , fEventAction->GetLayerHits()); 
+    analysisManager->CreateNtupleDColumn("LayerEnergyVector", fEventAction->GetLayerEdep());
+    analysisManager->CreateNtupleDColumn("LayerLengthVector", fEventAction->GetLayerLeng());
+    analysisManager->CreateNtupleDColumn("BarEnergyVector", fEventAction->GetEmCalEdep());
+    analysisManager->CreateNtupleDColumn("BarLengthVector", fEventAction->GetEmCalLeng());
+  }
   analysisManager->CreateNtupleIColumn("Nhits");
   analysisManager->CreateNtupleDColumn("Total_E");
   analysisManager->CreateNtupleDColumn("Total_L");

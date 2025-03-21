@@ -89,7 +89,12 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/)
     fHadrInteractionLayer = -1;
     fHadrSecondaries = -1;
     fHadronicTag=-1; 
-    // fBars =-1;
+
+    fCalEdep.assign(kNofEmCells, 0.0);
+    fCalLeng.assign(kNofEmCells, 0.0);
+    fLayHits.assign(kNofEmLayers, 0);
+    fLayEdep.assign(kNofEmLayers, 0.0);
+    fLayLeng.assign(kNofEmLayers, 0.0);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -172,14 +177,20 @@ void EventAction::EndOfEventAction(const G4Event* event)
       LengArray[14] += LengArray[i];
     }
   }
-  auto absoperHit = (*absoHC)[absoHC->entries()-1];
-  // G4cout << "Total Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
+  // auto absoperHit = (*absoHC)[absoHC->entries()-1];
+  // G4cout << "Total Edep " << absoperHit->GetEdep() / CLHEP::Ge << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
   // G4cout << "Check Total Edep " << EdepArray[14] << " GeV, Length " << LengArray[14] << " m, Fire Bars " << HitsArray[14] << G4endl;
+  // analysisManager->FillNtupleDColumn(10, fCalEdep);
+  // analysisManager->FillNtupleDColumn(11, fCalLeng);
+  // analysisManager->FillNtupleIColumn(12, fLayHits);
+  // analysisManager->FillNtupleDColumn(13, fLayEdep);
+  // analysisManager->FillNtupleDColumn(14, fLayLeng);
 
   analysisManager->FillNtupleIColumn(15, HitsArray[14]); 
   analysisManager->FillNtupleDColumn(16, EdepArray[14]);      
   analysisManager->FillNtupleDColumn(17, LengArray[14]);          
   analysisManager->AddNtupleRow();
+
 
   // Print per event (modulo n)
   G4RunManager* rm = G4RunManager::GetRunManager(); 

@@ -90,7 +90,6 @@ class EventAction : public G4UserEventAction
 
     std::vector<G4double>& GetEmCalEdep() { return fCalEdep; }
     std::vector<G4double>& GetEmCalLeng() { return fCalLeng; }
-
     std::vector<G4int>&    GetLayerHits() { return fLayHits; }
     std::vector<G4double>& GetLayerEdep() { return fLayEdep; }
     std::vector<G4double>& GetLayerLeng() { return fLayLeng; }
