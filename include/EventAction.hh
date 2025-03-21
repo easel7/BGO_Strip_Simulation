@@ -38,7 +38,6 @@
 
 #include "globals.hh"
 
-#include <array>
 #include <vector>
 
 class G4Event;
@@ -55,7 +54,7 @@ namespace B4
 class EventAction : public G4UserEventAction
 {
   public:
-    EventAction() = default;
+    EventAction();
     ~EventAction() override = default;
 
     void BeginOfEventAction(const G4Event* event) override;
@@ -97,9 +96,6 @@ class EventAction : public G4UserEventAction
   private:
     // methods
     CalorHitsCollection* GetHitsCollection(G4int hcID, const G4Event* event) const;
-    void PrintEventStatistics(G4double absoEdep, G4double absoTrackLength, G4double gapEdep,
-                              G4double gapTrackLength) const;
-
     // data members
     G4int fAbsHCID = -1;
     G4int fGapHCID = -1;
@@ -118,6 +114,7 @@ class EventAction : public G4UserEventAction
 
     std::vector<G4double> fCalEdep{ std::vector<G4double>(kNofEmCells, 0.) };
     std::vector<G4double> fCalLeng{ std::vector<G4double>(kNofEmCells, 0.) };
+    
     std::vector<G4int>    fLayHits{ std::vector<G4int>   (kNofEmLayers, 0) };
     std::vector<G4double> fLayEdep{ std::vector<G4double>(kNofEmLayers, 0.) };
     std::vector<G4double> fLayLeng{ std::vector<G4double>(kNofEmLayers, 0.) };

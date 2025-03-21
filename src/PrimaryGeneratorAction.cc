@@ -53,11 +53,8 @@ PrimaryGeneratorAction::PrimaryGeneratorAction()
 {
   G4int nofParticles = 1;
   fparticleSource = new G4GeneralParticleSource();
-  // default particle kinematic
   auto particleDefinition = G4ParticleTable::GetParticleTable()->FindParticle("proton");
   fparticleSource->SetParticleDefinition(particleDefinition);
-  // fparticleSource->SetEneDepositionType(G4ThreeVector(0., 0., 1.));  // 设置方向
-  // fparticleSource->SetMonoEnergy(20 * GeV);  // 设定单一能量
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -71,12 +68,6 @@ PrimaryGeneratorAction::~PrimaryGeneratorAction()
 
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
 {
-  // This function is called at the begining of event
-
-  // In order to avoid dependence of PrimaryGeneratorAction
-  // on DetectorConstruction class we get world volume
-  // from G4LogicalVolumeStore
-  //
   G4double worldZHalfLength = 0.;
   auto worldLV = G4LogicalVolumeStore::GetInstance()->GetVolume("World");
 
@@ -97,15 +88,6 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
     G4Exception("PrimaryGeneratorAction::GeneratePrimaries()", "MyCode0002", JustWarning, msg);
   }
 
-  // Set gun position
-  // G4double x = G4UniformRand() * 10.0 * cm;  // Ramdom X Coordinate
-  // G4double y = G4UniformRand() * 10.0 * cm;  // Ramdom Y Coordinate
-  // fparticleSource->SetParticlePosition(G4ThreeVector(x, y, -worldZHalfLength));
-  // Randomize the energy between 100 MeV and 500 MeV
-  // G4double energy =  G4UniformRand() * (100 * GeV - 10 * GeV) + 10 * GeV;
-  // G4double energy =  200 * GeV;
-  // fparticleSource->SetParticleEnergy(energy);
-  // G4cout<< "Watch out !!! energy" << energy << G4endl;
   fparticleSource->GeneratePrimaryVertex(event);
 }
 

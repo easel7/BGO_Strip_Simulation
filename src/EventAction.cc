@@ -42,7 +42,6 @@
 #include "G4RunManager.hh"
 #include <iomanip>
 
-using std::array;
 using std::vector;
 
 namespace B4
@@ -65,15 +64,10 @@ CalorHitsCollection* EventAction::GetHitsCollection(G4int hcID, const G4Event* e
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void EventAction::PrintEventStatistics(G4double absoEdep, G4double absoTrackLength,
-                                       G4double gapEdep, G4double gapTrackLength) const
+EventAction::EventAction()
 {
-  // print event statistics
-  G4cout << "   Absorber: total energy: " << std::setw(7) << G4BestUnit(absoEdep, "Energy")
-         << "       total track length: " << std::setw(7) << G4BestUnit(absoTrackLength, "Length")
-         << G4endl << "        Gap: total energy: " << std::setw(7) << G4BestUnit(gapEdep, "Energy")
-         << "       total track length: " << std::setw(7) << G4BestUnit(gapTrackLength, "Length")
-         << G4endl;
+  // set printing per each event
+  G4RunManager::GetRunManager()->SetPrintProgress(1);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -90,11 +84,6 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/)
     fHadrSecondaries = -1;
     fHadronicTag=-1; 
 
-    fCalEdep.assign(kNofEmCells, 0.0);
-    fCalLeng.assign(kNofEmCells, 0.0);
-    fLayHits.assign(kNofEmLayers, 0);
-    fLayEdep.assign(kNofEmLayers, 0.0);
-    fLayLeng.assign(kNofEmLayers, 0.0);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -180,11 +169,6 @@ void EventAction::EndOfEventAction(const G4Event* event)
   // auto absoperHit = (*absoHC)[absoHC->entries()-1];
   // G4cout << "Total Edep " << absoperHit->GetEdep() / CLHEP::Ge << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
   // G4cout << "Check Total Edep " << EdepArray[14] << " GeV, Length " << LengArray[14] << " m, Fire Bars " << HitsArray[14] << G4endl;
-  // analysisManager->FillNtupleDColumn(10, fCalEdep);
-  // analysisManager->FillNtupleDColumn(11, fCalLeng);
-  // analysisManager->FillNtupleIColumn(12, fLayHits);
-  // analysisManager->FillNtupleDColumn(13, fLayEdep);
-  // analysisManager->FillNtupleDColumn(14, fLayLeng);
 
   analysisManager->FillNtupleIColumn(15, HitsArray[14]); 
   analysisManager->FillNtupleDColumn(16, EdepArray[14]);      

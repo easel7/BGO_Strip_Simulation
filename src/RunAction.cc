@@ -42,20 +42,12 @@ namespace B4
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 RunAction::RunAction(B4::EventAction* eventAction) : fEventAction(eventAction)
-{ // Default filename
-  // set printing event number per each event
-  G4RunManager::GetRunManager()->SetPrintProgress(1);
-
-  // Create analysis manager
-  // The choice of the output format is done via the specified
-  // file extension.
+{ 
   auto analysisManager = G4AnalysisManager::Instance();
   analysisManager->SetDefaultFileType("root");
   analysisManager->SetVerboseLevel(1);
   analysisManager->SetNtupleMerging(true);
   analysisManager->SetFileName("B4");
-  // Creating 2D histograms
-
   analysisManager->CreateNtuple("B4", "Edep and TrackL");
   analysisManager->CreateNtupleIColumn("Particle");
   analysisManager->CreateNtupleDColumn("Energy"); // (MeV)
@@ -67,7 +59,6 @@ RunAction::RunAction(B4::EventAction* eventAction) : fEventAction(eventAction)
   analysisManager->CreateNtupleIColumn("First_Had_Layer"); // Layer (0,1,2...)
   analysisManager->CreateNtupleIColumn("First_Had_Second");  // Number of Secondaries
   analysisManager->CreateNtupleIColumn("First_Had_Type");    // -1 initial; 0 exclude Inelasitc ; 1 -Inelastic 
-  // Creating ntuple
   if (fEventAction) {
     analysisManager->CreateNtupleIColumn("LayerHitsVector"  , fEventAction->GetLayerHits()); 
     analysisManager->CreateNtupleDColumn("LayerEnergyVector", fEventAction->GetLayerEdep());
@@ -85,12 +76,10 @@ RunAction::RunAction(B4::EventAction* eventAction) : fEventAction(eventAction)
 
 void RunAction::BeginOfRunAction(const G4Run* /*run*/)
 {
-  // inform the runManager to save random number seed
-  // G4RunManager::GetRunManager()->SetRandomNumberStore(true);
+
   auto analysisManager = G4AnalysisManager::Instance();
   // Reset histograms from previous run
-  // analysisManager->Reset();
-  // Open an output file
+  analysisManager->Reset();
   analysisManager->OpenFile();
 }
 
