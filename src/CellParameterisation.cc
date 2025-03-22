@@ -37,6 +37,8 @@
 
 namespace B4
 {
+// 初始化静态旋转矩阵
+G4RotationMatrix CellParameterisation::fRotation90 = G4RotationMatrix();
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -61,6 +63,9 @@ CellParameterisation::CellParameterisation()
       fZCell[copyNo] = (iz - 6)  * 2.55 * cm - 1.30 * cm;
     }
   }
+
+    // 预先初始化旋转矩阵，只执行一次
+    fRotation90.rotateZ(90 * deg);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -68,21 +73,21 @@ CellParameterisation::CellParameterisation()
 void CellParameterisation::ComputeTransformation(const G4int copyNo,
                                                  G4VPhysicalVolume* physVol) const
 {
-  
-  G4int iz = copyNo / (kNofEmRows * kNofEmColumns); // 计算层编号
-  G4ThreeVector position = G4ThreeVector(fXCell[copyNo], fYCell[copyNo], fZCell[copyNo]);
+  G4int iz = copyNo / (kNofEmRows * kNofEmColumns);
+  G4ThreeVector position(fXCell[copyNo], fYCell[copyNo], fZCell[copyNo]);
 
-  // 创建旋转矩阵
-  G4RotationMatrix* rotation = nullptr;
-
-  if (iz % 2 == 1) { // 如果 iz 是奇数
-      rotation = new G4RotationMatrix();  
-      rotation->rotateZ(90 * deg); // 绕 Z 轴旋转 90°
-  }
+    // 直接使用静态成员变量，避免动态分配
+    if (iz % 2 == 1) 
+    {
+        physVol->SetRotation(&fRotation90);
+    }
+    else 
+    {
+        physVol->SetRotation(nullptr); 
+    }
 
   // 设置变换
   physVol->SetTranslation(position);
-  physVol->SetRotation(rotation);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

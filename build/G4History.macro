@@ -47,21 +47,3 @@
 /gui/addButton viewer "Flush viewer (= refresh + update)" "/vis/viewer/flush"
 /gui/addButton viewer "Update scene" "/vis/scene/notifyHandlers"
 /run/printProgress 100
-/run/initialize
-/vis/scene/notifyHandlers scene-0
-/gps/particle proton
-/gps/ene/type Pow
-/gps/ene/min 10 GeV
-/gps/ene/max 1000 GeV
-/gps/ene/alpha -2.7
-/gps/pos/type Plane
-/gps/pos/shape Square
-/gps/pos/halfx 10 cm
-/gps/pos/halfy 10 cm
-/gps/pos/centre 0. 0. -214.2 mm
-/gps/direction 0 0 1
-/run/printProgress 1000
-/run/beamOn 1
-/vis/scene/notifyHandlers scene-0
-/analysis/h1/getVector
-/analysis/h2/getVector

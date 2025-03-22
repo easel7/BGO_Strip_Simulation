@@ -57,6 +57,8 @@ class CellParameterisation : public G4VPVParameterisation
     std::array<G4double, kNofEmCells> fXCell;
     std::array<G4double, kNofEmCells> fYCell;
     std::array<G4double, kNofEmCells> fZCell;
+
+    static G4RotationMatrix fRotation90;  ///< 静态旋转矩阵，避免动态分配
 };
 
 }  // namespace B4
