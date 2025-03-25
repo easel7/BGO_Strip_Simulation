@@ -3,7 +3,7 @@
 /gps/particle deuteron
 /gps/ene/type Pow
 /gps/ene/min 10 GeV
-/gps/ene/max 4000 GeV
+/gps/ene/max 10 TeV
 /gps/ene/alpha -1
 
 /gps/pos/type Plane
@@ -15,5 +15,5 @@
 /gps/direction 0 0 1
 
 /run/printProgress 1000
-/run/beamOn 1000000
+/run/beamOn 400000
 

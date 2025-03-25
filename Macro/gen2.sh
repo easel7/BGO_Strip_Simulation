@@ -1,6 +1,6 @@
 #!/bin/bash
-Tag=(Gamma) #Proton Deuteron Electron Helium4 Helium3
-particle=(gamma) # proton deuteron e- alpha He3
+Tag=(Proton Deuteron Electron Helium4 Helium3 Gamma) #
+particle=(proton deuteron e- alpha He3 gamma) # 
 
 for i in "${!Tag[@]}"; do
   # Generate the corresponding macro file for the current particle
@@ -22,7 +22,7 @@ for i in "${!Tag[@]}"; do
 /gps/direction 0 0 1
 
 /run/printProgress 1000
-/run/beamOn 1000000
+/run/beamOn 400000
 
 EOL
 done

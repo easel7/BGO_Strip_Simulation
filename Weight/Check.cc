@@ -56,8 +56,6 @@ void Check()
     gPad->SetLogy();
     gStyle->SetOptStat(0);
 
-
-
     h1_w->Draw();
     auto tf1 = new TF1("tf1","[0]*TMath::Power(pow(10,x), [1])",1,3.5);
     h1_w->Fit(tf1,"R");
