@@ -133,6 +133,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
   int     HitsArray[15] = {0};
   double  EdepArray[15] = {0};
   double  LengArray[15] = {0};
+  double  Xw[14]        = {0};
+  double  Xw2[14]       = {0};
 
   // G4cout << "Total HitCollection Entries !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<< absoHC->entries() << G4endl;
   for (int i = 0; i < absoHC->entries() - 15 ; ++i) // 336 bar + 14 Layer + 1 Total 
@@ -145,41 +147,50 @@ void EventAction::EndOfEventAction(const G4Event* event)
       fCalLeng[i] = absoperHit->GetTrackLength() / CLHEP::m;  // 给Vector赋值
       if( fCalEdep[i] > 0 || fCalLeng[i] > 0)
       {
-        HitsArray[int(i/24)] += 1;
-        EdepArray[int(i/24)] += fCalEdep[i];
-        LengArray[int(i/24)] += fCalLeng[i];
+        // G4cout << " i =" << i << " bar " << i%22 << " x pos " <<  ((int(i%22)-10)*25-12.5) << G4endl;
+        HitsArray[int(i/22)] += 1;
+        EdepArray[int(i/22)] += fCalEdep[i];
+        LengArray[int(i/22)] += fCalLeng[i];
+        Xw[int(i/22)]        += ((int(i%22)-10)*25-12.5) * fCalEdep[i];
+        Xw2[int(i/22)]       += ((int(i%22)-10)*25-12.5) * ((int(i%22)-10)*25-12.5) * fCalEdep[i];
       }
     }
   }
-  
-  for (int i = 0; i < 14; ++i) // 336 bar + 14 Layer + 1 Total 
+  auto absoperHit = (*absoHC)[absoHC->entries()-1];
+  EdepArray[14] = absoperHit->GetEdep() / CLHEP::GeV  ;
+  LengArray[14] = absoperHit->GetTrackLength() / CLHEP::m;
+  // G4cout << "Check Total Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m " << G4endl;
+  for (int i = 0; i < 14; ++i) // 308 bar + 14 Layer + 1 Total = 323
   {
     auto absoperHit = (*absoHC)[absoHC->entries() - 15 + i];
     if (absoperHit) 
     {
-      // G4cout << "Layer = " <<  i << " Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
-      fLayEdep[i] = absoperHit->GetEdep() / CLHEP::GeV;  // 给Vector赋值
-      fLayLeng[i] = absoperHit->GetTrackLength() / CLHEP::m;  // 给Vector赋值
-      // G4cout << "Check Layer = " <<  i << " Edep " << EdepArray[i] << " GeV, Length " << LengArray[i] << " m, Fire Bars " << HitsArray[i] << G4endl;
       HitsArray[14] += HitsArray[i];
-      EdepArray[14] += EdepArray[i];
-      LengArray[14] += LengArray[i];
+      fLayEdep[i] = absoperHit->GetEdep() / CLHEP::GeV;  // 给Vector赋值
+      fLayLeng[i] = absoperHit->GetTrackLength() / CLHEP::m;  // 给Vector赋值 
+      Xw[i]       = Xw[i]  / fLayEdep[i];
+      Xw2[i]      = Xw2[i] / fLayEdep[i];
+      fEfrac[i]   = fLayEdep[i] / EdepArray[14];
+      fRMS[i]     = sqrt(Xw2[i] - Xw[i] * Xw[i]);
+      fFval[i]    = fRMS[i] * fEfrac[i];
+      // G4cout << "Layer = " <<  i << " Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
+      // G4cout << "Check Layer = " <<  i << " Edep " << EdepArray[i] << " GeV, Length " << LengArray[i] << " m, Fired Bars " << HitsArray[i] << G4endl;
+      // G4cout << "Efrac = " <<  fEfrac[i] << " fRMS " << fRMS[i] << G4endl;
     }
   }
-  // auto absoperHit = (*absoHC)[absoHC->entries()-1];
-  // G4cout << "Total Edep " << absoperHit->GetEdep() / CLHEP::Ge << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
   // G4cout << "Check Total Edep " << EdepArray[14] << " GeV, Length " << LengArray[14] << " m, Fire Bars " << HitsArray[14] << G4endl;
 
-  analysisManager->FillNtupleIColumn(15, HitsArray[14]); 
-  analysisManager->FillNtupleDColumn(16, EdepArray[14]);      
-  analysisManager->FillNtupleDColumn(17, LengArray[14]);          
+  analysisManager->FillNtupleIColumn(18, HitsArray[14]); 
+  analysisManager->FillNtupleDColumn(19, EdepArray[14]);
+  analysisManager->FillNtupleDColumn(20, LengArray[14]);
   analysisManager->AddNtupleRow();
 
 
   // Print per event (modulo n)
   G4RunManager* rm = G4RunManager::GetRunManager(); 
   auto printModulo = rm->GetPrintProgress();
-  if ((printModulo > 0) && (eventID % printModulo == 0)) {
+  if ((printModulo > 0) && (eventID % printModulo == 0)) 
+  {
     G4cout << "--> End of event: " << eventID << "\n" << G4endl;
   }
 }

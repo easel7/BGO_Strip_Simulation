@@ -92,6 +92,9 @@ class EventAction : public G4UserEventAction
     std::vector<G4int>&    GetLayerHits() { return fLayHits; }
     std::vector<G4double>& GetLayerEdep() { return fLayEdep; }
     std::vector<G4double>& GetLayerLeng() { return fLayLeng; }
+    std::vector<G4double>&       GetRMS() { return fRMS    ; }
+    std::vector<G4double>&     GetEfrac() { return fEfrac  ; }
+    std::vector<G4double>&      GetFval() { return fFval   ; }
 
   private:
     // methods
@@ -115,9 +118,15 @@ class EventAction : public G4UserEventAction
     std::vector<G4double> fCalEdep{ std::vector<G4double>(kNofEmCells, 0.) };
     std::vector<G4double> fCalLeng{ std::vector<G4double>(kNofEmCells, 0.) };
     
-    std::vector<G4int>    fLayHits{ std::vector<G4int>   (kNofEmLayers, 0) };
+    std::vector<G4int>    fLayHits{ std::vector<G4int>   (kNofEmLayers, 0)  };
     std::vector<G4double> fLayEdep{ std::vector<G4double>(kNofEmLayers, 0.) };
     std::vector<G4double> fLayLeng{ std::vector<G4double>(kNofEmLayers, 0.) };
+
+    std::vector<G4double>     fRMS{ std::vector<G4double>(kNofEmLayers, 0.) };
+    std::vector<G4double>   fEfrac{ std::vector<G4double>(kNofEmLayers, 0.) };
+    std::vector<G4double>    fFval{ std::vector<G4double>(kNofEmLayers, 0.) };
+
+
 };
 
 }  // namespace B4

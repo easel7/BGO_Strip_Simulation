@@ -35,7 +35,7 @@
 namespace B4
 {
 
-constexpr G4int kNofEmColumns = 24;
+constexpr G4int kNofEmColumns = 22;
 constexpr G4int kNofEmRows = 1;
 constexpr G4int kNofEmLayers = 14;
 constexpr G4int kNofEmCells = kNofEmColumns * kNofEmRows * kNofEmLayers;

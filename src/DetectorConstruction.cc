@@ -101,8 +101,7 @@ G4VPhysicalVolume* DetectorConstruction::DefineVolumes()
 
   G4double barSizeX = 25. * mm;
   G4double barSizeY = 600. * mm;
-  G4int fNofBars = 24;  // 每层 24 根 bars
-
+  
   auto layerThickness = absoThickness + gapThickness;
   auto calorThickness = fNofLayers * layerThickness;
   SetCalorThickness(calorThickness);

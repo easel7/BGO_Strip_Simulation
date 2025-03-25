@@ -2,7 +2,7 @@ void Draw_Pattern()
 {
     std::vector<double>* energyVec = nullptr;
     
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test_BK.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test.root");
     auto proton_tree = (TTree*)proton_file->Get("B4");
     // Set the branch address to the vector pointer
     proton_tree->SetBranchAddress("BarEnergyVector", &energyVec);
@@ -16,35 +16,41 @@ void Draw_Pattern()
     double maxVal = 2;  // 设置最大值
     // for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     // {
-        proton_tree->GetEntry(1);
+        proton_tree->GetEntry(0);
         for(size_t i = 0; i < energyVec->size(); ++i) 
         {
-            int layer = i / 24; 
-            int bar = i % 24;
+            int layer = i / 22; 
+            int bar = i % 22;
             double energy = 0;
             if ((*energyVec)[i] < 1e-3)  {energy = -5;              }
             else                         {energy = log10((*energyVec)[i]);}
             // std::cout << "ECEnergyVector[" << i << "] = " << (*energyVec)[i] << " , layer " <<  layer  << " , bar " <<  bar << " Calculated Energy " << energy << " , "<< layer % 2 << std::endl;
             if(layer % 2 == 0)
             {
-                hXZ->SetBinContent(bar+1, 14-layer, energy);
-                hYZ->SetBinContent(bar+1, 14-layer, -5);
+                hXZ->SetBinContent(bar+2, 14-layer, energy);
+                hYZ->SetBinContent(bar+2, 14-layer, -5);
                 for(int j = 0 ; j<24 ; ++j)
                 {
-                    h3box->SetBinContent(bar+1 , j+1  , 14-layer , (*energyVec)[i]);
+                    h3box->SetBinContent(bar+2 , j+1  , 14-layer , (*energyVec)[i]);
                 }
                 
             }
             else
             {
-                hYZ->SetBinContent(bar+1, 14-layer, energy);
-                hXZ->SetBinContent(bar+1, 14-layer, -5);
+                hYZ->SetBinContent(bar+2, 14-layer, energy);
+                hXZ->SetBinContent(bar+2, 14-layer, -5);
                 for(int j = 0 ; j<24 ; ++j)
                 {
-                    h3box->SetBinContent(j+1 , bar+1, 14-layer ,(*energyVec)[i]);
+                    h3box->SetBinContent(j+1 , bar+2, 14-layer ,(*energyVec)[i]);
                 }
             }
+        }
 
+        for (int layer = 0; layer < 14; ++layer) {
+            hXZ->SetBinContent(1, 14-layer, -5);
+            hXZ->SetBinContent(24, 14-layer, -5);
+            hYZ->SetBinContent(1, 14-layer, -5);
+            hYZ->SetBinContent(24, 14-layer, -5);
         }
 
 
@@ -89,6 +95,9 @@ void Draw_Pattern()
 
         c1->cd(3);
         h3box->GetZaxis()->SetNdivisions(10);
+        h3box->GetXaxis()->SetTitle("X-Z Plane");
+        h3box->GetYaxis()->SetTitle("Y-Z Plane");
+        h3box->GetZaxis()->SetTitle("Layer");
         h3box->Draw("BOX2Z");
         auto  *palette3 = (TPaletteAxis*) h3box->GetListOfFunctions()->FindObject("palette");
         latex.DrawLatexNDC(0.8, 0.92, "(Edep/GeV)");

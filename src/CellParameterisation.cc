@@ -53,12 +53,12 @@ CellParameterisation::CellParameterisation()
     if (iz % 2 == 1)  // 如果 iz 是奇数
     {
       fXCell[copyNo] = 0 ;
-      fYCell[copyNo] = (iy - 11) *  2.5 * cm - 1.25 * cm;
+      fYCell[copyNo] = (iy - 10) *  2.5 * cm - 1.25 * cm;
       fZCell[copyNo] = (iz - 6)  *  2.55 * cm - 1.30 * cm;
     }
     else
     {
-      fXCell[copyNo] = (iy - 11) * 2.5 * cm - 1.25 * cm;
+      fXCell[copyNo] = (iy - 10) * 2.5 * cm - 1.25 * cm;
       fYCell[copyNo] = 0 ;
       fZCell[copyNo] = (iz - 6)  * 2.55 * cm - 1.30 * cm;
     }

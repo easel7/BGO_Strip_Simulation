@@ -94,20 +94,20 @@ G4bool CalorimeterSD::ProcessHits(G4Step* step, G4TouchableHistory*)
   // Get hit for total accounting
   auto hitTotal = (*fHitsCollection)[fHitsCollection->entries() - 1];   hitTotal->Add(edep, stepLength);
   // Get hit for total accounting
-  auto hitLayer0  = (*fHitsCollection)[fHitsCollection->entries() - 15]; if(cellID / 24 ==0  ) {hitLayer0 ->Add(edep, stepLength); }
-  auto hitLayer1  = (*fHitsCollection)[fHitsCollection->entries() - 14]; if(cellID / 24 ==1  ) {hitLayer1 ->Add(edep, stepLength); }
-  auto hitLayer2  = (*fHitsCollection)[fHitsCollection->entries() - 13]; if(cellID / 24 ==2  ) {hitLayer2 ->Add(edep, stepLength); }
-  auto hitLayer3  = (*fHitsCollection)[fHitsCollection->entries() - 12]; if(cellID / 24 ==3  ) {hitLayer3 ->Add(edep, stepLength); }
-  auto hitLayer4  = (*fHitsCollection)[fHitsCollection->entries() - 11]; if(cellID / 24 ==4  ) {hitLayer4 ->Add(edep, stepLength); }
-  auto hitLayer5  = (*fHitsCollection)[fHitsCollection->entries() - 10]; if(cellID / 24 ==5  ) {hitLayer5 ->Add(edep, stepLength); }
-  auto hitLayer6  = (*fHitsCollection)[fHitsCollection->entries() -  9]; if(cellID / 24 ==6  ) {hitLayer6 ->Add(edep, stepLength); }
-  auto hitLayer7  = (*fHitsCollection)[fHitsCollection->entries() -  8]; if(cellID / 24 ==7  ) {hitLayer7 ->Add(edep, stepLength); }
-  auto hitLayer8  = (*fHitsCollection)[fHitsCollection->entries() -  7]; if(cellID / 24 ==8  ) {hitLayer8 ->Add(edep, stepLength); }
-  auto hitLayer9  = (*fHitsCollection)[fHitsCollection->entries() -  6]; if(cellID / 24 ==9  ) {hitLayer9 ->Add(edep, stepLength); }
-  auto hitLayer10 = (*fHitsCollection)[fHitsCollection->entries() -  5]; if(cellID / 24 ==10 ) {hitLayer10->Add(edep, stepLength); }
-  auto hitLayer11 = (*fHitsCollection)[fHitsCollection->entries() -  4]; if(cellID / 24 ==11 ) {hitLayer11->Add(edep, stepLength); }
-  auto hitLayer12 = (*fHitsCollection)[fHitsCollection->entries() -  3]; if(cellID / 24 ==12 ) {hitLayer12->Add(edep, stepLength); }
-  auto hitLayer13 = (*fHitsCollection)[fHitsCollection->entries() -  2]; if(cellID / 24 ==13 ) {hitLayer13->Add(edep, stepLength); }
+  auto hitLayer0  = (*fHitsCollection)[fHitsCollection->entries() - 15]; if(cellID / 22 ==0  ) {hitLayer0 ->Add(edep, stepLength); }
+  auto hitLayer1  = (*fHitsCollection)[fHitsCollection->entries() - 14]; if(cellID / 22 ==1  ) {hitLayer1 ->Add(edep, stepLength); }
+  auto hitLayer2  = (*fHitsCollection)[fHitsCollection->entries() - 13]; if(cellID / 22 ==2  ) {hitLayer2 ->Add(edep, stepLength); }
+  auto hitLayer3  = (*fHitsCollection)[fHitsCollection->entries() - 12]; if(cellID / 22 ==3  ) {hitLayer3 ->Add(edep, stepLength); }
+  auto hitLayer4  = (*fHitsCollection)[fHitsCollection->entries() - 11]; if(cellID / 22 ==4  ) {hitLayer4 ->Add(edep, stepLength); }
+  auto hitLayer5  = (*fHitsCollection)[fHitsCollection->entries() - 10]; if(cellID / 22 ==5  ) {hitLayer5 ->Add(edep, stepLength); }
+  auto hitLayer6  = (*fHitsCollection)[fHitsCollection->entries() -  9]; if(cellID / 22 ==6  ) {hitLayer6 ->Add(edep, stepLength); }
+  auto hitLayer7  = (*fHitsCollection)[fHitsCollection->entries() -  8]; if(cellID / 22 ==7  ) {hitLayer7 ->Add(edep, stepLength); }
+  auto hitLayer8  = (*fHitsCollection)[fHitsCollection->entries() -  7]; if(cellID / 22 ==8  ) {hitLayer8 ->Add(edep, stepLength); }
+  auto hitLayer9  = (*fHitsCollection)[fHitsCollection->entries() -  6]; if(cellID / 22 ==9  ) {hitLayer9 ->Add(edep, stepLength); }
+  auto hitLayer10 = (*fHitsCollection)[fHitsCollection->entries() -  5]; if(cellID / 22 ==10 ) {hitLayer10->Add(edep, stepLength); }
+  auto hitLayer11 = (*fHitsCollection)[fHitsCollection->entries() -  4]; if(cellID / 22 ==11 ) {hitLayer11->Add(edep, stepLength); }
+  auto hitLayer12 = (*fHitsCollection)[fHitsCollection->entries() -  3]; if(cellID / 22 ==12 ) {hitLayer12->Add(edep, stepLength); }
+  auto hitLayer13 = (*fHitsCollection)[fHitsCollection->entries() -  2]; if(cellID / 22 ==13 ) {hitLayer13->Add(edep, stepLength); }
 
   return true;
 }
