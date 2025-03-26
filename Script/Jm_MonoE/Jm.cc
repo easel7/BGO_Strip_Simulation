@@ -1,16 +1,16 @@
-void Rm()
+void Jm()
 {
     double Energy[19]={0};
     for (int i = 0; i < 19; i++) // Energy
     {
         if(i<9)  {Energy[i] =  (i+1)*10;}
         else   {Energy[i] =  i*100-800;}
-        int p_First_Had_Layer; double p_E_total;   std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr;
-        int d_First_Had_Layer; double d_E_total;   std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr;
-        int e_First_Had_Layer; double e_E_total;   std::vector<double>* e_RMSVec = nullptr;    std::vector<double>* e_EnergyVec = nullptr;    std::vector<double>* e_Efrac = nullptr;
-        int h_First_Had_Layer; double h_E_total;   std::vector<double>* h_RMSVec = nullptr;    std::vector<double>* h_EnergyVec = nullptr;    std::vector<double>* h_Efrac = nullptr;
-        int H_First_Had_Layer; double H_E_total;   std::vector<double>* H_RMSVec = nullptr;    std::vector<double>* H_EnergyVec = nullptr;    std::vector<double>* H_Efrac = nullptr;
-        int c_First_Had_Layer; double c_E_total;   std::vector<double>* c_RMSVec = nullptr;    std::vector<double>* c_EnergyVec = nullptr;    std::vector<double>* c_Efrac = nullptr;
+        int p_First_Had_Layer; double p_E_total;   std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_L_EnergyVec = nullptr;
+        int d_First_Had_Layer; double d_E_total;   std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_L_EnergyVec = nullptr;
+        int e_First_Had_Layer; double e_E_total;   std::vector<double>* e_RMSVec = nullptr;    std::vector<double>* e_EnergyVec = nullptr;    std::vector<double>* e_L_EnergyVec = nullptr;
+        int h_First_Had_Layer; double h_E_total;   std::vector<double>* h_RMSVec = nullptr;    std::vector<double>* h_EnergyVec = nullptr;    std::vector<double>* h_L_EnergyVec = nullptr;
+        int H_First_Had_Layer; double H_E_total;   std::vector<double>* H_RMSVec = nullptr;    std::vector<double>* H_EnergyVec = nullptr;    std::vector<double>* H_L_EnergyVec = nullptr;
+        int c_First_Had_Layer; double c_E_total;   std::vector<double>* c_RMSVec = nullptr;    std::vector<double>* c_EnergyVec = nullptr;    std::vector<double>* c_L_EnergyVec = nullptr;
 
         TH1D *h1_p[14];  TF1  *fitFunc_p[14]; double p_maxVal[14]={0};
         TH1D *h1_d[14];  TF1  *fitFunc_d[14]; double d_maxVal[14]={0};
@@ -30,7 +30,7 @@ void Rm()
         auto proton_tree = (TTree*)proton_file->Get("B4");
         proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
         proton_tree->SetBranchAddress("BarEnergyVector",&p_EnergyVec);
-        proton_tree->SetBranchAddress("Efrac"            ,&p_Efrac);
+        proton_tree->SetBranchAddress("LayerEnergyVector",&p_L_EnergyVec);
         proton_tree->SetBranchAddress("First_Had_Layer"  ,&p_First_Had_Layer);
         proton_tree->SetBranchAddress("Total_E"          ,&p_E_total);
 
@@ -38,7 +38,7 @@ void Rm()
         auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
         deuteron_tree->SetBranchAddress("RMS"              ,&d_RMSVec);
         deuteron_tree->SetBranchAddress("BarEnergyVector",&d_EnergyVec);
-        deuteron_tree->SetBranchAddress("Efrac"            ,&d_Efrac);
+        deuteron_tree->SetBranchAddress("LayerEnergyVector",&d_L_EnergyVec);
         deuteron_tree->SetBranchAddress("First_Had_Layer"  ,&d_First_Had_Layer);
         deuteron_tree->SetBranchAddress("Total_E"          ,&d_E_total);
 
@@ -46,7 +46,7 @@ void Rm()
         auto electron_tree = (TTree*)electron_file->Get("B4");
         electron_tree->SetBranchAddress("RMS"              ,&e_RMSVec);
         electron_tree->SetBranchAddress("BarEnergyVector",&e_EnergyVec);
-        electron_tree->SetBranchAddress("Efrac"            ,&e_Efrac);
+        electron_tree->SetBranchAddress("LayerEnergyVector",&e_L_EnergyVec);
         electron_tree->SetBranchAddress("First_Had_Layer"  ,&e_First_Had_Layer);
         electron_tree->SetBranchAddress("Total_E"          ,&e_E_total);
 
@@ -54,7 +54,7 @@ void Rm()
         auto helium4_tree = (TTree*)helium4_file->Get("B4");
         helium4_tree->SetBranchAddress("RMS"              ,&h_RMSVec);
         helium4_tree->SetBranchAddress("BarEnergyVector",&h_EnergyVec);
-        helium4_tree->SetBranchAddress("Efrac"            ,&h_Efrac);
+        helium4_tree->SetBranchAddress("LayerEnergyVector",&h_L_EnergyVec);
         helium4_tree->SetBranchAddress("First_Had_Layer"  ,&h_First_Had_Layer);
         helium4_tree->SetBranchAddress("Total_E"          ,&h_E_total);
         
@@ -62,7 +62,7 @@ void Rm()
         auto helium3_tree = (TTree*)helium3_file->Get("B4");
         helium3_tree->SetBranchAddress("RMS"              ,&H_RMSVec);
         helium3_tree->SetBranchAddress("BarEnergyVector",&H_EnergyVec);
-        helium3_tree->SetBranchAddress("Efrac"            ,&H_Efrac);
+        helium3_tree->SetBranchAddress("LayerEnergyVector",&H_L_EnergyVec);
         helium3_tree->SetBranchAddress("First_Had_Layer"  ,&H_First_Had_Layer);
         helium3_tree->SetBranchAddress("Total_E"          ,&H_E_total);
 
@@ -70,7 +70,7 @@ void Rm()
         auto carbon_tree = (TTree*)carbon_file->Get("B4");
         carbon_tree->SetBranchAddress("RMS"              ,&c_RMSVec);
         carbon_tree->SetBranchAddress("BarEnergyVector",&c_EnergyVec);
-        carbon_tree->SetBranchAddress("Efrac"            ,&c_Efrac);
+        carbon_tree->SetBranchAddress("LayerEnergyVector",&c_L_EnergyVec);
         carbon_tree->SetBranchAddress("First_Had_Layer"  ,&c_First_Had_Layer);
         carbon_tree->SetBranchAddress("Total_E"          ,&c_E_total);
 
@@ -103,12 +103,12 @@ void Rm()
             for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
             {
                 
-                auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal[int(k/22)] = *std::max_element(p_start, p_end);  h1_p[int(k/22)]->Fill(log10(p_maxVal[int(k/22)]/p_E_total));
-                auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal[int(k/22)] = *std::max_element(d_start, d_end);  h1_d[int(k/22)]->Fill(log10(d_maxVal[int(k/22)]/d_E_total));
-                auto e_start = e_EnergyVec->begin() + k;  auto e_end = (k + 22 < e_EnergyVec->size() ) ? e_start + 22 : e_EnergyVec->end();  e_maxVal[int(k/22)] = *std::max_element(e_start, e_end);  h1_e[int(k/22)]->Fill(log10(e_maxVal[int(k/22)]/e_E_total));
-                auto h_start = h_EnergyVec->begin() + k;  auto h_end = (k + 22 < h_EnergyVec->size() ) ? h_start + 22 : h_EnergyVec->end();  h_maxVal[int(k/22)] = *std::max_element(h_start, h_end);  h1_h[int(k/22)]->Fill(log10(h_maxVal[int(k/22)]/h_E_total));
-                auto H_start = H_EnergyVec->begin() + k;  auto H_end = (k + 22 < H_EnergyVec->size() ) ? H_start + 22 : H_EnergyVec->end();  H_maxVal[int(k/22)] = *std::max_element(H_start, H_end);  h1_H[int(k/22)]->Fill(log10(H_maxVal[int(k/22)]/H_E_total));
-                auto c_start = c_EnergyVec->begin() + k;  auto c_end = (k + 22 < c_EnergyVec->size() ) ? c_start + 22 : c_EnergyVec->end();  c_maxVal[int(k/22)] = *std::max_element(c_start, c_end);  h1_c[int(k/22)]->Fill(log10(c_maxVal[int(k/22)]/c_E_total));
+                auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal[int(k/22)] = *std::max_element(p_start, p_end);  h1_p[int(k/22)]->Fill(log10(p_maxVal[int(k/22)]/(*d_L_EnergyVec)[int(k/22)]));
+                auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal[int(k/22)] = *std::max_element(d_start, d_end);  h1_d[int(k/22)]->Fill(log10(d_maxVal[int(k/22)]/(*d_L_EnergyVec)[int(k/22)]));
+                auto e_start = e_EnergyVec->begin() + k;  auto e_end = (k + 22 < e_EnergyVec->size() ) ? e_start + 22 : e_EnergyVec->end();  e_maxVal[int(k/22)] = *std::max_element(e_start, e_end);  h1_e[int(k/22)]->Fill(log10(e_maxVal[int(k/22)]/(*d_L_EnergyVec)[int(k/22)]));
+                auto h_start = h_EnergyVec->begin() + k;  auto h_end = (k + 22 < h_EnergyVec->size() ) ? h_start + 22 : h_EnergyVec->end();  h_maxVal[int(k/22)] = *std::max_element(h_start, h_end);  h1_h[int(k/22)]->Fill(log10(h_maxVal[int(k/22)]/(*d_L_EnergyVec)[int(k/22)]));
+                auto H_start = H_EnergyVec->begin() + k;  auto H_end = (k + 22 < H_EnergyVec->size() ) ? H_start + 22 : H_EnergyVec->end();  H_maxVal[int(k/22)] = *std::max_element(H_start, H_end);  h1_H[int(k/22)]->Fill(log10(H_maxVal[int(k/22)]/(*d_L_EnergyVec)[int(k/22)]));
+                auto c_start = c_EnergyVec->begin() + k;  auto c_end = (k + 22 < c_EnergyVec->size() ) ? c_start + 22 : c_EnergyVec->end();  c_maxVal[int(k/22)] = *std::max_element(c_start, c_end);  h1_c[int(k/22)]->Fill(log10(c_maxVal[int(k/22)]/(*d_L_EnergyVec)[int(k/22)]));
                 // cout << " bar " << k << " Layer " << int(k/22) <<endl; 
                 // std::copy(p_start, p_end, std::ostream_iterator<double>(std::cout, ", "));
                 // cout << " max = "<< p_maxVal[int(k/22)] <<  endl;
@@ -126,7 +126,7 @@ void Rm()
             h1_H[j]->Sumw2(); h1_H[j]->Scale(1.0/h1_H[j]->Integral()); h1_H[j]->SetLineColor(kGreen-3); h1_H[j]->SetMarkerColor(kGreen-3); h1_H[j]->SetLineWidth(2);
             h1_c[j]->Sumw2(); h1_c[j]->Scale(1.0/h1_c[j]->Integral()); h1_c[j]->SetLineColor(kMagenta); h1_c[j]->SetMarkerColor(kMagenta); h1_c[j]->SetLineWidth(2);
             // h1_e[j]->GetYaxis()->SetRangeUser(0,0.25);
-            h1_e[j]->SetTitle(Form("%.f GeV incident in L%d;log_{10}(Rm) = log_{10}(Max Energy Deposit bar in L0/ Total Deposit);Normalized Count",Energy[i],j));
+            h1_e[j]->SetTitle(Form("%.f GeV incident in L%d;log_{10}(Jm) = log_{10}(Max Energy Deposit bar in L%d/ Energy Deposit in L%d);Normalized Count",Energy[i],j,j,j));
             h1_e[j]->Draw();
             h1_H[j]->Draw("same");
             h1_c[j]->Draw("same");
@@ -162,7 +162,7 @@ void Rm()
         legend1->AddEntry(h1_H[0], "Helium3", "l");         
         legend1->AddEntry(h1_c[0], "Carbon", "l");         
         legend1->Draw();       
-        c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Rm_MonoE/Rm_%dGeV.pdf",int(Energy[i])));
+        c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Jm_MonoE/Jm_%dGeV.pdf",int(Energy[i])));
 
         auto c2 = new TCanvas("c2","c2",1000,1000);
         // c2->cd();
@@ -173,7 +173,7 @@ void Rm()
         auto gre_H = new TGraphAsymmErrors(14,Layer,Helium3_Ratio ,Layer_Err,Layer_Err,Helium3_Ratio_LL ,Helium3_Ratio_UL);
         auto gre_c = new TGraphAsymmErrors(14,Layer,Carbon_Ratio ,Layer_Err,Layer_Err,Carbon_Ratio_LL ,Carbon_Ratio_UL);
 
-        gre_e->SetTitle(Form("Incident Energy %d GeV ; BGO Layer (Rad Length); log10(Rm) = log10( (dE/dx) / Edep)",int(Energy[i])));
+        gre_e->SetTitle(Form("Incident Energy %d GeV ; BGO Layer (Rad Length); log10(Jm) = log10( (dE/dx) / Edep)",int(Energy[i])));
         gre_e->SetMarkerStyle(22);
         
         gre_e->SetMarkerColor(kOrange-3);
@@ -217,7 +217,7 @@ void Rm()
         legend2->AddEntry(gre_c, "HET Carbon", "ep");
         legend2->Draw();
 
-        c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Rm_MonoE/Rm_BGOLayer_%dGeV.pdf",int(Energy[i])));
+        c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Jm_MonoE/Jm_BGOLayer_%dGeV.pdf",int(Energy[i])));
     }
     
 }
