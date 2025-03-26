@@ -1,3 +1,20 @@
+void CalculateEfficiency(TH1D* h1, TH1D* h2, TH1D* h3, TH1D* h4, double Eff_HET, double Eff_UBT, double Eff_MIT)
+{
+    Eff_HET = h2->Integral() / h1->Integral();
+    Eff_UBT = h3->Integral() / h1->Integral();
+    Eff_MIT = h4->Integral() / h1->Integral();
+}
+
+TGraphErrors* CreateGraphWithProperties(int n, double* x, double* y, double* xErr, double* yErr, int markerStyle, int markerColor, int lineColor, const char* title)
+{
+    auto graph = new TGraphErrors(n, x, y, xErr, yErr);
+    graph->SetTitle(title);
+    graph->SetMarkerStyle(markerStyle);
+    graph->SetMarkerColor(markerColor);
+    graph->SetLineColor(lineColor);
+    return graph;
+}
+
 void Efficiency_UBT()
 {
     double Proton_Eff_HET[9]={0};
@@ -43,6 +60,9 @@ void Efficiency_UBT()
 
     for (int i = 0; i < 9; i++)
     {
+
+        if(i<10)  {Energy[i] =  (i+1)*10; Energy_Err[i] = 5;}
+        else   {Energy[i] =  i*100-800;Energy_Err[i] = 50;}
         h1_p[i] = new TH1D(Form("h1_p[%d]",i),Form("h1_p[%d]",i),100,0,1);
         h2_p[i] = new TH1D(Form("h2_p[%d]",i),Form("h2_p[%d]",i),100,0,1);
         h3_p[i] = new TH1D(Form("h3_p[%d]",i),Form("h3_p[%d]",i),100,0,1);
@@ -67,11 +87,6 @@ void Efficiency_UBT()
         h2_c[i] = new TH1D(Form("h2_c[%d]",i),Form("h2_c[%d]",i),100,0,1);
         h3_c[i] = new TH1D(Form("h3_c[%d]",i),Form("h3_c[%d]",i),100,0,1);
         h4_c[i] = new TH1D(Form("h4_c[%d]",i),Form("h4_c[%d]",i),100,0,1);
-    }
-    for (int i = 0; i < 9; i++)
-    {
-        if(i<10)  {Energy[i] =  (i+1)*10; Energy_Err[i] = 5;}
-        else   {Energy[i] =  i*100-800;Energy_Err[i] = 50;}
 
         auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Proton_%dGeV.root",int(Energy[i])));
         auto proton_tree = (TTree*)proton_file->Get("B4");
@@ -145,9 +160,7 @@ void Efficiency_UBT()
             if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_EnergyVec)[2] > 0.23 && (*c_EnergyVec)[3] > 0.046) h2_c[i]->Fill(c_Total_E/c_Energy); 
             if (((*c_EnergyVec)[2] > 0.0092 && (*c_EnergyVec)[10] > 0.0092 && (*c_EnergyVec)[12] > 0.0092 ) || ((*c_EnergyVec)[3] > 0.0092 && (*c_EnergyVec)[11] > 0.0092 && (*c_EnergyVec)[13] > 0.0092 )) h4_c[i]->Fill(c_Total_E/c_Energy);
         }
-    }
-    for (int i = 0; i < 9; i++)
-    {
+
         Proton_Eff_HET[i]   = h2_p[i]->Integral()/h1_p[i]->Integral();
         Proton_Eff_UBT[i]   = h3_p[i]->Integral()/h1_p[i]->Integral();
         Proton_Eff_MIT[i]   = h4_p[i]->Integral()/h1_p[i]->Integral();
@@ -170,94 +183,29 @@ void Efficiency_UBT()
         cout << "Energy = " << int(Energy[i]) << " GeV !  ele Total eff : " << h1_e[i]->Integral() << " ele HET eff : " <<  h2_e[i]->Integral() <<" ele UBT eff : " << h3_e[i]->Integral() <<" ele MIP eff : " << h4_e[i]->Integral() <<endl;
     }
 
-    auto gre_p_HET = new TGraphErrors(9, Energy, Proton_Eff_HET, Energy_Err, Uncertainty);
-    auto gre_p_UBT = new TGraphErrors(9, Energy, Proton_Eff_UBT, Energy_Err, Uncertainty);
-    auto gre_p_MIT = new TGraphErrors(9, Energy, Proton_Eff_MIT, Energy_Err, Uncertainty);
+    auto gre_p_HET = CreateGraphWithProperties(9, Energy, Proton_Eff_HET, Energy_Err, Uncertainty, 20, kRed, kRed, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_p_UBT = CreateGraphWithProperties(9, Energy, Proton_Eff_UBT, Energy_Err, Uncertainty, 20, kRed, kRed, "Unbiased Trigger;Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_p_MIT = CreateGraphWithProperties(9, Energy, Proton_Eff_MIT, Energy_Err, Uncertainty, 20, kRed, kRed, "MIP Trigger;Kinetic Energy (GeV); Trigger Efficiency");
 
-    gre_p_HET->SetTitle("High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    gre_p_HET->SetMarkerStyle(20);
-    gre_p_HET->SetMarkerColor(kRed);
-    gre_p_HET->SetLineColor(kRed);
-    gre_p_UBT->SetTitle("Unbiased Trigger;Kinetic Energy (GeV); Trigger Efficiency");
-    gre_p_UBT->SetMarkerStyle(20);
-    gre_p_UBT->SetMarkerColor(kRed);
-    gre_p_UBT->SetLineColor(kRed);
-    gre_p_MIT->SetTitle("MIP Trigger;Kinetic Energy (GeV); Trigger Efficiency");
-    gre_p_MIT->SetMarkerStyle(20);
-    gre_p_MIT->SetMarkerColor(kRed);
-    gre_p_MIT->SetLineColor(kRed);
+    auto gre_d_HET = CreateGraphWithProperties(9, Energy, Deuteron_Eff_HET, Energy_Err, Uncertainty, 21, kBlue, kBlue, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_d_UBT = CreateGraphWithProperties(9, Energy, Deuteron_Eff_UBT, Energy_Err, Uncertainty, 21, kBlue, kBlue, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_d_MIT = CreateGraphWithProperties(9, Energy, Deuteron_Eff_MIT, Energy_Err, Uncertainty, 21, kBlue, kBlue, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
 
-    auto gre_d_HET = new TGraphErrors(9, Energy, Deuteron_Eff_HET, Energy_Err, Uncertainty);
-    auto gre_d_UBT = new TGraphErrors(9, Energy, Deuteron_Eff_UBT, Energy_Err, Uncertainty);
-    auto gre_d_MIT = new TGraphErrors(9, Energy, Deuteron_Eff_MIT, Energy_Err, Uncertainty);
+    auto gre_e_HET = CreateGraphWithProperties(9, Energy, Electron_Eff_HET, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_e_UBT = CreateGraphWithProperties(9, Energy, Electron_Eff_UBT, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_e_MIT = CreateGraphWithProperties(9, Energy, Electron_Eff_MIT, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
 
-    gre_d_HET->SetMarkerStyle(21);
-    gre_d_HET->SetMarkerColor(kBlue);
-    gre_d_HET->SetLineColor(kBlue);
-    gre_d_UBT->SetMarkerStyle(21);
-    gre_d_UBT->SetMarkerColor(kBlue);
-    gre_d_UBT->SetLineColor(kBlue);
-    gre_d_MIT->SetMarkerStyle(21);
-    gre_d_MIT->SetMarkerColor(kBlue);
-    gre_d_MIT->SetLineColor(kBlue);
+    auto gre_h_HET = CreateGraphWithProperties(9, Energy, Helium4_Eff_HET, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_h_UBT = CreateGraphWithProperties(9, Energy, Helium4_Eff_UBT, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_h_MIT = CreateGraphWithProperties(9, Energy, Helium4_Eff_MIT, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
 
-    auto gre_e_HET = new TGraphErrors(9, Energy, Electron_Eff_HET, Energy_Err, Uncertainty);
-    auto gre_e_UBT = new TGraphErrors(9, Energy, Electron_Eff_UBT, Energy_Err, Uncertainty);
-    auto gre_e_MIT = new TGraphErrors(9, Energy, Electron_Eff_MIT, Energy_Err, Uncertainty);
+    auto gre_H_HET = CreateGraphWithProperties(9, Energy, Helium3_Eff_HET, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_H_UBT = CreateGraphWithProperties(9, Energy, Helium3_Eff_UBT, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_H_MIT = CreateGraphWithProperties(9, Energy, Helium3_Eff_MIT, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
 
-
-    gre_e_HET->SetMarkerStyle(22);
-    gre_e_HET->SetMarkerColor(kOrange-3);
-    gre_e_HET->SetLineColor(kOrange-3);
-    gre_e_UBT->SetMarkerStyle(22);
-    gre_e_UBT->SetMarkerColor(kOrange-3);
-    gre_e_UBT->SetLineColor(kOrange-3);
-    gre_e_MIT->SetMarkerStyle(22);
-    gre_e_MIT->SetMarkerColor(kOrange-3);
-    gre_e_MIT->SetLineColor(kOrange-3);
-
-
-    auto gre_h_HET = new TGraphErrors(9, Energy, Helium4_Eff_HET, Energy_Err, Uncertainty);
-    auto gre_h_UBT = new TGraphErrors(9, Energy, Helium4_Eff_UBT, Energy_Err, Uncertainty);
-    auto gre_h_MIT = new TGraphErrors(9, Energy, Helium4_Eff_MIT, Energy_Err, Uncertainty);
-
-    gre_h_HET->SetMarkerStyle(23);
-    gre_h_HET->SetMarkerColor(kGreen-3);
-    gre_h_HET->SetLineColor(kGreen-3);
-    gre_h_UBT->SetMarkerStyle(23);
-    gre_h_UBT->SetMarkerColor(kGreen-3);
-    gre_h_UBT->SetLineColor(kGreen-3);
-    gre_h_MIT->SetMarkerStyle(23);
-    gre_h_MIT->SetMarkerColor(kGreen-3);
-    gre_h_MIT->SetLineColor(kGreen-3);
-
-    auto gre_H_HET = new TGraphErrors(9, Energy, Helium3_Eff_HET, Energy_Err, Uncertainty);
-    auto gre_H_UBT = new TGraphErrors(9, Energy, Helium3_Eff_UBT, Energy_Err, Uncertainty);
-    auto gre_H_MIT = new TGraphErrors(9, Energy, Helium3_Eff_MIT, Energy_Err, Uncertainty);
-
-    gre_H_HET->SetMarkerStyle(32);
-    gre_H_HET->SetMarkerColor(kGreen-3);
-    gre_H_HET->SetLineColor(kGreen-3);
-    gre_H_UBT->SetMarkerStyle(32);
-    gre_H_UBT->SetMarkerColor(kGreen-3);
-    gre_H_UBT->SetLineColor(kGreen-3);
-    gre_H_MIT->SetMarkerStyle(32);
-    gre_H_MIT->SetMarkerColor(kGreen-3);
-    gre_H_MIT->SetLineColor(kGreen-3);
-
-    auto gre_c_HET = new TGraphErrors(9, Energy, Carbon_Eff_HET, Energy_Err, Uncertainty);
-    auto gre_c_UBT = new TGraphErrors(9, Energy, Carbon_Eff_UBT, Energy_Err, Uncertainty);
-    auto gre_c_MIT = new TGraphErrors(9, Energy, Carbon_Eff_MIT, Energy_Err, Uncertainty);
-
-    gre_c_HET->SetMarkerStyle(23);
-    gre_c_HET->SetMarkerColor(kMagenta);
-    gre_c_HET->SetLineColor(kMagenta);
-    gre_c_UBT->SetMarkerStyle(32);
-    gre_c_UBT->SetMarkerColor(kMagenta);
-    gre_c_UBT->SetLineColor(kMagenta);
-    gre_c_MIT->SetMarkerStyle(32);
-    gre_c_MIT->SetMarkerColor(kMagenta);
-    gre_c_MIT->SetLineColor(kMagenta);
+    auto gre_c_HET = CreateGraphWithProperties(9, Energy, Carbon_Eff_HET, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_c_UBT = CreateGraphWithProperties(9, Energy, Carbon_Eff_UBT, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_c_MIT = CreateGraphWithProperties(9, Energy, Carbon_Eff_MIT, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
 
     auto c0 = new TCanvas("c0","c0",1200,1200);
     c0->Clear();

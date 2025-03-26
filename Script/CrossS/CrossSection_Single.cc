@@ -3,9 +3,9 @@ void CrossSection_Single()
     auto file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_100GeV.root");
     auto tree = (TTree*)file->Get("B4");
     auto c1 = new TCanvas("c1","c1",1800,600);
-    auto *h0 = new TH1D("h0","h0",200,0,100);
-    auto *h1 = new TH1D("h1","h1",200,0,100);
-    auto *h2 = new TH1D("h2","h2",200,0,100);
+    auto *h0 = new TH1D("h0","h0",200,0,100);     // auto *h0 = new TH1D("h0","h0",30,0,30);
+    auto *h1 = new TH1D("h1","h1",200,0,100);     // auto *h1 = new TH1D("h1","h1",30,0,30);
+    auto *h2 = new TH1D("h2","h2",200,0,100);     // auto *h2 = new TH1D("h2","h2",30,0,30);
 
     TCut EM  = "First_Type==0";
     TCut HD  = "First_Had_Depth>=0";
