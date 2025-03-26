@@ -1,4 +1,4 @@
-void Fval_Single()
+void Fval1_Single()
 {
     int p_First_Had_Layer;    std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Fval = nullptr;    std::vector<double>* p_Efrac = nullptr;
     int d_First_Had_Layer;    std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Fval = nullptr;    std::vector<double>* d_Efrac = nullptr;
@@ -45,23 +45,23 @@ void Fval_Single()
     carbon_tree->SetBranchAddress("First_Had_Layer"  ,&c_First_Had_Layer);
 
     cout  << proton_tree->GetEntries() << endl;
-    auto h1_p = new TH1D("h1_p","h1_p",100,-3,2);  
-    auto h1_d = new TH1D("h1_d","h1_d",100,-3,2);  
-    auto h1_e = new TH1D("h1_e","h1_e",100,-3,2);  
-    auto h1_h = new TH1D("h1_h","h1_h",100,-3,2);  
-    auto h1_H = new TH1D("h1_H","h1_H",100,-3,2);  
-    auto h1_c = new TH1D("h1_c","h1_c",100,-3,2);  
+    auto h1_p = new TH1D("h1_p","h1_p",100,0,10);  
+    auto h1_d = new TH1D("h1_d","h1_d",100,0,10);  
+    auto h1_e = new TH1D("h1_e","h1_e",100,0,10);  
+    auto h1_h = new TH1D("h1_h","h1_h",100,0,10);  
+    auto h1_H = new TH1D("h1_H","h1_H",100,0,10);  
+    auto h1_c = new TH1D("h1_c","h1_c",100,0,10);  
 
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     {
-        proton_tree->GetEntry(entry);   /* if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_EnergyVec)[2] > 0.23 && (*p_EnergyVec)[0] > 0.046)*/ h1_p->Fill(log10((*p_Fval)[0]));
-        deuteron_tree->GetEntry(entry); /* if ((*d_EnergyVec)[0] > 0.23 && (*d_EnergyVec)[1] > 0.23 && (*d_EnergyVec)[2] > 0.23 && (*d_EnergyVec)[0] > 0.046)*/ h1_d->Fill(log10((*d_Fval)[0]));
-        electron_tree->GetEntry(entry); /* if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_EnergyVec)[2] > 0.23 && (*e_EnergyVec)[0] > 0.046)*/ h1_e->Fill(log10((*e_Fval)[0]));
-        helium4_tree->GetEntry(entry);  /* if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_EnergyVec)[2] > 0.23 && (*h_EnergyVec)[0] > 0.046)*/ h1_h->Fill(log10((*h_Fval)[0]));
-        helium3_tree->GetEntry(entry);  /* if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_EnergyVec)[2] > 0.23 && (*H_EnergyVec)[0] > 0.046)*/ h1_H->Fill(log10((*H_Fval)[0]));
-        carbon_tree->GetEntry(entry);   /* if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_EnergyVec)[2] > 0.23 && (*c_EnergyVec)[0] > 0.046)*/ h1_c->Fill(log10((*c_Fval)[0]));
+        proton_tree->GetEntry(entry);    h1_p->Fill(log10(pow((*p_RMSVec)[4],3)));  // (*p_Fval)[4]*
+        deuteron_tree->GetEntry(entry);  h1_d->Fill(log10(pow((*d_RMSVec)[4],3)));  // (*d_Fval)[4]*
+        electron_tree->GetEntry(entry);  h1_e->Fill(log10(pow((*e_RMSVec)[4],3)));  // (*e_Fval)[4]*
+        helium4_tree->GetEntry(entry);   h1_h->Fill(log10(pow((*h_RMSVec)[4],3)));  // (*h_Fval)[4]*
+        helium3_tree->GetEntry(entry);   h1_H->Fill(log10(pow((*H_RMSVec)[4],3)));  // (*H_Fval)[4]*
+        carbon_tree->GetEntry(entry);    h1_c->Fill(log10(pow((*c_RMSVec)[4],3)));  // (*c_Fval)[4]*
     }
-    h1_p->Sumw2(); h1_p->Scale(1.0/h1_p->Integral());h1_p->SetLineColor(kRed);     h1_p->SetMarkerColor(kRed);     h1_p->SetLineWidth(2);h1_p->GetYaxis()->SetRangeUser(0,0.25);h1_p->SetTitle("100 GeV incident Particle; log10(Fval) ;Normalized Count");
+    h1_p->Sumw2(); h1_p->Scale(1.0/h1_p->Integral());h1_p->SetLineColor(kRed);     h1_p->SetMarkerColor(kRed);     h1_p->SetLineWidth(2);h1_p->GetYaxis()->SetRangeUser(0,0.25);h1_p->SetTitle("100 GeV incident Particle; Fval ;Normalized Count");
     h1_d->Sumw2(); h1_d->Scale(1.0/h1_d->Integral());h1_d->SetLineColor(kBlue);    h1_d->SetMarkerColor(kBlue);    h1_d->SetLineWidth(2);
     h1_e->Sumw2(); h1_e->Scale(1.0/h1_e->Integral());h1_e->SetLineColor(kOrange-3);h1_e->SetMarkerColor(kOrange-3);h1_e->SetLineWidth(2);
     h1_h->Sumw2(); h1_h->Scale(1.0/h1_h->Integral());h1_h->SetLineColor(kGreen-3); h1_h->SetMarkerColor(kGreen-3); h1_h->SetLineWidth(2);
@@ -77,13 +77,13 @@ void Fval_Single()
     h1_H->Draw("same");
     h1_c->Draw("same");
 
-    double quantiles[3] = {0.16, 0.50, 0.84};  // Percentiles
-    double p_values[3];      h1_p->GetQuantiles(3, p_values, quantiles);        TLine *l_p[3];
-    double d_values[3];      h1_d->GetQuantiles(3, d_values, quantiles);        TLine *l_d[3];
-    double e_values[3];      h1_e->GetQuantiles(3, e_values, quantiles);        TLine *l_e[3];
-    double h_values[3];      h1_h->GetQuantiles(3, h_values, quantiles);        TLine *l_h[3];
-    double H_values[3];      h1_H->GetQuantiles(3, H_values, quantiles);        TLine *l_H[3];
-    double c_values[3];      h1_c->GetQuantiles(3, c_values, quantiles);        TLine *l_c[3];
+    double quantiles[4] = {0.16, 0.50, 0.84};  // Percentiles
+    double p_values[4];      h1_p->GetQuantiles(3, p_values, quantiles);        TLine *l_p[4];
+    double d_values[4];      h1_d->GetQuantiles(3, d_values, quantiles);        TLine *l_d[4];
+    double e_values[4];      h1_e->GetQuantiles(3, e_values, quantiles);        TLine *l_e[4];
+    double h_values[4];      h1_h->GetQuantiles(3, h_values, quantiles);        TLine *l_h[4];
+    double H_values[4];      h1_H->GetQuantiles(3, H_values, quantiles);        TLine *l_H[4];
+    double c_values[4];      h1_c->GetQuantiles(3, c_values, quantiles);        TLine *l_c[4];
 
     for (int ii = 0 ;ii< 3 ; ii++)
     {
@@ -104,7 +104,5 @@ void Fval_Single()
     legend1->AddEntry(h1_c, "Carbon", "el");         
 
     legend1->Draw();       
-    // Proton_Ratio = p_values[1];     Proton_Ratio_LL  = p_values[1] - p_values[0];   Proton_Ratio_UL= p_values[2] - p_values[1];      
-    // cout << Proton_Ratio  << " , " << Proton_Ratio_LL<< " , " << Proton_Ratio_UL << endl; 
-    // cout << Layer  << " , " << Layer_Err << " , " << Layer_Err << endl;      
+   
 }

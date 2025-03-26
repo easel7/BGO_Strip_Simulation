@@ -1,4 +1,4 @@
-void Fval()
+void Fval1()
 {
     double Energy[19]={0};
     for (int i = 0; i < 19; i++) // Energy
@@ -99,7 +99,7 @@ void Fval()
             h1_H[j]->Sumw2(); h1_H[j]->Scale(1.0/h1_H[j]->Integral());h1_H[j]->SetLineColor(kGreen-3); h1_H[j]->SetMarkerColor(kGreen-3); h1_H[j]->SetLineWidth(2);
             h1_c[j]->Sumw2(); h1_c[j]->Scale(1.0/h1_c[j]->Integral());h1_c[j]->SetLineColor(kMagenta); h1_c[j]->SetMarkerColor(kMagenta); h1_c[j]->SetLineWidth(2);
 
-            h1_e[j]->GetYaxis()->SetRangeUser(0,0.25);h1_e[j]->SetTitle(Form(" log10 [Fval (RMS * Efrac)] Distribution in L%d; log10 [Fval (RMS * Efrac)] ;Normalized Count",j));
+            h1_e[j]->GetYaxis()->SetRangeUser(0,0.25);h1_e[j]->SetTitle(Form(" Fval (RMS * Efrac) Distribution in L%d;RMS (mm);Normalized Count",j));
             h1_e[j]->Draw();
             h1_H[j]->Draw("same");
             h1_c[j]->Draw("same");
@@ -137,7 +137,7 @@ void Fval()
         legend1->AddEntry(h1_H[0], "Helium3", "l");         
         legend1->AddEntry(h1_c[0], "Carbon", "l");         
         legend1->Draw();       
-        c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Fval_MonoE/Fval_%dGeV.pdf",int(Energy[i])));
+        c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Fval1_MonoE/Fval_%dGeV.pdf",int(Energy[i])));
 
         auto c2 = new TCanvas("c2","c2",1500,1000);
         c2->cd();
@@ -148,7 +148,7 @@ void Fval()
         auto gre_H = new TGraphAsymmErrors(14,Layer,Helium3_RMS ,Layer_Err,Layer_Err,Helium3_RMS_LL ,Helium3_RMS_UL);
         auto gre_c = new TGraphAsymmErrors(14,Layer,Carbon_RMS ,Layer_Err,Layer_Err,Carbon_RMS_LL ,Carbon_RMS_UL);
 
-        gre_e->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; log10 [Fval (RMS * Efrac)] ",int(Energy[i])));
+        gre_e->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; Fval (RMS * Efrac)",int(Energy[i])));
         gre_e->SetMarkerStyle(22);
         gre_e->GetYaxis()->SetRangeUser(-3,2);
         
@@ -193,6 +193,6 @@ void Fval()
         legend2->AddEntry(gre_c, "HET Carbon", "ep");
         legend2->Draw();
 
-        c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Fval_MonoE/Fval_BGOLayer_%dGeV.pdf",int(Energy[i])));
+        c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Fval1_MonoE/Fval_BGOLayer_%dGeV.pdf",int(Energy[i])));
     }
 }
