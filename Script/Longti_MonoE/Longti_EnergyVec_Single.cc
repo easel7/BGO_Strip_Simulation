@@ -78,26 +78,12 @@ void Longti_EnergyVec_Single()
     h1_c->Draw("same");h1_c->SetStats(kFALSE); 
 
     double quantiles[3] = {0.16, 0.50, 0.84};  // Percentiles
-    double p_values[3];  // Will store the x-values corresponding to the percentiles
-    double d_values[3];  // Will store the x-values corresponding to the percentiles
-    double e_values[3];  // Will store the x-values corresponding to the percentiles
-    double h_values[3];  // Will store the x-values corresponding to the percentiles
-    double H_values[3];  // Will store the x-values corresponding to the percentiles
-    double c_values[3];  // Will store the x-values corresponding to the percentiles
-
-    h1_p->GetQuantiles(3, p_values, quantiles);
-    h1_d->GetQuantiles(3, d_values, quantiles);
-    h1_e->GetQuantiles(3, e_values, quantiles);
-    h1_h->GetQuantiles(3, h_values, quantiles);
-    h1_H->GetQuantiles(3, H_values, quantiles);
-    h1_c->GetQuantiles(3, c_values, quantiles);
-
-    TLine *l_p[3];
-    TLine *l_d[3];
-    TLine *l_e[3];
-    TLine *l_h[3];
-    TLine *l_H[3];
-    TLine *l_c[3];
+    double p_values[3];      h1_p->GetQuantiles(3, p_values, quantiles);    TLine *l_p[3];
+    double d_values[3];      h1_d->GetQuantiles(3, d_values, quantiles);    TLine *l_d[3];
+    double e_values[3];      h1_e->GetQuantiles(3, e_values, quantiles);    TLine *l_e[3];
+    double h_values[3];      h1_h->GetQuantiles(3, h_values, quantiles);    TLine *l_h[3];
+    double H_values[3];      h1_H->GetQuantiles(3, H_values, quantiles);    TLine *l_H[3];
+    double c_values[3];      h1_c->GetQuantiles(3, c_values, quantiles);    TLine *l_c[3];
 
     for (int ii = 0 ;ii< 3 ; ii++)
     {
