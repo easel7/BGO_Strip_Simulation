@@ -45,7 +45,7 @@ void Rm()
         auto electron_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Electron_%dGeV.root",int(Energy[i])));
         auto electron_tree = (TTree*)electron_file->Get("B4");
         electron_tree->SetBranchAddress("RMS"              ,&e_RMSVec);
-        electron_tree->SetBranchAddress("BarEnergyVector",&e_EnergyVec);
+        electron_tree->SetBranchAddress("BarEnergyVector"  ,&e_EnergyVec);
         electron_tree->SetBranchAddress("Efrac"            ,&e_Efrac);
         electron_tree->SetBranchAddress("First_Had_Layer"  ,&e_First_Had_Layer);
         electron_tree->SetBranchAddress("Total_E"          ,&e_E_total);
@@ -53,7 +53,7 @@ void Rm()
         auto helium4_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Helium4_%dGeV.root",int(Energy[i])));
         auto helium4_tree = (TTree*)helium4_file->Get("B4");
         helium4_tree->SetBranchAddress("RMS"              ,&h_RMSVec);
-        helium4_tree->SetBranchAddress("BarEnergyVector",&h_EnergyVec);
+        helium4_tree->SetBranchAddress("BarEnergyVector"  ,&h_EnergyVec);
         helium4_tree->SetBranchAddress("Efrac"            ,&h_Efrac);
         helium4_tree->SetBranchAddress("First_Had_Layer"  ,&h_First_Had_Layer);
         helium4_tree->SetBranchAddress("Total_E"          ,&h_E_total);
@@ -61,7 +61,7 @@ void Rm()
         auto helium3_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Helium3_%dGeV.root",int(Energy[i])));
         auto helium3_tree = (TTree*)helium3_file->Get("B4");
         helium3_tree->SetBranchAddress("RMS"              ,&H_RMSVec);
-        helium3_tree->SetBranchAddress("BarEnergyVector",&H_EnergyVec);
+        helium3_tree->SetBranchAddress("BarEnergyVector"  ,&H_EnergyVec);
         helium3_tree->SetBranchAddress("Efrac"            ,&H_Efrac);
         helium3_tree->SetBranchAddress("First_Had_Layer"  ,&H_First_Had_Layer);
         helium3_tree->SetBranchAddress("Total_E"          ,&H_E_total);
@@ -69,7 +69,7 @@ void Rm()
         auto carbon_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Carbon_%dGeV.root",int(Energy[i])));
         auto carbon_tree = (TTree*)carbon_file->Get("B4");
         carbon_tree->SetBranchAddress("RMS"              ,&c_RMSVec);
-        carbon_tree->SetBranchAddress("BarEnergyVector",&c_EnergyVec);
+        carbon_tree->SetBranchAddress("BarEnergyVector"  ,&c_EnergyVec);
         carbon_tree->SetBranchAddress("Efrac"            ,&c_Efrac);
         carbon_tree->SetBranchAddress("First_Had_Layer"  ,&c_First_Had_Layer);
         carbon_tree->SetBranchAddress("Total_E"          ,&c_E_total);
@@ -81,12 +81,12 @@ void Rm()
         gStyle->SetOptStat(0);
         for (int j = 0; j < 14; j++)
         {
-            h1_p[j] = new TH1D(Form("h1_p[%d]",j), Form("h1_p[%d]",j),40,-4,0);  
-            h1_d[j] = new TH1D(Form("h1_d[%d]",j), Form("h1_d[%d]",j),40,-4,0);  
-            h1_e[j] = new TH1D(Form("h1_e[%d]",j), Form("h1_e[%d]",j),40,-4,0);  
-            h1_h[j] = new TH1D(Form("h1_h[%d]",j), Form("h1_h[%d]",j),40,-4,0);  
-            h1_H[j] = new TH1D(Form("h1_H[%d]",j), Form("h1_H[%d]",j),40,-4,0);  
-            h1_c[j] = new TH1D(Form("h1_c[%d]",j), Form("h1_c[%d]",j),40,-4,0);  
+            h1_p[j] = new TH1D(Form("h1_p[%d]",j), Form("h1_p[%d]",j),50,-5,0);  
+            h1_d[j] = new TH1D(Form("h1_d[%d]",j), Form("h1_d[%d]",j),50,-5,0);  
+            h1_e[j] = new TH1D(Form("h1_e[%d]",j), Form("h1_e[%d]",j),50,-5,0);  
+            h1_h[j] = new TH1D(Form("h1_h[%d]",j), Form("h1_h[%d]",j),50,-5,0);  
+            h1_H[j] = new TH1D(Form("h1_H[%d]",j), Form("h1_H[%d]",j),50,-5,0);  
+            h1_c[j] = new TH1D(Form("h1_c[%d]",j), Form("h1_c[%d]",j),50,-5,0);  
         }
 
         for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
@@ -173,7 +173,7 @@ void Rm()
         auto gre_H = new TGraphAsymmErrors(14,Layer,Helium3_Ratio ,Layer_Err,Layer_Err,Helium3_Ratio_LL ,Helium3_Ratio_UL);
         auto gre_c = new TGraphAsymmErrors(14,Layer,Carbon_Ratio ,Layer_Err,Layer_Err,Carbon_Ratio_LL ,Carbon_Ratio_UL);
 
-        gre_e->SetTitle(Form("Incident Energy %d GeV ; BGO Layer (Rad Length); log10(Rm) = log10( (dE/dx) / Edep)",int(Energy[i])));
+        gre_e->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; log_{10}(Rm) = log_{10}( (dE/dx) / Edep)",int(Energy[i])));
         gre_e->SetMarkerStyle(22);
         
         gre_e->SetMarkerColor(kOrange-3);
@@ -198,14 +198,22 @@ void Rm()
         gre_h->SetLineWidth(2);
         gre_H->SetLineWidth(2);gre_H->SetLineStyle(2);
         gre_c->SetLineWidth(2);
-        
+
+        gre_e->GetYaxis()->SetRangeUser(-5,0);
+        gre_e->GetXaxis()->SetLimits(0,14);
         gre_e->Draw("AP");
-    
         gre_h->Draw("PSAME");
         gre_H->Draw("PSAME");
         gre_c->Draw("PSAME");
         gre_d->Draw("PSAME");
         gre_p->Draw("PSAME");
+
+        auto axis_top = new TGaxis(0, 0, 14, 0, 0, 32, 510, "-L"); 
+        axis_top->SetTitle("Radiation Length"); // 设置顶部X轴的标题
+        axis_top->SetLabelSize(0.03);  // 设置刻度数字大小
+        axis_top->SetTitleSize(0.03);  // 设置标题大小
+        axis_top->SetTitleOffset(1.2); // 设置标题偏移
+        axis_top->Draw();
 
         auto legend2 = new TLegend(0.42, 0.12, 0.58, 0.32);
         legend2->SetNColumns(2);

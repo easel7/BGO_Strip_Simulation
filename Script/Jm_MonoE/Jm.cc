@@ -81,12 +81,12 @@ void Jm()
         gStyle->SetOptStat(0);
         for (int j = 0; j < 14; j++)
         {
-            h1_p[j] = new TH1D(Form("h1_p[%d]",j), Form("h1_p[%d]",j),30,-3,0);  
-            h1_d[j] = new TH1D(Form("h1_d[%d]",j), Form("h1_d[%d]",j),30,-3,0);  
-            h1_e[j] = new TH1D(Form("h1_e[%d]",j), Form("h1_e[%d]",j),30,-3,0);  
-            h1_h[j] = new TH1D(Form("h1_h[%d]",j), Form("h1_h[%d]",j),30,-3,0);  
-            h1_H[j] = new TH1D(Form("h1_H[%d]",j), Form("h1_H[%d]",j),30,-3,0);  
-            h1_c[j] = new TH1D(Form("h1_c[%d]",j), Form("h1_c[%d]",j),30,-3,0);  
+            h1_p[j] = new TH1D(Form("h1_p[%d]",j), Form("h1_p[%d]",j),40,-1,0);  
+            h1_d[j] = new TH1D(Form("h1_d[%d]",j), Form("h1_d[%d]",j),40,-1,0);  
+            h1_e[j] = new TH1D(Form("h1_e[%d]",j), Form("h1_e[%d]",j),40,-1,0);  
+            h1_h[j] = new TH1D(Form("h1_h[%d]",j), Form("h1_h[%d]",j),40,-1,0);  
+            h1_H[j] = new TH1D(Form("h1_H[%d]",j), Form("h1_H[%d]",j),40,-1,0);  
+            h1_c[j] = new TH1D(Form("h1_c[%d]",j), Form("h1_c[%d]",j),40,-1,0);  
         }
 
         for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
@@ -102,13 +102,12 @@ void Jm()
             // cout << p_EnergyVec->size() << endl;
             for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
             {
-                
-                auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal[int(k/22)] = *std::max_element(p_start, p_end);  h1_p[int(k/22)]->Fill(log10(p_maxVal[int(k/22)]/(*d_L_EnergyVec)[int(k/22)]));
+                auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal[int(k/22)] = *std::max_element(p_start, p_end);  h1_p[int(k/22)]->Fill(log10(p_maxVal[int(k/22)]/(*p_L_EnergyVec)[int(k/22)]));
                 auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal[int(k/22)] = *std::max_element(d_start, d_end);  h1_d[int(k/22)]->Fill(log10(d_maxVal[int(k/22)]/(*d_L_EnergyVec)[int(k/22)]));
-                auto e_start = e_EnergyVec->begin() + k;  auto e_end = (k + 22 < e_EnergyVec->size() ) ? e_start + 22 : e_EnergyVec->end();  e_maxVal[int(k/22)] = *std::max_element(e_start, e_end);  h1_e[int(k/22)]->Fill(log10(e_maxVal[int(k/22)]/(*d_L_EnergyVec)[int(k/22)]));
-                auto h_start = h_EnergyVec->begin() + k;  auto h_end = (k + 22 < h_EnergyVec->size() ) ? h_start + 22 : h_EnergyVec->end();  h_maxVal[int(k/22)] = *std::max_element(h_start, h_end);  h1_h[int(k/22)]->Fill(log10(h_maxVal[int(k/22)]/(*d_L_EnergyVec)[int(k/22)]));
-                auto H_start = H_EnergyVec->begin() + k;  auto H_end = (k + 22 < H_EnergyVec->size() ) ? H_start + 22 : H_EnergyVec->end();  H_maxVal[int(k/22)] = *std::max_element(H_start, H_end);  h1_H[int(k/22)]->Fill(log10(H_maxVal[int(k/22)]/(*d_L_EnergyVec)[int(k/22)]));
-                auto c_start = c_EnergyVec->begin() + k;  auto c_end = (k + 22 < c_EnergyVec->size() ) ? c_start + 22 : c_EnergyVec->end();  c_maxVal[int(k/22)] = *std::max_element(c_start, c_end);  h1_c[int(k/22)]->Fill(log10(c_maxVal[int(k/22)]/(*d_L_EnergyVec)[int(k/22)]));
+                auto e_start = e_EnergyVec->begin() + k;  auto e_end = (k + 22 < e_EnergyVec->size() ) ? e_start + 22 : e_EnergyVec->end();  e_maxVal[int(k/22)] = *std::max_element(e_start, e_end);  h1_e[int(k/22)]->Fill(log10(e_maxVal[int(k/22)]/(*e_L_EnergyVec)[int(k/22)]));
+                auto h_start = h_EnergyVec->begin() + k;  auto h_end = (k + 22 < h_EnergyVec->size() ) ? h_start + 22 : h_EnergyVec->end();  h_maxVal[int(k/22)] = *std::max_element(h_start, h_end);  h1_h[int(k/22)]->Fill(log10(h_maxVal[int(k/22)]/(*h_L_EnergyVec)[int(k/22)]));
+                auto H_start = H_EnergyVec->begin() + k;  auto H_end = (k + 22 < H_EnergyVec->size() ) ? H_start + 22 : H_EnergyVec->end();  H_maxVal[int(k/22)] = *std::max_element(H_start, H_end);  h1_H[int(k/22)]->Fill(log10(H_maxVal[int(k/22)]/(*H_L_EnergyVec)[int(k/22)]));
+                auto c_start = c_EnergyVec->begin() + k;  auto c_end = (k + 22 < c_EnergyVec->size() ) ? c_start + 22 : c_EnergyVec->end();  c_maxVal[int(k/22)] = *std::max_element(c_start, c_end);  h1_c[int(k/22)]->Fill(log10(c_maxVal[int(k/22)]/(*c_L_EnergyVec)[int(k/22)]));
                 // cout << " bar " << k << " Layer " << int(k/22) <<endl; 
                 // std::copy(p_start, p_end, std::ostream_iterator<double>(std::cout, ", "));
                 // cout << " max = "<< p_maxVal[int(k/22)] <<  endl;
@@ -175,6 +174,7 @@ void Jm()
 
         gre_e->SetTitle(Form("Incident Energy %d GeV ; BGO Layer (Rad Length); log10(Jm) = log10( (dE/dx) / Edep)",int(Energy[i])));
         gre_e->SetMarkerStyle(22);
+        gre_e->GetYaxis()->SetRangeUser(-1,0);
         
         gre_e->SetMarkerColor(kOrange-3);
         gre_e->SetLineColor(kOrange-3);
