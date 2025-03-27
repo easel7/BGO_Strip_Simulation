@@ -51,7 +51,7 @@ void Lateral_RMS_Single()
     auto h1_h = new TH1D("h1_h","h1_h",75,0,150);  
     auto h1_H = new TH1D("h1_H","h1_H",75,0,150);  
     auto h1_c = new TH1D("h1_c","h1_c",75,0,150);  
-    int k =0;
+    int k =13;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     {
         proton_tree->GetEntry(entry);   /* if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_EnergyVec)[2] > 0.23 && (*p_EnergyVec)[0] > 0.046) */ h1_p->Fill((*p_RMSVec)[k]);

@@ -7,8 +7,8 @@ void Rm_L1()
     int H_First_Had_Layer;   int H_First_Had_Type; double H_E_total;    std::vector<double>* H_RMSVec = nullptr;    std::vector<double>* H_EnergyVec = nullptr;    std::vector<double>* H_Efrac = nullptr;
     int c_First_Had_Layer;   int c_First_Had_Type; double c_E_total;    std::vector<double>* c_RMSVec = nullptr;    std::vector<double>* c_EnergyVec = nullptr;    std::vector<double>* c_Efrac = nullptr;
 
-    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
+    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
 
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
@@ -34,7 +34,7 @@ void Rm_L1()
     double H_maxVal;
     double c_maxVal;
 
-    int k = 13;
+    int k =10;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     // for (Long64_t entry = 0; entry < 1; ++entry)
     {
@@ -50,8 +50,8 @@ void Rm_L1()
                 if(p_First_Had_Layer==-1) { h1_h->Fill(log10(p_maxVal/p_E_total)); }
                 if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1              && p_First_Had_Type == 1) { h1_e->Fill(log10(p_maxVal/p_E_total)); }
                 if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1) { h1_H->Fill(log10(p_maxVal/p_E_total)); }
-                if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2) { h1_c->Fill(log10(p_maxVal/p_E_total)); }
-                if(p_First_Had_Layer>=k+1) { h1_h->Fill(log10(p_maxVal/p_E_total)); }
+                if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2)                                                  { h1_c->Fill(log10(p_maxVal/p_E_total)); }
+                if(p_First_Had_Layer>=k+1) { h1_E->Fill(log10(p_maxVal/p_E_total)); }
                 
             }
             else if (k==0)

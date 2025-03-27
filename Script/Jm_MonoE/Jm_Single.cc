@@ -92,6 +92,7 @@ void Jm_Single()
     h1_H->Sumw2(); h1_H->Scale(1.0/h1_H->Integral()); h1_H->SetLineColor(kGreen-3); h1_H->SetMarkerColor(kGreen-3); h1_H->SetLineWidth(2);
     h1_c->Sumw2(); h1_c->Scale(1.0/h1_c->Integral()); h1_c->SetLineColor(kMagenta); h1_c->SetMarkerColor(kGreen-3); h1_c->SetLineWidth(2);
     h1_p->Sumw2(); h1_p->Scale(1.0/h1_p->Integral()); h1_p->SetLineColor(kRed);     h1_p->SetMarkerColor(kRed);     h1_p->SetLineWidth(2);
+
     h1_p->GetYaxis()->SetRangeUser(0,0.6);h1_p->SetTitle(Form("1000 GeV incident EdepRatio Distrubution in L%d; log_{10}(Jm) = log_{10}(Max Energy Deposit bar in L%d/ Energy Deposit in L%d);Normalized Count",k,k,k));
 
     

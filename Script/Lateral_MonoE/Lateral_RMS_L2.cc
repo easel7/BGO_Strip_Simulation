@@ -26,6 +26,8 @@ void Lateral_RMS_L2()
     auto h1_h = new TH1D("h1_h","h1_h",75,0,150); 
     auto h1_H = new TH1D("h1_H","h1_H",75,0,150); 
     auto h1_c = new TH1D("h1_c","h1_c",75,0,150); 
+    auto h1_C = new TH1D("h1_C","h1_C",75,0,150); 
+
 
     double p_maxVal;
     double d_maxVal;
@@ -34,7 +36,7 @@ void Lateral_RMS_L2()
     double H_maxVal;
     double c_maxVal;
 
-    int k = 13;
+    int k = 3;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     // for (Long64_t entry = 0; entry < 1; ++entry)
     {
@@ -45,31 +47,33 @@ void Lateral_RMS_L2()
             auto p_start = p_EnergyVec->begin() + i;  auto p_end = (i + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal = *std::max_element(p_start, p_end); 
             if(k>0 && k<13)
             {
-                h1_p->Fill(p_RMSVec);
-                if(p_First_Had_Layer==k) { h1_d->Fill(p_RMSVec); }
-                if(p_First_Had_Layer==-1) { h1_h->Fill(p_RMSVec); }
-                if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1              && p_First_Had_Type == 1) { h1_e->Fill(p_RMSVec); }
-                if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1) { h1_H->Fill(p_RMSVec); }
-                if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2) { h1_c->Fill(p_RMSVec); }
-                if(p_First_Had_Layer>=k+1) { h1_h->Fill(p_RMSVec); }
+                h1_p->Fill((*p_RMSVec)[k]);
+                if(p_First_Had_Layer==k) { h1_d->Fill((*p_RMSVec)[k]); }
+                if(p_First_Had_Layer==-1) { h1_h->Fill((*p_RMSVec)[k]); }
+                if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1              && p_First_Had_Type == 1) { h1_e->Fill((*p_RMSVec)[k]); }
+                if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1) { h1_H->Fill((*p_RMSVec)[k]); }
+                if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2) { h1_c->Fill((*p_RMSVec)[k]); }
+                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 1 ) { h1_E->Fill((*p_RMSVec)[k]); }
+                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 2 ) { h1_C->Fill((*p_RMSVec)[k]); }
+
                 
             }
             else if (k==0)
             {
-                h1_p->Fill(p_RMSVec);
-                if(p_First_Had_Layer==k) { h1_d->Fill(p_RMSVec); }
-                if(p_First_Had_Layer==-1) { h1_h->Fill(p_RMSVec); }
-                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 1) { h1_e->Fill(p_RMSVec); }
-                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 2) { h1_E->Fill(p_RMSVec); }
+                h1_p->Fill((*p_RMSVec)[k]);
+                if(p_First_Had_Layer==k) { h1_d->Fill((*p_RMSVec)[k]); }
+                if(p_First_Had_Layer==-1) { h1_h->Fill((*p_RMSVec)[k]); }
+                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 1) { h1_e->Fill((*p_RMSVec)[k]); }
+                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 2) { h1_E->Fill((*p_RMSVec)[k]); }
             }
             else if (k==13)
             {
-                h1_p->Fill(p_RMSVec);
-                if(p_First_Had_Layer==k) { h1_d->Fill(p_RMSVec); }
-                if(p_First_Had_Layer==-1) { h1_h->Fill(p_RMSVec); }
-                if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1              && p_First_Had_Type == 1) { h1_e->Fill(p_RMSVec); }
-                if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1) { h1_H->Fill(p_RMSVec); }
-                if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2) { h1_c->Fill(p_RMSVec); }
+                h1_p->Fill((*p_RMSVec)[k]);
+                if(p_First_Had_Layer==k) { h1_d->Fill((*p_RMSVec)[k]); }
+                if(p_First_Had_Layer==-1) { h1_h->Fill((*p_RMSVec)[k]); }
+                if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1              && p_First_Had_Type == 1) { h1_e->Fill((*p_RMSVec)[k]); }
+                if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1) { h1_H->Fill((*p_RMSVec)[k]); }
+                if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2) { h1_c->Fill((*p_RMSVec)[k]); }
             }
             
             
@@ -82,11 +86,11 @@ void Lateral_RMS_L2()
     h1_h->Sumw2(); /*h1_h->Scale(1.0/h1_h->Integral());*/ h1_h->SetLineColor(kGreen-3); h1_h->SetMarkerColor(kGreen-3); h1_h->SetLineWidth(2);
     h1_c->Sumw2(); /*h1_c->Scale(1.0/h1_c->Integral());*/ h1_c->SetLineColor(kMagenta); h1_c->SetMarkerColor(kMagenta); h1_c->SetLineWidth(2);
     h1_H->Sumw2(); /*h1_H->Scale(1.0/h1_H->Integral());*/ h1_H->SetLineColor(kBlack);   h1_H->SetMarkerColor(kBlack);   h1_H->SetLineWidth(2);
-    h1_E->Sumw2(); /*h1_H->Scale(1.0/h1_H->Integral());*/ h1_E->SetLineColor(kCyan);   h1_E->SetMarkerColor(kCyan);   h1_E->SetLineWidth(2);
+    h1_E->Sumw2(); /*h1_E->Scale(1.0/h1_E->Integral());*/ h1_E->SetLineColor(kCyan);   h1_E->SetMarkerColor(kCyan);   h1_E->SetLineWidth(2);
+    h1_C->Sumw2(); /*h1_C->Scale(1.0/h1_C->Integral());*/ h1_C->SetLineColor(kGray);   h1_C->SetMarkerColor(kGray);   h1_C->SetLineWidth(2);
 
-   
     // h1_p->GetYaxis()->SetRangeUser(0,0.5);h1_p->SetTitle("1000 GeV incident; log_{10}(Rm) = log_{10}(Max Energy Deposit bar in L0/ Total Deposit);Normalized Count");
-    h1_p->GetYaxis()->SetRangeUser(0,2000);h1_p->SetTitle(Form("1000 GeV incident; log_{10}(Rm) = log_{10}(Max Energy Deposit bar in L%d/ Total Deposit);Count",k));
+    h1_p->GetYaxis()->SetRangeUser(0,2000);h1_p->SetTitle(Form("1000 GeV incident; RMS L%d;Count",k));
     
     auto c1 = new TCanvas("c1","c1",900,600);
     c1->cd();
@@ -104,17 +108,21 @@ void Lateral_RMS_L2()
     {
         h1_H->Draw("same");h1_H->SetStats(kFALSE); 
         h1_E->Draw("same");h1_c->SetStats(kFALSE); 
+        h1_C->Draw("same");h1_C->SetStats(kFALSE); 
 
         legend1->AddEntry(h1_p, "All", "el");
         legend1->AddEntry(h1_d, Form("Had Interaction at L%d",k), "el");
         legend1->AddEntry(h1_e, Form("Inelastic Interaction at shallower Layer [L%d,L%d]",int(floor((k-1)/2)),k-1), "el");
         legend1->AddEntry(h1_H, Form("Inelastic Interaction at shallower Layer [L%d,L%d]",0,int(floor((k-1)/2))), "el");  
         legend1->AddEntry(h1_c, "Elastic Interaction at shallower Layer", "el");  
-        legend1->AddEntry(h1_E, "Had Interaction at deeper Layer", "el");  
+        legend1->AddEntry(h1_E, "Inelastic Interaction at deeper Layer", "el");  
+        legend1->AddEntry(h1_C, "Elastic Interaction at deeper Layer", "el");  
+
         legend1->AddEntry(h1_h, "Pass Through", "el");       
     }
     else if (k==0)
     {
+        
         legend1->AddEntry(h1_p, "All", "el");
         legend1->AddEntry(h1_d, Form("Had Interaction at L%d",k), "el");
         legend1->AddEntry(h1_e, "Inelastic Interaction at deeper Layer", "el");
@@ -131,7 +139,6 @@ void Lateral_RMS_L2()
         legend1->AddEntry(h1_c, "Elastic Interaction at shallower Layer", "el");  
         legend1->AddEntry(h1_h, "Pass Through", "el");       
     }
-
 
     legend1->Draw();       
 }
