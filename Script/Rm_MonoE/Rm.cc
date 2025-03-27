@@ -81,12 +81,12 @@ void Rm()
         gStyle->SetOptStat(0);
         for (int j = 0; j < 14; j++)
         {
-            h1_p[j] = new TH1D(Form("h1_p[%d]",j), Form("h1_p[%d]",j),30,-3,0);  
-            h1_d[j] = new TH1D(Form("h1_d[%d]",j), Form("h1_d[%d]",j),30,-3,0);  
-            h1_e[j] = new TH1D(Form("h1_e[%d]",j), Form("h1_e[%d]",j),30,-3,0);  
-            h1_h[j] = new TH1D(Form("h1_h[%d]",j), Form("h1_h[%d]",j),30,-3,0);  
-            h1_H[j] = new TH1D(Form("h1_H[%d]",j), Form("h1_H[%d]",j),30,-3,0);  
-            h1_c[j] = new TH1D(Form("h1_c[%d]",j), Form("h1_c[%d]",j),30,-3,0);  
+            h1_p[j] = new TH1D(Form("h1_p[%d]",j), Form("h1_p[%d]",j),40,-4,0);  
+            h1_d[j] = new TH1D(Form("h1_d[%d]",j), Form("h1_d[%d]",j),40,-4,0);  
+            h1_e[j] = new TH1D(Form("h1_e[%d]",j), Form("h1_e[%d]",j),40,-4,0);  
+            h1_h[j] = new TH1D(Form("h1_h[%d]",j), Form("h1_h[%d]",j),40,-4,0);  
+            h1_H[j] = new TH1D(Form("h1_H[%d]",j), Form("h1_H[%d]",j),40,-4,0);  
+            h1_c[j] = new TH1D(Form("h1_c[%d]",j), Form("h1_c[%d]",j),40,-4,0);  
         }
 
         for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
@@ -125,14 +125,14 @@ void Rm()
             h1_h[j]->Sumw2(); h1_h[j]->Scale(1.0/h1_h[j]->Integral()); h1_h[j]->SetLineColor(kGreen-3); h1_h[j]->SetMarkerColor(kGreen-3); h1_h[j]->SetLineWidth(2);
             h1_H[j]->Sumw2(); h1_H[j]->Scale(1.0/h1_H[j]->Integral()); h1_H[j]->SetLineColor(kGreen-3); h1_H[j]->SetMarkerColor(kGreen-3); h1_H[j]->SetLineWidth(2);
             h1_c[j]->Sumw2(); h1_c[j]->Scale(1.0/h1_c[j]->Integral()); h1_c[j]->SetLineColor(kMagenta); h1_c[j]->SetMarkerColor(kMagenta); h1_c[j]->SetLineWidth(2);
-            // h1_e[j]->GetYaxis()->SetRangeUser(0,0.25);
+            h1_e[j]->GetYaxis()->SetRangeUser(0,0.6);
             h1_e[j]->SetTitle(Form("%.f GeV incident in L%d;log_{10}(Rm) = log_{10}(Max Energy Deposit bar in L0/ Total Deposit);Normalized Count",Energy[i],j));
             h1_e[j]->Draw();
             h1_H[j]->Draw("same");
             h1_c[j]->Draw("same");
             h1_h[j]->Draw("same");
-            h1_p[j]->Draw("same");
-            h1_d[j]->Draw("same");
+            h1_p[j]->Draw("histsame");
+            h1_d[j]->Draw("histsame");
 
             double quantiles[3] = {0.16, 0.50, 0.84};  // Percentiles
             double p_values[3];  h1_p[j]->GetQuantiles(3, p_values, quantiles);

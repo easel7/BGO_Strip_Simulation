@@ -45,12 +45,12 @@ void Rm_Single()
     carbon_tree->SetBranchAddress("Total_E"          ,&c_E_total);
 
     cout  << proton_tree->GetEntries() << endl;
-    auto h1_p = new TH1D("h1_p","h1_p",30,-3,0);  
-    auto h1_d = new TH1D("h1_d","h1_d",30,-3,0);  
-    auto h1_e = new TH1D("h1_e","h1_e",30,-3,0);  
-    auto h1_h = new TH1D("h1_h","h1_h",30,-3,0);  
-    auto h1_H = new TH1D("h1_H","h1_H",30,-3,0);  
-    auto h1_c = new TH1D("h1_c","h1_c",30,-3,0);  
+    auto h1_p = new TH1D("h1_p","h1_p",40,-4,0);  
+    auto h1_d = new TH1D("h1_d","h1_d",40,-4,0);  
+    auto h1_e = new TH1D("h1_e","h1_e",40,-4,0);  
+    auto h1_h = new TH1D("h1_h","h1_h",40,-4,0);  
+    auto h1_H = new TH1D("h1_H","h1_H",40,-4,0);  
+    auto h1_c = new TH1D("h1_c","h1_c",40,-4,0);  
 
     double p_maxVal;
     double d_maxVal;
@@ -74,7 +74,7 @@ void Rm_Single()
         if (!h_EnergyVec || h_EnergyVec->empty()) cout << "branch fail"<< endl;
         if (!H_EnergyVec || H_EnergyVec->empty()) cout << "branch fail"<< endl;
         if (!c_EnergyVec || c_EnergyVec->empty()) cout << "branch fail"<< endl;
-        cout << p_E_total << endl;
+        // cout << p_E_total << endl;
         // for (size_t i = 0; i < 22; i += 22)
         for (size_t i = 0; i < p_EnergyVec->size(); i += 22)
         {
@@ -98,7 +98,7 @@ void Rm_Single()
     }
 
     
-    h1_p->Sumw2(); h1_p->Scale(1.0/h1_p->Integral()); h1_p->SetLineColor(kRed);     h1_p->SetMarkerColor(kRed);     h1_p->SetLineWidth(2);h1_p->GetYaxis()->SetRangeUser(0,0.4);h1_p->SetTitle("100 GeV incident EdepRatio Distrubution in L0; log_{10}(Rm) = log_{10}(Max Energy Deposit bar in L0/ Total Deposit);Normalized Count");
+    h1_p->Sumw2(); h1_p->Scale(1.0/h1_p->Integral()); h1_p->SetLineColor(kRed);     h1_p->SetMarkerColor(kRed);     h1_p->SetLineWidth(2);h1_p->GetYaxis()->SetRangeUser(0,0.6);h1_p->SetTitle("100 GeV incident EdepRatio Distrubution in L0; log_{10}(Rm) = log_{10}(Max Energy Deposit bar in L0/ Total Deposit);Normalized Count");
     h1_d->Sumw2(); h1_d->Scale(1.0/h1_d->Integral()); h1_d->SetLineColor(kBlue);    h1_d->SetMarkerColor(kBlue);    h1_d->SetLineWidth(2);
     h1_e->Sumw2(); h1_e->Scale(1.0/h1_e->Integral()); h1_e->SetLineColor(kOrange-3);h1_e->SetMarkerColor(kOrange-3);h1_e->SetLineWidth(2);
     h1_h->Sumw2(); h1_h->Scale(1.0/h1_h->Integral()); h1_h->SetLineColor(kGreen-3); h1_h->SetMarkerColor(kGreen-3); h1_h->SetLineWidth(2);
