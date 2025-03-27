@@ -49,15 +49,15 @@ particle=(proton deuteron e- alpha He3 gamma) #
 # done
 for i in "${!Tag[@]}"; do
 
-for energy in $(seq 2 1 10)
+for energy in $(seq 2000 1000 10000)
 do
   # Generate the corresponding macro file for the current energy value
-  cat <<EOL > "${Tag[$i]}_${energy}TeV.mac"
+  cat <<EOL > "${Tag[$i]}_${energy}GeV.mac"
 /run/initialize
-/analysis/setFileName ../Root/${Tag[$i]}_${energy}TeV
+/analysis/setFileName ../Root/${Tag[$i]}_${energy}GeV
 /gps/particle ${particle[$i]}
 /gps/ene/type Mono
-/gps/ene/mono ${energy} TeV
+/gps/ene/mono $(printf "%.1f" "$(echo "$energy / 1000" | bc -l)") TeV
 
 /gps/pos/type Plane
 /gps/pos/shape Square
