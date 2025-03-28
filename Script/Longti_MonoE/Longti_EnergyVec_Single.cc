@@ -68,7 +68,7 @@ void Longti_EnergyVec_Single()
     h1_h->Sumw2(); h1_h->Scale(1.0/h1_h->Integral());h1_h->SetLineColor(kGreen-3); h1_h->SetMarkerColor(kGreen-3); h1_h->SetLineWidth(2);
     h1_H->Sumw2(); h1_H->Scale(1.0/h1_H->Integral());h1_H->SetLineColor(kGreen-3); h1_H->SetMarkerColor(kGreen-3); h1_H->SetLineWidth(2);
     h1_c->Sumw2(); h1_c->Scale(1.0/h1_c->Integral());h1_c->SetLineColor(kMagenta); h1_c->SetMarkerColor(kGreen-3); h1_c->SetLineWidth(2);
-    h1_p->GetYaxis()->SetRangeUser(0,0.6);h1_p->SetTitle(Form("1000GeV incident EdepRatio Distrubution in L0;og_{10}(Energy Deposit in L%d/GeV);Normalized Count",k));
+    h1_p->GetYaxis()->SetRangeUser(0,0.6);h1_p->SetTitle(Form("1000GeV incident EdepRatio Distrubution in L0;log_{10}(Energy Deposit in L%d/GeV);Normalized Count",k));
 
     auto c1 = new TCanvas("c1","c1",900,600);
     c1->cd();
