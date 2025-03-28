@@ -13,7 +13,7 @@ void Jm_L1()
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
     proton_tree->SetBranchAddress("BarEnergyVector"  ,&p_EnergyVec);
-    proton_tree->SetBranchAddress("LayerEnergyVector"  ,&p_L_EnergyVec);
+    proton_tree->SetBranchAddress("LayerEnergyVector",&p_L_EnergyVec);
     proton_tree->SetBranchAddress("Efrac"            ,&p_Efrac);
     proton_tree->SetBranchAddress("First_Had_Layer"  ,&p_First_Had_Layer);
     proton_tree->SetBranchAddress("First_Had_Type"   ,&p_First_Had_Type);
@@ -35,10 +35,8 @@ void Jm_L1()
     double H_maxVal;
     double c_maxVal;
 
-
-    int k = 0;
+    int k = 13;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
-    // for (Long64_t entry = 0; entry < 1; ++entry)
     {
 
         proton_tree->GetEntry(entry);    
@@ -50,29 +48,29 @@ void Jm_L1()
                 h1_p->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k]));
                 if(p_First_Had_Layer==k) { h1_d->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
                 if(p_First_Had_Layer==-1) { h1_h->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1              && p_First_Had_Type == 1) { h1_e->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1) { h1_H->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2)                                                  { h1_c->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 1 )                                                { h1_E->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 2 )                                                { h1_C->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1             && p_First_Had_Type == 1) { h1_e->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1)  { h1_H->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2)                                                   { h1_c->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 1 )                                                  { h1_E->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 2 )                                                  { h1_C->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
                 
             }
             else if (k==0)
             {
                 h1_p->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k]));
-                if(p_First_Had_Layer==k) { h1_d->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer==-1) { h1_h->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 1) { h1_e->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 2) { h1_c->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                if(p_First_Had_Layer==0)                                                                             { h1_d->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                if(p_First_Had_Layer==-1)                                                                            { h1_h->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                if(p_First_Had_Layer>=1 && p_First_Had_Type == 1)                                                   { h1_e->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                if(p_First_Had_Layer>=1 && p_First_Had_Type == 2)                                                    { h1_c->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
             }
             else if (k==13)
             {
                 h1_p->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k]));
-                if(p_First_Had_Layer==k) { h1_d->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer==-1) { h1_h->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1              && p_First_Had_Type == 1) { h1_e->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1) { h1_H->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2) { h1_c->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                if(p_First_Had_Layer==k)                                                                            { h1_d->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                if(p_First_Had_Layer==-1)                                                                           { h1_h->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1           && p_First_Had_Type == 1)  { h1_e->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2) && p_First_Had_Type == 1)  { h1_H->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2)                                                 { h1_c->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
             }
             
             
@@ -114,7 +112,7 @@ void Jm_L1()
         legend1->AddEntry(h1_h, "Pass Through", "el");       
 
         legend1->AddEntry(h1_e, Form("Inelastic Interaction at shallower Layer [L%d,L%d]",int(floor((k-1)/2)),k-1), "el");
-        legend1->AddEntry(h1_H, Form("Inelastic Interaction at shallower Layer [L%d,L%d]",0,int(floor((k-1)/2))), "el");  
+        legend1->AddEntry(h1_H, Form("Inelastic Interaction at shallower Layer [L%d,L%d)",0,int(floor((k-1)/2))), "el");  
         legend1->AddEntry(h1_c, "Elastic Interaction at shallower Layer", "el");  
         legend1->AddEntry(h1_E, "Inelastic Interaction at deeper Layer", "el");  
         legend1->AddEntry(h1_C, "Elastic Interaction at deeper Layer", "el");  
@@ -122,7 +120,6 @@ void Jm_L1()
     }
     else if (k==0)
     {
-        
         legend1->AddEntry(h1_p, "All", "el");
         legend1->AddEntry(h1_d, Form("Had Interaction at L%d",k), "el");
         legend1->AddEntry(h1_h, "Pass Through", "el");    
@@ -134,9 +131,9 @@ void Jm_L1()
     {
         h1_H->Draw("same");h1_H->SetStats(kFALSE); 
         legend1->AddEntry(h1_p, "All", "el");
-        legend1->AddEntry(h1_h, "Pass Through", "el");       
-
         legend1->AddEntry(h1_d, Form("Had Interaction at L%d",k), "el");
+        legend1->AddEntry(h1_h, "Pass Through", "el"); 
+
         legend1->AddEntry(h1_e, Form("Inelastic Interaction at shallower Layer [L%d,L%d]",int(floor((k-1)/2)),k-1), "el");
         legend1->AddEntry(h1_H, Form("Inelastic Interaction at shallower Layer [L%d,L%d]",0,int(floor((k-1)/2))), "el");  
         legend1->AddEntry(h1_c, "Elastic Interaction at shallower Layer", "el");  

@@ -20,49 +20,79 @@ void Edep_Ratio()
 
     double Energy[19]={0};
     double Energy_Err[19]={0};
-    TH1D *h1_e[19];  TF1  *fitFunc_e[19];
-    TH1D *h1_p[19];  TF1  *fitFunc_p[19];
-    TH1D *h1_d[19];  TF1  *fitFunc_d[19];
-    TH1D *h1_h[19];  TF1  *fitFunc_h[19];
-    TH1D *h1_H[19];  TF1  *fitFunc_H[19];
-    TH1D *h1_c[19];  TF1  *fitFunc_c[19];
+    TH1D *h1_e[19];  TF1  *fitFunc_e[19]; 
+    TH1D *h1_p[19];  TF1  *fitFunc_p[19]; 
+    TH1D *h1_d[19];  TF1  *fitFunc_d[19]; 
+    TH1D *h1_h[19];  TF1  *fitFunc_h[19]; 
+    TH1D *h1_H[19];  TF1  *fitFunc_H[19]; 
+    TH1D *h1_c[19];  TF1  *fitFunc_c[19]; 
 
     TCut UBT = "(L0_E>0.0092 && L1_E>0.0092)";
     TCut HET = "(L0_E>0.23 && L1_E >0.23 && L2_E>0.23 && L3_E>0.046)";
     // TCut HET = "";
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 19; i++)
     {
         if(i<9)  {Energy[i] =  (i+1)*10;}
         else   {Energy[i] =  i*100-800;}
         cout << "Energy = " << int(Energy[i]) << " GeV !" << endl;
+        double p_Total_E; std::vector<double>* p_EnergyVec = nullptr;
+        double d_Total_E; std::vector<double>* d_EnergyVec = nullptr;
+        double e_Total_E; std::vector<double>* e_EnergyVec = nullptr;
+        double h_Total_E; std::vector<double>* h_EnergyVec = nullptr;
+        double H_Total_E; std::vector<double>* H_EnergyVec = nullptr;
+        double c_Total_E; std::vector<double>* c_EnergyVec = nullptr;
 
         auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Proton_%dGeV.root",int(Energy[i])));
         auto proton_tree = (TTree*)proton_file->Get("B4");
+        proton_tree->SetBranchAddress("Total_E"          ,&p_Total_E);
+        proton_tree->SetBranchAddress("LayerEnergyVector",&p_EnergyVec);
         auto deuteron_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_%dGeV.root",int(Energy[i])));
         auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
+        deuteron_tree->SetBranchAddress("Total_E"           ,&d_Total_E);
+        deuteron_tree->SetBranchAddress("LayerEnergyVector",&d_EnergyVec);
         auto electron_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Electron_%dGeV.root",int(Energy[i])));
         auto electron_tree = (TTree*)electron_file->Get("B4");
+        electron_tree->SetBranchAddress("Total_E"           ,&e_Total_E);
+        electron_tree->SetBranchAddress("LayerEnergyVector",&e_EnergyVec);
         auto helium4_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Helium4_%dGeV.root",int(Energy[i])));
         auto helium4_tree = (TTree*)helium4_file->Get("B4");
+        helium4_tree->SetBranchAddress("Total_E"           ,&h_Total_E);
+        helium4_tree->SetBranchAddress("LayerEnergyVector",&h_EnergyVec);
         auto helium3_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Helium3_%dGeV.root",int(Energy[i])));
         auto helium3_tree = (TTree*)helium3_file->Get("B4");
+        helium3_tree->SetBranchAddress("Total_E"           ,&H_Total_E);
+        helium3_tree->SetBranchAddress("LayerEnergyVector",&H_EnergyVec);
         auto carbon_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Carbon_%dGeV.root",int(Energy[i])));
         auto carbon_tree = (TTree*)carbon_file->Get("B4");
+        carbon_tree->SetBranchAddress("Total_E"           ,&c_Total_E);
+        carbon_tree->SetBranchAddress("LayerEnergyVector",&c_EnergyVec);
 
         h1_p[i] = new TH1D(Form("h1_p[%d]",i),Form("h1_p[%d]",i),50,0,1); 
         h1_d[i] = new TH1D(Form("h1_d[%d]",i),Form("h1_d[%d]",i),50,0,1); 
         h1_e[i] = new TH1D(Form("h1_e[%d]",i),Form("h1_e[%d]",i),50,0,1); 
         h1_h[i] = new TH1D(Form("h1_h[%d]",i),Form("h1_h[%d]",i),50,0,1); 
         h1_H[i] = new TH1D(Form("h1_H[%d]",i), Form("h1_H[%d]",i),50,0,1); 
-        h1_c[i] = new TH1D(Form("h1_c[%d]",i), Form("h1_c[%d]",i),50,0,1); 
+        h1_c[i] = new TH1D(Form("h1_c[%d]",i), Form("h1_c[%d]",i),50,0,1);  
 
-        proton_tree->Draw(Form("Total_E/Energy>>h1_p[%d]",i),   "", "");  h1_p[i]->Sumw2(); h1_p[i]->SetLineColor(kRed);      h1_p[i]->SetMarkerColor(kRed);     h1_p[i]->SetLineWidth(2);
-        deuteron_tree->Draw(Form("Total_E/Energy>>h1_d[%d]",i), "", "");  h1_d[i]->Sumw2(); h1_d[i]->SetLineColor(kBlue);     h1_d[i]->SetMarkerColor(kBlue);    h1_d[i]->SetLineWidth(2);
-        electron_tree->Draw(Form("Total_E/Energy>>h1_e[%d]",i), "", "");  h1_e[i]->Sumw2(); h1_e[i]->SetLineColor(kOrange-3); h1_e[i]->SetMarkerColor(kOrange-3);h1_e[i]->SetLineWidth(2);
-        helium4_tree->Draw(Form("Total_E/Energy>>h1_h[%d]",i),  "", "");  h1_h[i]->Sumw2(); h1_h[i]->SetLineColor(kGreen-3);  h1_h[i]->SetMarkerColor(kGreen-3); h1_h[i]->SetLineWidth(2);
-        helium3_tree->Draw(Form("Total_E/Energy>>h1_H[%d]",i),  "", "");  h1_H[i]->Sumw2(); h1_H[i]->SetLineColor(kGreen-3);  h1_H[i]->SetMarkerColor(kGreen-3); h1_H[i]->SetLineWidth(2);
-        carbon_tree ->Draw(Form("Total_E/Energy>>h1_c[%d]",i),  "", "");  h1_c[i]->Sumw2(); h1_c[i]->SetLineColor(kMagenta);  h1_c[i]->SetMarkerColor(kMagenta); h1_c[i]->SetLineWidth(2);
+        for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
+        {
+                proton_tree->GetEntry(entry);   if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_EnergyVec)[2] > 0.23 && (*p_EnergyVec)[0] > 0.046) h1_p[i]->Fill(p_Total_E/(Energy[i]));
+                deuteron_tree->GetEntry(entry); if ((*d_EnergyVec)[0] > 0.23 && (*d_EnergyVec)[1] > 0.23 && (*d_EnergyVec)[2] > 0.23 && (*d_EnergyVec)[0] > 0.046) h1_d[i]->Fill(d_Total_E/(Energy[i]));
+                electron_tree->GetEntry(entry); if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_EnergyVec)[2] > 0.23 && (*e_EnergyVec)[0] > 0.046) h1_e[i]->Fill(e_Total_E/(Energy[i]));
+                helium4_tree->GetEntry(entry);  if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_EnergyVec)[2] > 0.23 && (*h_EnergyVec)[0] > 0.046) h1_h[i]->Fill(h_Total_E/(Energy[i]));
+                helium3_tree->GetEntry(entry);  if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_EnergyVec)[2] > 0.23 && (*H_EnergyVec)[0] > 0.046) h1_H[i]->Fill(H_Total_E/(Energy[i]));
+                carbon_tree->GetEntry(entry);   if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_EnergyVec)[2] > 0.23 && (*c_EnergyVec)[0] > 0.046) h1_c[i]->Fill(c_Total_E/(Energy[i]));           
+        }
+
+
+
+        h1_p[i]->Sumw2(); h1_p[i]->SetLineColor(kRed);      h1_p[i]->SetMarkerColor(kRed);     h1_p[i]->SetLineWidth(2);
+        h1_d[i]->Sumw2(); h1_d[i]->SetLineColor(kBlue);     h1_d[i]->SetMarkerColor(kBlue);    h1_d[i]->SetLineWidth(2);
+        h1_e[i]->Sumw2(); h1_e[i]->SetLineColor(kOrange-3); h1_e[i]->SetMarkerColor(kOrange-3);h1_e[i]->SetLineWidth(2);
+        h1_h[i]->Sumw2(); h1_h[i]->SetLineColor(kGreen-3);  h1_h[i]->SetMarkerColor(kGreen-3); h1_h[i]->SetLineWidth(2);
+        h1_H[i]->Sumw2(); h1_H[i]->SetLineColor(kGreen-3);  h1_H[i]->SetMarkerColor(kGreen-3); h1_H[i]->SetLineWidth(2);
+        h1_c[i]->Sumw2(); h1_c[i]->SetLineColor(kMagenta);  h1_c[i]->SetMarkerColor(kMagenta); h1_c[i]->SetLineWidth(2);
 
         
         h1_e[i]->SetTitle(Form("%d GeV - Deposit Energy/Incident Energy;Energy Deposit Ratio;Counts",int(Energy[i])));
@@ -118,7 +148,7 @@ void Edep_Ratio()
         fitFunc_c[i]->Draw("same");
         Carbon_Edep[i]     = fitFunc_c[i]->GetParameter(1);
         Carbon_Edep_Err[i] = fitFunc_c[i]->GetParameter(2);
-        c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/EnergyLong_MonoE/EnergyDeposit_%dGeV.pdf",int(Energy[i])) );
+        c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Matrix/EnergyDeposit_%dGeV.pdf",int(Energy[i])) );
 
     }
     auto c0 = new TCanvas("c0","c0",900,600);

@@ -113,7 +113,7 @@ void Lateral_RMS_L2()
         legend1->AddEntry(h1_p, "All", "el");
         legend1->AddEntry(h1_d, Form("Had Interaction at L%d",k), "el");
         legend1->AddEntry(h1_e, Form("Inelastic Interaction at shallower Layer [L%d,L%d]",int(floor((k-1)/2)),k-1), "el");
-        legend1->AddEntry(h1_H, Form("Inelastic Interaction at shallower Layer [L%d,L%d]",0,int(floor((k-1)/2))), "el");  
+        legend1->AddEntry(h1_H, Form("Inelastic Interaction at shallower Layer [L%d,L%d)",0,int(floor((k-1)/2))), "el");  
         legend1->AddEntry(h1_c, "Elastic Interaction at shallower Layer", "el");  
         legend1->AddEntry(h1_E, "Inelastic Interaction at deeper Layer", "el");  
         legend1->AddEntry(h1_C, "Elastic Interaction at deeper Layer", "el");  
@@ -135,7 +135,7 @@ void Lateral_RMS_L2()
         legend1->AddEntry(h1_p, "All", "el");
         legend1->AddEntry(h1_d, Form("Had Interaction at L%d",k), "el");
         legend1->AddEntry(h1_e, Form("Inelastic Interaction at shallower Layer [L%d,L%d]",int(floor((k-1)/2)),k-1), "el");
-        legend1->AddEntry(h1_H, Form("Inelastic Interaction at shallower Layer [L%d,L%d]",0,int(floor((k-1)/2))), "el");  
+        legend1->AddEntry(h1_H, Form("Inelastic Interaction at shallower Layer [L%d,L%d)",0,int(floor((k-1)/2))), "el");  
         legend1->AddEntry(h1_c, "Elastic Interaction at shallower Layer", "el");  
         legend1->AddEntry(h1_h, "Pass Through", "el");       
     }

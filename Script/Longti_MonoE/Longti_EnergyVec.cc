@@ -1,7 +1,7 @@
 void Longti_EnergyVec()
 {
     double Energy[19]={0};
-    for (int i = 0; i < 10; i++) // Energy
+    for (int i = 0; i < 19; i++) // Energy
     {
         if(i<9)  {Energy[i] =  (i+1)*10;}
         else   {Energy[i] =  i*100-800;}
@@ -70,21 +70,21 @@ void Longti_EnergyVec()
         for (int j = 0; j < 14; j++)
         {
             c1->cd(j + 1);
-            h1_p[j] = new TH1D(Form("h1_p[%d]",j), Form("h1_p[%d]",j),50,-5,0);  
-            h1_d[j] = new TH1D(Form("h1_d[%d]",j), Form("h1_d[%d]",j),50,-5,0);  
-            h1_e[j] = new TH1D(Form("h1_e[%d]",j), Form("h1_e[%d]",j),50,-5,0);  
-            h1_h[j] = new TH1D(Form("h1_h[%d]",j), Form("h1_h[%d]",j),50,-5,0);  
-            h1_H[j] = new TH1D(Form("h1_H[%d]",j), Form("h1_H[%d]",j),50,-5,0);  
-            h1_c[j] = new TH1D(Form("h1_c[%d]",j), Form("h1_c[%d]",j),50,-5,0);  
+            h1_p[j] = new TH1D(Form("h1_p[%d]",j), Form("h1_p[%d]",j),60,-2.5,3.5);  
+            h1_d[j] = new TH1D(Form("h1_d[%d]",j), Form("h1_d[%d]",j),60,-2.5,3.5);  
+            h1_e[j] = new TH1D(Form("h1_e[%d]",j), Form("h1_e[%d]",j),60,-2.5,3.5);  
+            h1_h[j] = new TH1D(Form("h1_h[%d]",j), Form("h1_h[%d]",j),60,-2.5,3.5);  
+            h1_H[j] = new TH1D(Form("h1_H[%d]",j), Form("h1_H[%d]",j),60,-2.5,3.5);  
+            h1_c[j] = new TH1D(Form("h1_c[%d]",j), Form("h1_c[%d]",j),60,-2.5,3.5);  
 
             for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
             {
-                proton_tree->GetEntry(entry);   if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_EnergyVec)[2] > 0.23 && (*p_EnergyVec)[0] > 0.046) h1_p[j]->Fill(log10((*p_Efrac)[j]));
-                deuteron_tree->GetEntry(entry); if ((*d_EnergyVec)[0] > 0.23 && (*d_EnergyVec)[1] > 0.23 && (*d_EnergyVec)[2] > 0.23 && (*d_EnergyVec)[0] > 0.046) h1_d[j]->Fill(log10((*d_Efrac)[j]));
-                electron_tree->GetEntry(entry); if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_EnergyVec)[2] > 0.23 && (*e_EnergyVec)[0] > 0.046) h1_e[j]->Fill(log10((*e_Efrac)[j]));
-                helium4_tree->GetEntry(entry);  if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_EnergyVec)[2] > 0.23 && (*h_EnergyVec)[0] > 0.046) h1_h[j]->Fill(log10((*h_Efrac)[j]));
-                helium3_tree->GetEntry(entry);  if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_EnergyVec)[2] > 0.23 && (*H_EnergyVec)[0] > 0.046) h1_H[j]->Fill(log10((*H_Efrac)[j]));
-                carbon_tree->GetEntry(entry);   if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_EnergyVec)[2] > 0.23 && (*c_EnergyVec)[0] > 0.046) h1_c[j]->Fill(log10((*c_Efrac)[j]));
+                proton_tree->GetEntry(entry);   if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_EnergyVec)[2] > 0.23 && (*p_EnergyVec)[0] > 0.046) h1_p[j]->Fill(log10((*p_EnergyVec)[j]));
+                deuteron_tree->GetEntry(entry); if ((*d_EnergyVec)[0] > 0.23 && (*d_EnergyVec)[1] > 0.23 && (*d_EnergyVec)[2] > 0.23 && (*d_EnergyVec)[0] > 0.046) h1_d[j]->Fill(log10((*d_EnergyVec)[j]));
+                electron_tree->GetEntry(entry); if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_EnergyVec)[2] > 0.23 && (*e_EnergyVec)[0] > 0.046) h1_e[j]->Fill(log10((*e_EnergyVec)[j]));
+                helium4_tree->GetEntry(entry);  if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_EnergyVec)[2] > 0.23 && (*h_EnergyVec)[0] > 0.046) h1_h[j]->Fill(log10((*h_EnergyVec)[j]));
+                helium3_tree->GetEntry(entry);  if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_EnergyVec)[2] > 0.23 && (*H_EnergyVec)[0] > 0.046) h1_H[j]->Fill(log10((*H_EnergyVec)[j]));
+                carbon_tree->GetEntry(entry);   if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_EnergyVec)[2] > 0.23 && (*c_EnergyVec)[0] > 0.046) h1_c[j]->Fill(log10((*c_EnergyVec)[j]));
             }
 
             h1_p[j]->Sumw2(); h1_p[j]->Scale(1.0/h1_p[j]->Integral());h1_p[j]->SetLineColor(kRed);     h1_p[j]->SetMarkerColor(kRed);     h1_p[j]->SetLineWidth(2);
@@ -94,7 +94,7 @@ void Longti_EnergyVec()
             h1_H[j]->Sumw2(); h1_H[j]->Scale(1.0/h1_H[j]->Integral());h1_H[j]->SetLineColor(kGreen-3); h1_H[j]->SetMarkerColor(kGreen-3); h1_H[j]->SetLineWidth(2);
             h1_c[j]->Sumw2(); h1_c[j]->Scale(1.0/h1_c[j]->Integral());h1_c[j]->SetLineColor(kMagenta); h1_c[j]->SetMarkerColor(kMagenta); h1_c[j]->SetLineWidth(2);
 
-            h1_e[j]->GetYaxis()->SetRangeUser(0,0.25);h1_e[j]->SetTitle(Form("EdepRatio Distrubution in L%d;log_{10}(Energy Deposit Ratio);Normalized Count",j));
+            h1_e[j]->GetYaxis()->SetRangeUser(0,0.25);h1_e[j]->SetTitle(Form("EdepRatio Distrubution in L%d;log_{10}(Energy Deposit/ GeV);Normalized Count",j));
             h1_e[j]->Draw();
             h1_H[j]->Draw("same");
             h1_c[j]->Draw("same");
@@ -142,7 +142,7 @@ void Longti_EnergyVec()
         auto gre_H = new TGraphAsymmErrors(14,Layer,Helium3_Ratio ,Layer_Err,Layer_Err,Helium3_Ratio_LL ,Helium3_Ratio_UL);
         auto gre_c = new TGraphAsymmErrors(14,Layer,Carbon_Ratio ,Layer_Err,Layer_Err,Carbon_Ratio_LL ,Carbon_Ratio_UL);
 
-        gre_e->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; log10(Deposit Energy Ratio)",int(Energy[i])));
+        gre_e->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; log10(Deposit Energy/ GeV)",int(Energy[i])));
         gre_e->SetMarkerStyle(22);
         
         gre_e->SetMarkerColor(kOrange-3);

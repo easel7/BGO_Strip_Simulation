@@ -34,7 +34,7 @@ void Rm_L1()
     double H_maxVal;
     double c_maxVal;
 
-    int k =10;
+    int k =0;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     // for (Long64_t entry = 0; entry < 1; ++entry)
     {

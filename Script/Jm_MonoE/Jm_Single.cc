@@ -58,7 +58,7 @@ void Jm_Single()
     double h_maxVal;
     double H_maxVal;
     double c_maxVal;
-    int k = 0;
+    int k = 13;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     // for (Long64_t entry = 0; entry < 1; ++entry)
     {
@@ -72,12 +72,12 @@ void Jm_Single()
         for (size_t i = 22*k; i < 22*(k+1); i += 22)
         // for (size_t i = 0; i < p_EnergyVec->size(); i += 22)
         {
-            auto p_start = p_EnergyVec->begin() + i;  auto p_end = (i + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal = *std::max_element(p_start, p_end);        h1_p->Fill(log10(p_maxVal/(*p_L_EnergyVec)[0]));
-            auto d_start = d_EnergyVec->begin() + i;  auto d_end = (i + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal = *std::max_element(d_start, d_end);        h1_d->Fill(log10(d_maxVal/(*d_L_EnergyVec)[0]));
-            auto e_start = e_EnergyVec->begin() + i;  auto e_end = (i + 22 < e_EnergyVec->size() ) ? e_start + 22 : e_EnergyVec->end();  e_maxVal = *std::max_element(e_start, e_end);        h1_e->Fill(log10(e_maxVal/(*e_L_EnergyVec)[0]));
-            auto h_start = h_EnergyVec->begin() + i;  auto h_end = (i + 22 < h_EnergyVec->size() ) ? h_start + 22 : h_EnergyVec->end();  h_maxVal = *std::max_element(h_start, h_end);        h1_h->Fill(log10(h_maxVal/(*h_L_EnergyVec)[0]));
-            auto H_start = H_EnergyVec->begin() + i;  auto H_end = (i + 22 < H_EnergyVec->size() ) ? H_start + 22 : H_EnergyVec->end();  H_maxVal = *std::max_element(H_start, H_end);        h1_H->Fill(log10(H_maxVal/(*H_L_EnergyVec)[0]));
-            auto c_start = c_EnergyVec->begin() + i;  auto c_end = (i + 22 < c_EnergyVec->size() ) ? c_start + 22 : c_EnergyVec->end();  c_maxVal = *std::max_element(c_start, c_end);        h1_c->Fill(log10(c_maxVal/(*c_L_EnergyVec)[0]));
+            auto p_start = p_EnergyVec->begin() + i;  auto p_end = (i + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal = *std::max_element(p_start, p_end);        h1_p->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k]));
+            auto d_start = d_EnergyVec->begin() + i;  auto d_end = (i + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal = *std::max_element(d_start, d_end);        h1_d->Fill(log10(d_maxVal/(*d_L_EnergyVec)[k]));
+            auto e_start = e_EnergyVec->begin() + i;  auto e_end = (i + 22 < e_EnergyVec->size() ) ? e_start + 22 : e_EnergyVec->end();  e_maxVal = *std::max_element(e_start, e_end);        h1_e->Fill(log10(e_maxVal/(*e_L_EnergyVec)[k]));
+            auto h_start = h_EnergyVec->begin() + i;  auto h_end = (i + 22 < h_EnergyVec->size() ) ? h_start + 22 : h_EnergyVec->end();  h_maxVal = *std::max_element(h_start, h_end);        h1_h->Fill(log10(h_maxVal/(*h_L_EnergyVec)[k]));
+            auto H_start = H_EnergyVec->begin() + i;  auto H_end = (i + 22 < H_EnergyVec->size() ) ? H_start + 22 : H_EnergyVec->end();  H_maxVal = *std::max_element(H_start, H_end);        h1_H->Fill(log10(H_maxVal/(*H_L_EnergyVec)[k]));
+            auto c_start = c_EnergyVec->begin() + i;  auto c_end = (i + 22 < c_EnergyVec->size() ) ? c_start + 22 : c_EnergyVec->end();  c_maxVal = *std::max_element(c_start, c_end);        h1_c->Fill(log10(c_maxVal/(*c_L_EnergyVec)[k]));
             
             // cout << " bar " << i << " Layer " << int(i/22) <<endl; 
             // std::copy(p_start, p_end, std::ostream_iterator<double>(std::cout, " "));
@@ -99,7 +99,7 @@ void Jm_Single()
     auto c1 = new TCanvas("c1","c1",900,600);
     c1->cd();
     c1->Clear();
-    h1_p->Draw("hist");      h1_p->SetStats(kTRUE); 
+    h1_p->Draw("hist");      h1_p->SetStats(kFALSE); 
     h1_d->Draw("histsame");h1_d->SetStats(kFALSE); 
     h1_e->Draw("same");h1_e->SetStats(kFALSE); 
     h1_h->Draw("same");h1_h->SetStats(kFALSE); 

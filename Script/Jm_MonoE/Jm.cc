@@ -172,7 +172,7 @@ void Jm()
         auto gre_H = new TGraphAsymmErrors(14,Layer,Helium3_Ratio ,Layer_Err,Layer_Err,Helium3_Ratio_LL ,Helium3_Ratio_UL);
         auto gre_c = new TGraphAsymmErrors(14,Layer,Carbon_Ratio ,Layer_Err,Layer_Err,Carbon_Ratio_LL ,Carbon_Ratio_UL);
 
-        gre_e->SetTitle(Form("Incident Energy %d GeV ; BGO Layer (Rad Length); log10(Jm) = log10( (dE/dx) / Edep)",int(Energy[i])));
+        gre_e->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; log_{10}(Jm) = log_{10}( (dE/dx) / Edep per Layer)",int(Energy[i])));
         gre_e->SetMarkerStyle(22);
         gre_e->GetYaxis()->SetRangeUser(-1,0);
         
