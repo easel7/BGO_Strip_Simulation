@@ -52,7 +52,7 @@ void Fval_Single()
     auto h1_H = new TH1D("h1_H","h1_H",100,-3,2);  
     auto h1_c = new TH1D("h1_c","h1_c",100,-3,2);  
 
-    int k =0;
+    int k =13;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     {
         proton_tree->GetEntry(entry);   /* if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_EnergyVec)[2] > 0.23 && (*p_EnergyVec)[0] > 0.046)*/ h1_p->Fill(log10((*p_Fval)[k]));
@@ -85,7 +85,5 @@ void Fval_Single()
     legend1->AddEntry(h1_h, "Helium4", "el");         
     legend1->AddEntry(h1_c, "Carbon", "el");         
     legend1->Draw();       
-    // Proton_Ratio = p_values[1];     Proton_Ratio_LL  = p_values[1] - p_values[0];   Proton_Ratio_UL= p_values[2] - p_values[1];      
-    // cout << Proton_Ratio  << " , " << Proton_Ratio_LL<< " , " << Proton_Ratio_UL << endl; 
-    // cout << Layer  << " , " << Layer_Err << " , " << Layer_Err << endl;      
+
 }

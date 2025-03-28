@@ -7,8 +7,8 @@ void Lateral_RMS_L2()
     int H_First_Had_Layer;   int H_First_Had_Type; double H_E_total;    std::vector<double>* H_RMSVec = nullptr;    std::vector<double>* H_EnergyVec = nullptr;    std::vector<double>* H_Efrac = nullptr;
     int c_First_Had_Layer;   int c_First_Had_Type; double c_E_total;    std::vector<double>* c_RMSVec = nullptr;    std::vector<double>* c_EnergyVec = nullptr;    std::vector<double>* c_Efrac = nullptr;
 
-    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
+    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
 
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
@@ -36,7 +36,7 @@ void Lateral_RMS_L2()
     double H_maxVal;
     double c_maxVal;
 
-    int k = 3;
+    int k = 0;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     // for (Long64_t entry = 0; entry < 1; ++entry)
     {
@@ -95,17 +95,18 @@ void Lateral_RMS_L2()
     auto c1 = new TCanvas("c1","c1",900,600);
     c1->cd();
     c1->Clear();
-    h1_p->Draw("hist");h1_p->SetStats(kFALSE); 
-    h1_d->Draw("same");h1_d->SetStats(kFALSE); 
-    h1_e->Draw("same");h1_e->SetStats(kFALSE); 
-    h1_h->Draw("same");h1_h->SetStats(kFALSE); 
-    h1_c->Draw("same");h1_c->SetStats(kFALSE); 
+
 
     auto legend1 = new TLegend(0.12, 0.58, 0.68, 0.88);
  
 
     if(k>0 && k<13)
     {
+        h1_p->Draw("hist");h1_p->SetStats(kFALSE); 
+        h1_d->Draw("same");h1_d->SetStats(kFALSE); 
+        h1_e->Draw("same");h1_e->SetStats(kFALSE); 
+        h1_h->Draw("same");h1_h->SetStats(kFALSE); 
+        h1_c->Draw("same");h1_c->SetStats(kFALSE); 
         h1_H->Draw("same");h1_H->SetStats(kFALSE); 
         h1_E->Draw("same");h1_c->SetStats(kFALSE); 
         h1_C->Draw("same");h1_C->SetStats(kFALSE); 
@@ -122,15 +123,25 @@ void Lateral_RMS_L2()
     }
     else if (k==0)
     {
-        
+        h1_p->Draw("hist");h1_p->SetStats(kFALSE); 
+        h1_d->Draw("same");h1_d->SetStats(kFALSE); 
+        h1_e->Draw("same");h1_e->SetStats(kFALSE); 
+        h1_h->Draw("same");h1_h->SetStats(kFALSE); 
+        h1_E->Draw("same");h1_E->SetStats(kFALSE); 
+        h1_E->Draw("same");h1_c->SetStats(kFALSE); 
         legend1->AddEntry(h1_p, "All", "el");
         legend1->AddEntry(h1_d, Form("Had Interaction at L%d",k), "el");
         legend1->AddEntry(h1_e, "Inelastic Interaction at deeper Layer", "el");
-        legend1->AddEntry(h1_c, "Elastic Interaction at deeper Layer", "el");  
+        legend1->AddEntry(h1_E, "Elastic Interaction at deeper Layer", "el");  
         legend1->AddEntry(h1_h, "Pass Through", "el");    
     }
     else if (k==13)
     {
+        h1_p->Draw("hist");h1_p->SetStats(kFALSE); 
+        h1_d->Draw("same");h1_d->SetStats(kFALSE); 
+        h1_e->Draw("same");h1_e->SetStats(kFALSE); 
+        h1_h->Draw("same");h1_h->SetStats(kFALSE); 
+        h1_c->Draw("same");h1_c->SetStats(kFALSE); 
         h1_H->Draw("same");h1_H->SetStats(kFALSE); 
         legend1->AddEntry(h1_p, "All", "el");
         legend1->AddEntry(h1_d, Form("Had Interaction at L%d",k), "el");

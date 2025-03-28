@@ -1,22 +1,28 @@
 void Draw_Pattern()
 {
     std::vector<double>* energyVec = nullptr;
-    
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test.root");
+    std::vector<double>* p_RMSVec = nullptr;
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
     auto proton_tree = (TTree*)proton_file->Get("B4");
+
     // Set the branch address to the vector pointer
     proton_tree->SetBranchAddress("BarEnergyVector", &energyVec);
+    proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
+
     cout  << proton_tree->GetEntries() << endl;
     auto c1    = new TCanvas("c1","c1",1800,600);
     auto hXZ   = new TH2D("hXZ","BGO X-Z Plane",24,-12,12,14,0,14);
     auto hYZ   = new TH2D("hYZ","BGO Y-Z Plane",24,-12,12,14,0,14);
-    auto h3box = new TH3D("h3box","3D View 100 GeV Proton Cascade",24,-12,12,24,-12,12,14,0,14);
+    auto h3box = new TH3D("h3box","3D View Deuteron_1000GeV Cascade",24,-12,12,24,-12,12,14,0,14);
 
     double minVal = -3;  // 设置最小值
     double maxVal = 2;  // 设置最大值
     // for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
-    // {
-        proton_tree->GetEntry(0);
+    for (Long64_t entry = 0; entry < 10; ++entry)
+    {
+        proton_tree->GetEntry(entry);
+        cout << " RMS at 0 layer = " << (*p_RMSVec)[0] << endl;
+
         for(size_t i = 0; i < energyVec->size(); ++i) 
         {
             int layer = i / 22; 
@@ -101,6 +107,8 @@ void Draw_Pattern()
         h3box->Draw("BOX2Z");
         auto  *palette3 = (TPaletteAxis*) h3box->GetListOfFunctions()->FindObject("palette");
         latex.DrawLatexNDC(0.8, 0.92, "(Edep/GeV)");
-        // }
+
+        c1->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/Deuteron_1000GeV_%d.root",entry));
+    }
 
 }

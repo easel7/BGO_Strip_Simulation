@@ -1,4 +1,4 @@
-void Longti_Efrac_Single()
+void Longti_EnergyVec_Single()
 {
     int p_First_Had_Layer;    std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr;
     int d_First_Had_Layer;    std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr;
@@ -45,55 +45,40 @@ void Longti_Efrac_Single()
     carbon_tree->SetBranchAddress("First_Had_Layer"  ,&c_First_Had_Layer);
 
     cout  << proton_tree->GetEntries() << endl;
-    auto h1_p = new TH1D("h1_p","h1_p",50,-5,0);  
-    auto h1_d = new TH1D("h1_d","h1_d",50,-5,0);  
-    auto h1_e = new TH1D("h1_e","h1_e",50,-5,0);  
-    auto h1_h = new TH1D("h1_h","h1_h",50,-5,0);  
-    auto h1_H = new TH1D("h1_H","h1_H",50,-5,0);  
-    auto h1_c = new TH1D("h1_c","h1_c",50,-5,0);  
+    auto h1_p = new TH1D("h1_p","h1_p",60,-2.5,3.5);  
+    auto h1_d = new TH1D("h1_d","h1_d",60,-2.5,3.5);  
+    auto h1_e = new TH1D("h1_e","h1_e",60,-2.5,3.5);  
+    auto h1_h = new TH1D("h1_h","h1_h",60,-2.5,3.5);  
+    auto h1_H = new TH1D("h1_H","h1_H",60,-2.5,3.5);  
+    auto h1_c = new TH1D("h1_c","h1_c",60,-2.5,3.5);  
 
+    int k = 0;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     {
-        proton_tree->GetEntry(entry);   if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_EnergyVec)[2] > 0.23 && (*p_EnergyVec)[0] > 0.046) h1_p->Fill(log10((*p_Efrac)[0]));
-        deuteron_tree->GetEntry(entry); if ((*d_EnergyVec)[0] > 0.23 && (*d_EnergyVec)[1] > 0.23 && (*d_EnergyVec)[2] > 0.23 && (*d_EnergyVec)[0] > 0.046) h1_d->Fill(log10((*d_Efrac)[0]));
-        electron_tree->GetEntry(entry); if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_EnergyVec)[2] > 0.23 && (*e_EnergyVec)[0] > 0.046) h1_e->Fill(log10((*e_Efrac)[0]));
-        helium4_tree->GetEntry(entry);  if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_EnergyVec)[2] > 0.23 && (*h_EnergyVec)[0] > 0.046) h1_h->Fill(log10((*h_Efrac)[0]));
-        helium3_tree->GetEntry(entry);  if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_EnergyVec)[2] > 0.23 && (*H_EnergyVec)[0] > 0.046) h1_H->Fill(log10((*H_Efrac)[0]));
-        carbon_tree->GetEntry(entry);   if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_EnergyVec)[2] > 0.23 && (*c_EnergyVec)[0] > 0.046) h1_c->Fill(log10((*c_Efrac)[0]));
+        proton_tree->GetEntry(entry);    /*if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_EnergyVec)[2] > 0.23 && (*p_EnergyVec)[0] > 0.046)*/  h1_p->Fill(log10((*p_EnergyVec)[k]));
+        deuteron_tree->GetEntry(entry);  /*if ((*d_EnergyVec)[0] > 0.23 && (*d_EnergyVec)[1] > 0.23 && (*d_EnergyVec)[2] > 0.23 && (*d_EnergyVec)[0] > 0.046)*/  h1_d->Fill(log10((*d_EnergyVec)[k]));
+        electron_tree->GetEntry(entry);  /*if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_EnergyVec)[2] > 0.23 && (*e_EnergyVec)[0] > 0.046)*/  h1_e->Fill(log10((*e_EnergyVec)[k]));
+        helium4_tree->GetEntry(entry);   /*if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_EnergyVec)[2] > 0.23 && (*h_EnergyVec)[0] > 0.046)*/  h1_h->Fill(log10((*h_EnergyVec)[k]));
+        helium3_tree->GetEntry(entry);   /*if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_EnergyVec)[2] > 0.23 && (*H_EnergyVec)[0] > 0.046)*/  h1_H->Fill(log10((*H_EnergyVec)[k]));
+        carbon_tree->GetEntry(entry);    /*if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_EnergyVec)[2] > 0.23 && (*c_EnergyVec)[0] > 0.046)*/  h1_c->Fill(log10((*c_EnergyVec)[k]));
     }
-    h1_p->Sumw2(); h1_p->Scale(1.0/h1_p->Integral());h1_p->SetLineColor(kRed);     h1_p->SetMarkerColor(kRed);     h1_p->SetLineWidth(2);h1_p->GetYaxis()->SetRangeUser(0,0.25);h1_p->SetTitle("100 GeV incident EdepRatio Distrubution in L0;og_{10}(Energy Deposit in Layer/ Total Deposit);Normalized Count");
+    h1_p->Sumw2(); h1_p->Scale(1.0/h1_p->Integral());h1_p->SetLineColor(kRed);     h1_p->SetMarkerColor(kRed);     h1_p->SetLineWidth(2);
     h1_d->Sumw2(); h1_d->Scale(1.0/h1_d->Integral());h1_d->SetLineColor(kBlue);    h1_d->SetMarkerColor(kBlue);    h1_d->SetLineWidth(2);
     h1_e->Sumw2(); h1_e->Scale(1.0/h1_e->Integral());h1_e->SetLineColor(kOrange-3);h1_e->SetMarkerColor(kOrange-3);h1_e->SetLineWidth(2);
     h1_h->Sumw2(); h1_h->Scale(1.0/h1_h->Integral());h1_h->SetLineColor(kGreen-3); h1_h->SetMarkerColor(kGreen-3); h1_h->SetLineWidth(2);
     h1_H->Sumw2(); h1_H->Scale(1.0/h1_H->Integral());h1_H->SetLineColor(kGreen-3); h1_H->SetMarkerColor(kGreen-3); h1_H->SetLineWidth(2);
     h1_c->Sumw2(); h1_c->Scale(1.0/h1_c->Integral());h1_c->SetLineColor(kMagenta); h1_c->SetMarkerColor(kGreen-3); h1_c->SetLineWidth(2);
+    h1_p->GetYaxis()->SetRangeUser(0,0.6);h1_p->SetTitle(Form("1000GeV incident EdepRatio Distrubution in L0;og_{10}(Energy Deposit in L%d/GeV);Normalized Count",k));
+
     auto c1 = new TCanvas("c1","c1",900,600);
     c1->cd();
     c1->Clear();
-    h1_p->Draw();      h1_p->SetStats(kTRUE); 
-    h1_d->Draw("same");h1_d->SetStats(kFALSE); 
+    h1_p->Draw("hist");      h1_p->SetStats(kTRUE); 
+    h1_d->Draw("histsame");h1_d->SetStats(kFALSE); 
     h1_e->Draw("same");h1_e->SetStats(kFALSE); 
     h1_h->Draw("same");h1_h->SetStats(kFALSE); 
     h1_H->Draw("same");h1_H->SetStats(kFALSE); 
     h1_c->Draw("same");h1_c->SetStats(kFALSE); 
-
-    double quantiles[3] = {0.16, 0.50, 0.84};  // Percentiles
-    double p_values[3];      h1_p->GetQuantiles(3, p_values, quantiles);    TLine *l_p[3];
-    double d_values[3];      h1_d->GetQuantiles(3, d_values, quantiles);    TLine *l_d[3];
-    double e_values[3];      h1_e->GetQuantiles(3, e_values, quantiles);    TLine *l_e[3];
-    double h_values[3];      h1_h->GetQuantiles(3, h_values, quantiles);    TLine *l_h[3];
-    double H_values[3];      h1_H->GetQuantiles(3, H_values, quantiles);    TLine *l_H[3];
-    double c_values[3];      h1_c->GetQuantiles(3, c_values, quantiles);    TLine *l_c[3];
-
-    for (int ii = 0 ;ii< 3 ; ii++)
-    {
-        l_p[ii] = new TLine(p_values[ii],0,p_values[ii],h1_p->GetBinContent(h1_p->FindBin(p_values[ii])));l_p[ii]->SetLineColor(kRed);     l_p[ii]->SetLineWidth(2);l_p[ii]->Draw();
-        l_d[ii] = new TLine(d_values[ii],0,d_values[ii],h1_d->GetBinContent(h1_d->FindBin(d_values[ii])));l_d[ii]->SetLineColor(kBlue);    l_d[ii]->SetLineWidth(2);l_d[ii]->Draw();
-        l_e[ii] = new TLine(e_values[ii],0,e_values[ii],h1_e->GetBinContent(h1_e->FindBin(e_values[ii])));l_e[ii]->SetLineColor(kOrange-3);l_e[ii]->SetLineWidth(2);l_e[ii]->Draw();
-        l_h[ii] = new TLine(h_values[ii],0,h_values[ii],h1_h->GetBinContent(h1_h->FindBin(h_values[ii])));l_h[ii]->SetLineColor(kGreen-3); l_h[ii]->SetLineWidth(2);l_h[ii]->Draw();
-        l_H[ii] = new TLine(H_values[ii],0,H_values[ii],h1_H->GetBinContent(h1_H->FindBin(H_values[ii])));l_H[ii]->SetLineColor(kGreen-3); l_H[ii]->SetLineWidth(2);l_H[ii]->Draw();l_H[ii]->SetLineStyle(2);
-        l_c[ii] = new TLine(c_values[ii],0,c_values[ii],h1_c->GetBinContent(h1_c->FindBin(c_values[ii])));l_c[ii]->SetLineColor(kMagenta); l_c[ii]->SetLineWidth(2);l_c[ii]->Draw();
-    }
 
     auto legend1 = new TLegend(0.12, 0.68, 0.28, 0.88);
     legend1->AddEntry(h1_p, "Proton", "el");
