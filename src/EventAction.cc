@@ -166,6 +166,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
     if (absoperHit) 
     {
       HitsArray[14] += HitsArray[i];
+      fLayHits[i] = HitsArray[i];
       fLayEdep[i] = absoperHit->GetEdep() / CLHEP::GeV;  // 给Vector赋值
       fLayLeng[i] = absoperHit->GetTrackLength() / CLHEP::m;  // 给Vector赋值 
       Xw[i]       = Xw[i]  / fLayEdep[i];
