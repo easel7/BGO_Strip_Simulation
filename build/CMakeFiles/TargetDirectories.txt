@@ -1,3 +1,0 @@
-/Users/xiongzheng/software/B4/B4e/build/CMakeFiles/exampleB4e.dir
-/Users/xiongzheng/software/B4/B4e/build/CMakeFiles/edit_cache.dir
-/Users/xiongzheng/software/B4/B4e/build/CMakeFiles/rebuild_cache.dir
