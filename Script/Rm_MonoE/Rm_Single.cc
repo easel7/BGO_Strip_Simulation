@@ -51,19 +51,12 @@ void Rm_Single()
     carbon_tree->SetBranchAddress("Total_E"          ,&c_E_total);
 
     cout  << proton_tree->GetEntries() << endl;
-    auto h1_p = new TH1D("h1_p","h1_p",50,-5,0);  
-    auto h1_d = new TH1D("h1_d","h1_d",50,-5,0);  
-    auto h1_e = new TH1D("h1_e","h1_e",50,-5,0);  
-    auto h1_h = new TH1D("h1_h","h1_h",50,-5,0);  
-    auto h1_H = new TH1D("h1_H","h1_H",50,-5,0);  
-    auto h1_c = new TH1D("h1_c","h1_c",50,-5,0);  
-
-    double p_maxVal;
-    double d_maxVal;
-    double e_maxVal;
-    double h_maxVal;
-    double H_maxVal;
-    double c_maxVal;
+    auto h1_p = new TH1D("h1_p","h1_p",50,-5,0);      double p_maxVal;
+    auto h1_d = new TH1D("h1_d","h1_d",50,-5,0);      double d_maxVal;
+    auto h1_e = new TH1D("h1_e","h1_e",50,-5,0);      double e_maxVal;
+    auto h1_h = new TH1D("h1_h","h1_h",50,-5,0);      double h_maxVal;
+    auto h1_H = new TH1D("h1_H","h1_H",50,-5,0);      double H_maxVal;
+    auto h1_c = new TH1D("h1_c","h1_c",50,-5,0);      double c_maxVal;
 
     int k = 13;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)

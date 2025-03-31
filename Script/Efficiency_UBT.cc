@@ -17,29 +17,29 @@ TGraphErrors* CreateGraphWithProperties(int n, double* x, double* y, double* xEr
 
 void Efficiency_UBT()
 {
-    double Proton_Eff_HET[9]={0};
-    double Proton_Eff_UBT[9]={0};
-    double Proton_Eff_MIT[9]={0};
+    double Proton_Eff_HET[19]={0};
+    double Proton_Eff_UBT[19]={0};
+    double Proton_Eff_MIT[19]={0};
 
-    double Deuteron_Eff_HET[9]={0};
-    double Deuteron_Eff_UBT[9]={0};
-    double Deuteron_Eff_MIT[9]={0};
+    double Deuteron_Eff_HET[19]={0};
+    double Deuteron_Eff_UBT[19]={0};
+    double Deuteron_Eff_MIT[19]={0};
 
-    double Electron_Eff_HET[9]={0};
-    double Electron_Eff_UBT[9]={0};
-    double Electron_Eff_MIT[9]={0};
+    double Electron_Eff_HET[19]={0};
+    double Electron_Eff_UBT[19]={0};
+    double Electron_Eff_MIT[19]={0};
 
-    double Helium4_Eff_HET[9]={0};
-    double Helium4_Eff_UBT[9]={0};
-    double Helium4_Eff_MIT[9]={0};
+    double Helium4_Eff_HET[19]={0};
+    double Helium4_Eff_UBT[19]={0};
+    double Helium4_Eff_MIT[19]={0};
 
-    double Helium3_Eff_HET[9]={0};
-    double Helium3_Eff_UBT[9]={0};
-    double Helium3_Eff_MIT[9]={0};
+    double Helium3_Eff_HET[19]={0};
+    double Helium3_Eff_UBT[19]={0};
+    double Helium3_Eff_MIT[19]={0};
 
-    double Carbon_Eff_HET[9]={0};
-    double Carbon_Eff_UBT[9]={0};
-    double Carbon_Eff_MIT[9]={0};
+    double Carbon_Eff_HET[19]={0};
+    double Carbon_Eff_UBT[19]={0};
+    double Carbon_Eff_MIT[19]={0};
 
     std::vector<double>* p_EnergyVec = nullptr;    double p_Total_E; double p_Energy;
     std::vector<double>* d_EnergyVec = nullptr;    double d_Total_E; double d_Energy;
@@ -47,18 +47,18 @@ void Efficiency_UBT()
     std::vector<double>* h_EnergyVec = nullptr;    double h_Total_E; double h_Energy;
     std::vector<double>* H_EnergyVec = nullptr;    double H_Total_E; double H_Energy;
     std::vector<double>* c_EnergyVec = nullptr;    double c_Total_E; double c_Energy;
-    double Energy[9]={0};
-    double Energy_Err[9]={0};
-    double Uncertainty[9]={0};
+    double Energy[19]={0};
+    double Energy_Err[19]={0};
+    double Uncertainty[19]={0};
     double n_BGO = TMath::Na()*7.13/1245.8344; // cm-3
-    TH1D *h1_p[9]; TH1D *h2_p[9]; TH1D *h3_p[9]; TH1D *h4_p[9];
-    TH1D *h1_d[9]; TH1D *h2_d[9]; TH1D *h3_d[9]; TH1D *h4_d[9];
-    TH1D *h1_e[9]; TH1D *h2_e[9]; TH1D *h3_e[9]; TH1D *h4_e[9];
-    TH1D *h1_h[9]; TH1D *h2_h[9]; TH1D *h3_h[9]; TH1D *h4_h[9];
-    TH1D *h1_H[9]; TH1D *h2_H[9]; TH1D *h3_H[9]; TH1D *h4_H[9];
-    TH1D *h1_c[9]; TH1D *h2_c[9]; TH1D *h3_c[9]; TH1D *h4_c[9];
+    TH1D *h1_p[19]; TH1D *h2_p[19]; TH1D *h3_p[19]; TH1D *h4_p[19];
+    TH1D *h1_d[19]; TH1D *h2_d[19]; TH1D *h3_d[19]; TH1D *h4_d[19];
+    TH1D *h1_e[19]; TH1D *h2_e[19]; TH1D *h3_e[19]; TH1D *h4_e[19];
+    TH1D *h1_h[19]; TH1D *h2_h[19]; TH1D *h3_h[19]; TH1D *h4_h[19];
+    TH1D *h1_H[19]; TH1D *h2_H[19]; TH1D *h3_H[19]; TH1D *h4_H[19];
+    TH1D *h1_c[19]; TH1D *h2_c[19]; TH1D *h3_c[19]; TH1D *h4_c[19];
 
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 19; i++)
     {
 
         if(i<10)  {Energy[i] =  (i+1)*10; Energy_Err[i] = 5;}
@@ -183,29 +183,29 @@ void Efficiency_UBT()
         cout << "Energy = " << int(Energy[i]) << " GeV !  ele Total eff : " << h1_e[i]->Integral() << " ele HET eff : " <<  h2_e[i]->Integral() <<" ele UBT eff : " << h3_e[i]->Integral() <<" ele MIP eff : " << h4_e[i]->Integral() <<endl;
     }
 
-    auto gre_p_HET = CreateGraphWithProperties(9, Energy, Proton_Eff_HET, Energy_Err, Uncertainty, 20, kRed, kRed, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_p_UBT = CreateGraphWithProperties(9, Energy, Proton_Eff_UBT, Energy_Err, Uncertainty, 20, kRed, kRed, "Unbiased Trigger;Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_p_MIT = CreateGraphWithProperties(9, Energy, Proton_Eff_MIT, Energy_Err, Uncertainty, 20, kRed, kRed, "MIP Trigger;Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_p_HET = CreateGraphWithProperties(19, Energy, Proton_Eff_HET, Energy_Err, Uncertainty, 20, kRed, kRed, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_p_UBT = CreateGraphWithProperties(19, Energy, Proton_Eff_UBT, Energy_Err, Uncertainty, 20, kRed, kRed, "Unbiased Trigger;Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_p_MIT = CreateGraphWithProperties(19, Energy, Proton_Eff_MIT, Energy_Err, Uncertainty, 20, kRed, kRed, "MIP Trigger;Kinetic Energy (GeV); Trigger Efficiency");
 
-    auto gre_d_HET = CreateGraphWithProperties(9, Energy, Deuteron_Eff_HET, Energy_Err, Uncertainty, 21, kBlue, kBlue, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_d_UBT = CreateGraphWithProperties(9, Energy, Deuteron_Eff_UBT, Energy_Err, Uncertainty, 21, kBlue, kBlue, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_d_MIT = CreateGraphWithProperties(9, Energy, Deuteron_Eff_MIT, Energy_Err, Uncertainty, 21, kBlue, kBlue, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_d_HET = CreateGraphWithProperties(19, Energy, Deuteron_Eff_HET, Energy_Err, Uncertainty, 21, kBlue, kBlue, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_d_UBT = CreateGraphWithProperties(19, Energy, Deuteron_Eff_UBT, Energy_Err, Uncertainty, 21, kBlue, kBlue, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_d_MIT = CreateGraphWithProperties(19, Energy, Deuteron_Eff_MIT, Energy_Err, Uncertainty, 21, kBlue, kBlue, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
 
-    auto gre_e_HET = CreateGraphWithProperties(9, Energy, Electron_Eff_HET, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_e_UBT = CreateGraphWithProperties(9, Energy, Electron_Eff_UBT, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_e_MIT = CreateGraphWithProperties(9, Energy, Electron_Eff_MIT, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_e_HET = CreateGraphWithProperties(19, Energy, Electron_Eff_HET, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_e_UBT = CreateGraphWithProperties(19, Energy, Electron_Eff_UBT, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_e_MIT = CreateGraphWithProperties(19, Energy, Electron_Eff_MIT, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
 
-    auto gre_h_HET = CreateGraphWithProperties(9, Energy, Helium4_Eff_HET, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_h_UBT = CreateGraphWithProperties(9, Energy, Helium4_Eff_UBT, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_h_MIT = CreateGraphWithProperties(9, Energy, Helium4_Eff_MIT, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_h_HET = CreateGraphWithProperties(19, Energy, Helium4_Eff_HET, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_h_UBT = CreateGraphWithProperties(19, Energy, Helium4_Eff_UBT, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_h_MIT = CreateGraphWithProperties(19, Energy, Helium4_Eff_MIT, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
 
-    auto gre_H_HET = CreateGraphWithProperties(9, Energy, Helium3_Eff_HET, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_H_UBT = CreateGraphWithProperties(9, Energy, Helium3_Eff_UBT, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_H_MIT = CreateGraphWithProperties(9, Energy, Helium3_Eff_MIT, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_H_HET = CreateGraphWithProperties(19, Energy, Helium3_Eff_HET, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_H_UBT = CreateGraphWithProperties(19, Energy, Helium3_Eff_UBT, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_H_MIT = CreateGraphWithProperties(19, Energy, Helium3_Eff_MIT, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
 
-    auto gre_c_HET = CreateGraphWithProperties(9, Energy, Carbon_Eff_HET, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_c_UBT = CreateGraphWithProperties(9, Energy, Carbon_Eff_UBT, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_c_MIT = CreateGraphWithProperties(9, Energy, Carbon_Eff_MIT, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_c_HET = CreateGraphWithProperties(19, Energy, Carbon_Eff_HET, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_c_UBT = CreateGraphWithProperties(19, Energy, Carbon_Eff_UBT, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_c_MIT = CreateGraphWithProperties(19, Energy, Carbon_Eff_MIT, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
 
     auto c0 = new TCanvas("c0","c0",1200,1200);
     c0->Clear();

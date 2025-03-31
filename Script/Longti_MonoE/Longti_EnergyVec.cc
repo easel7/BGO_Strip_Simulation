@@ -144,33 +144,15 @@ void Longti_EnergyVec()
 
         gre_e->GetYaxis()->SetRangeUser(-2.5,3);
         gre_e->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; log10(Deposit Energy/ GeV)",int(Energy[i])));
-        gre_e->SetMarkerStyle(22);
-        
-        gre_e->SetMarkerColor(kOrange-3);
-        gre_e->SetLineColor(kOrange-3);
-        gre_p->SetMarkerStyle(20);
-        gre_p->SetMarkerColor(kRed);
-        gre_p->SetLineColor(kRed);
-        gre_d->SetMarkerStyle(21);
-        gre_d->SetMarkerColor(kBlue);
-        gre_d->SetLineColor(kBlue);
-        gre_h->SetMarkerStyle(23);
-        gre_h->SetMarkerColor(kGreen-3);
-        gre_h->SetLineColor(kGreen-3);
-        gre_H->SetMarkerColor(kGreen-3);
-        gre_H->SetLineColor(kGreen-3);
-        gre_c->SetMarkerColor(kMagenta);
-        gre_c->SetLineColor(kMagenta);
-
-        gre_p->SetLineWidth(2);
-        gre_d->SetLineWidth(2);
-        gre_e->SetLineWidth(2);
-        gre_h->SetLineWidth(2);
-        gre_H->SetLineWidth(2);gre_H->SetLineStyle(2);
-        gre_c->SetLineWidth(2);
+        gre_e->SetMarkerStyle(22);gre_e->SetMarkerColor(kOrange-3);gre_e->SetLineColor(kOrange-3);gre_p->SetLineWidth(2); 
+        gre_p->SetMarkerStyle(20);gre_p->SetMarkerColor(kRed);     gre_p->SetLineColor(kRed);     gre_d->SetLineWidth(2);
+        gre_d->SetMarkerStyle(21);gre_d->SetMarkerColor(kBlue);    gre_d->SetLineColor(kBlue);    gre_e->SetLineWidth(2);
+        gre_h->SetMarkerStyle(23);gre_h->SetMarkerColor(kGreen-3); gre_h->SetLineColor(kGreen-3); gre_h->SetLineWidth(2);
+        gre_H->SetMarkerStyle(32);gre_H->SetMarkerColor(kGreen-3); gre_H->SetLineColor(kGreen-3); gre_H->SetLineWidth(2);gre_H->SetLineStyle(2);
+        gre_c->SetMarkerStyle(23);gre_c->SetMarkerColor(kMagenta); gre_c->SetLineColor(kMagenta); gre_c->SetLineWidth(2);       
         
         gre_e->Draw("AP");
-    
+
         gre_h->Draw("PSAME");
         gre_H->Draw("PSAME");
         gre_c->Draw("PSAME");

@@ -135,19 +135,14 @@ void Rm()
             h1_d[j]->Draw("histsame");
 
             double quantiles[3] = {0.16, 0.50, 0.84};  // Percentiles
-            double p_values[3];  h1_p[j]->GetQuantiles(3, p_values, quantiles);
-            double d_values[3];  h1_d[j]->GetQuantiles(3, d_values, quantiles);
-            double e_values[3];  h1_e[j]->GetQuantiles(3, e_values, quantiles);
-            double h_values[3];  h1_h[j]->GetQuantiles(3, h_values, quantiles);
-            double H_values[3];  h1_H[j]->GetQuantiles(3, H_values, quantiles);
-            double c_values[3];  h1_c[j]->GetQuantiles(3, c_values, quantiles);
+            double p_values[3];  h1_p[j]->GetQuantiles(3, p_values, quantiles);  Proton_Ratio[j] = p_values[1];     Proton_Ratio_LL[j]  = p_values[1] - p_values[0];   Proton_Ratio_UL[j]= p_values[2] - p_values[1];
+            double d_values[3];  h1_d[j]->GetQuantiles(3, d_values, quantiles);  Deuteron_Ratio[j] = d_values[1];   Deuteron_Ratio_LL[j]= d_values[1] - d_values[0];   Deuteron_Ratio_UL[j]= d_values[2] - d_values[1];
+            double e_values[3];  h1_e[j]->GetQuantiles(3, e_values, quantiles);  Electron_Ratio[j] = e_values[1];   Electron_Ratio_LL[j]= e_values[1] - e_values[0];   Electron_Ratio_UL[j]= e_values[2] - e_values[1];
+            double h_values[3];  h1_h[j]->GetQuantiles(3, h_values, quantiles);  Helium4_Ratio[j] = h_values[1];    Helium4_Ratio_LL[j] = h_values[1] - h_values[0];   Helium4_Ratio_UL[j]= h_values[2] - h_values[1];
+            double H_values[3];  h1_H[j]->GetQuantiles(3, H_values, quantiles);  Helium3_Ratio[j] = H_values[1];    Helium3_Ratio_LL[j] = H_values[1] - H_values[0];   Helium3_Ratio_UL[j]= H_values[2] - H_values[1];
+            double c_values[3];  h1_c[j]->GetQuantiles(3, c_values, quantiles);  Carbon_Ratio[j] = c_values[1];     Carbon_Ratio_LL[j] = c_values[1] - c_values[0];    Carbon_Ratio_UL[j]= c_values[2] - c_values[1];
 
-            Proton_Ratio[j] = p_values[1];     Proton_Ratio_LL[j]  = p_values[1] - p_values[0];   Proton_Ratio_UL[j]= p_values[2] - p_values[1];
-            Deuteron_Ratio[j] = d_values[1];   Deuteron_Ratio_LL[j]= d_values[1] - d_values[0];   Deuteron_Ratio_UL[j]= d_values[2] - d_values[1];
-            Electron_Ratio[j] = e_values[1];   Electron_Ratio_LL[j]= e_values[1] - e_values[0];   Electron_Ratio_UL[j]= e_values[2] - e_values[1];
-            Helium4_Ratio[j] = h_values[1];    Helium4_Ratio_LL[j] = h_values[1] - h_values[0];   Helium4_Ratio_UL[j]= h_values[2] - h_values[1];
-            Helium3_Ratio[j] = H_values[1];    Helium3_Ratio_LL[j] = H_values[1] - H_values[0];   Helium3_Ratio_UL[j]= H_values[2] - H_values[1];
-            Carbon_Ratio[j] = c_values[1];     Carbon_Ratio_LL[j] = c_values[1] - c_values[0];    Carbon_Ratio_UL[j]= c_values[2] - c_values[1];
+
 
             Layer[j] = 0.5 + j;
             Layer_Err[j] = 0.5;
@@ -174,30 +169,13 @@ void Rm()
         auto gre_c = new TGraphAsymmErrors(14,Layer,Carbon_Ratio ,Layer_Err,Layer_Err,Carbon_Ratio_LL ,Carbon_Ratio_UL);
 
         gre_e->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; log_{10}(Rm) = log_{10}( (dE/dx) / Edep)",int(Energy[i])));
-        gre_e->SetMarkerStyle(22);
-        
-        gre_e->SetMarkerColor(kOrange-3);
-        gre_e->SetLineColor(kOrange-3);
-        gre_p->SetMarkerStyle(20);
-        gre_p->SetMarkerColor(kRed);
-        gre_p->SetLineColor(kRed);
-        gre_d->SetMarkerStyle(21);
-        gre_d->SetMarkerColor(kBlue);
-        gre_d->SetLineColor(kBlue);
-        gre_h->SetMarkerStyle(23);
-        gre_h->SetMarkerColor(kGreen-3);
-        gre_h->SetLineColor(kGreen-3);
-        gre_H->SetMarkerColor(kGreen-3);
-        gre_H->SetLineColor(kGreen-3);
-        gre_c->SetMarkerColor(kMagenta);
-        gre_c->SetLineColor(kMagenta);
 
-        gre_p->SetLineWidth(2);
-        gre_d->SetLineWidth(2);
-        gre_e->SetLineWidth(2);
-        gre_h->SetLineWidth(2);
-        gre_H->SetLineWidth(2);gre_H->SetLineStyle(2);
-        gre_c->SetLineWidth(2);
+        gre_e->SetMarkerStyle(22);gre_e->SetMarkerColor(kOrange-3);gre_e->SetLineColor(kOrange-3);gre_p->SetLineWidth(2); 
+        gre_p->SetMarkerStyle(20);gre_p->SetMarkerColor(kRed);     gre_p->SetLineColor(kRed);     gre_d->SetLineWidth(2);
+        gre_d->SetMarkerStyle(21);gre_d->SetMarkerColor(kBlue);    gre_d->SetLineColor(kBlue);    gre_e->SetLineWidth(2);
+        gre_h->SetMarkerStyle(23);gre_h->SetMarkerColor(kGreen-3); gre_h->SetLineColor(kGreen-3); gre_h->SetLineWidth(2);
+        gre_H->SetMarkerStyle(32);gre_H->SetMarkerColor(kGreen-3); gre_H->SetLineColor(kGreen-3); gre_H->SetLineWidth(2);gre_H->SetLineStyle(2);
+        gre_c->SetMarkerStyle(23);gre_c->SetMarkerColor(kMagenta); gre_c->SetLineColor(kMagenta); gre_c->SetLineWidth(2);       
 
         gre_e->GetYaxis()->SetRangeUser(-5,0);
         gre_e->GetXaxis()->SetLimits(0,14);

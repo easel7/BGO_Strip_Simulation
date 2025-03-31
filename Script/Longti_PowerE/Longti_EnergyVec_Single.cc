@@ -1,65 +1,78 @@
-void Longti_Efrac_Single()
+void Longti_EnergyVec_Single()
 {
-    int p_First_Had_Layer;    std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr;
-    int d_First_Had_Layer;    std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr;
-    int e_First_Had_Layer;    std::vector<double>* e_RMSVec = nullptr;    std::vector<double>* e_EnergyVec = nullptr;    std::vector<double>* e_Efrac = nullptr;
-    int h_First_Had_Layer;    std::vector<double>* h_RMSVec = nullptr;    std::vector<double>* h_EnergyVec = nullptr;    std::vector<double>* h_Efrac = nullptr;
-    int H_First_Had_Layer;    std::vector<double>* H_RMSVec = nullptr;    std::vector<double>* H_EnergyVec = nullptr;    std::vector<double>* H_Efrac = nullptr;
-    int c_First_Had_Layer;    std::vector<double>* c_RMSVec = nullptr;    std::vector<double>* c_EnergyVec = nullptr;    std::vector<double>* c_Efrac = nullptr;
+    int p_First_Had_Layer;  double p_Total_E;  std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr;
+    int d_First_Had_Layer;  double d_Total_E;  std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr;
+    int e_First_Had_Layer;  double e_Total_E;  std::vector<double>* e_RMSVec = nullptr;    std::vector<double>* e_EnergyVec = nullptr;    std::vector<double>* e_Efrac = nullptr;
+    int h_First_Had_Layer;  double h_Total_E;  std::vector<double>* h_RMSVec = nullptr;    std::vector<double>* h_EnergyVec = nullptr;    std::vector<double>* h_Efrac = nullptr;
+    int H_First_Had_Layer;  double H_Total_E;  std::vector<double>* H_RMSVec = nullptr;    std::vector<double>* H_EnergyVec = nullptr;    std::vector<double>* H_Efrac = nullptr;
+    int c_First_Had_Layer;  double c_Total_E;  std::vector<double>* c_RMSVec = nullptr;    std::vector<double>* c_EnergyVec = nullptr;    std::vector<double>* c_Efrac = nullptr;
 
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_10GeV.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_PowerLaw.root");
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
     proton_tree->SetBranchAddress("LayerEnergyVector",&p_EnergyVec);
     proton_tree->SetBranchAddress("Efrac"            ,&p_Efrac);
     proton_tree->SetBranchAddress("First_Had_Layer"  ,&p_First_Had_Layer);
-    auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_10GeV.root");
+    proton_tree->SetBranchAddress("Total_E"          ,&p_Total_E);
+
+    auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_PowerLaw.root");
     auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
     deuteron_tree->SetBranchAddress("RMS"              ,&d_RMSVec);
     deuteron_tree->SetBranchAddress("LayerEnergyVector",&d_EnergyVec);
     deuteron_tree->SetBranchAddress("Efrac"            ,&d_Efrac);
     deuteron_tree->SetBranchAddress("First_Had_Layer"  ,&d_First_Had_Layer);
-    auto electron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Electron_10GeV.root");
+    deuteron_tree_tree->SetBranchAddress("Total_E"     ,&d_Total_E);
+
+    auto electron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Electron_PowerLaw.root");
     auto electron_tree = (TTree*)electron_file->Get("B4");
     electron_tree->SetBranchAddress("RMS"              ,&e_RMSVec);
     electron_tree->SetBranchAddress("LayerEnergyVector",&e_EnergyVec);
     electron_tree->SetBranchAddress("Efrac"            ,&e_Efrac);
     electron_tree->SetBranchAddress("First_Had_Layer"  ,&e_First_Had_Layer);
-    auto helium4_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Helium4_10GeV.root");
+    electron_tree->SetBranchAddress("Total_E"          ,&e_Total_E);
+
+    auto helium4_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Helium4_PowerLaw.root");
     auto helium4_tree = (TTree*)helium4_file->Get("B4");
     helium4_tree->SetBranchAddress("RMS"              ,&h_RMSVec);
     helium4_tree->SetBranchAddress("LayerEnergyVector",&h_EnergyVec);
     helium4_tree->SetBranchAddress("Efrac"            ,&h_Efrac);
     helium4_tree->SetBranchAddress("First_Had_Layer"  ,&h_First_Had_Layer);
-    auto helium3_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Helium3_10GeV.root");
+    helium4_tree->SetBranchAddress("Total_E"          ,&h_Total_E);
+
+    auto helium3_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Helium3_PowerLaw.root");
     auto helium3_tree = (TTree*)helium3_file->Get("B4");
     helium3_tree->SetBranchAddress("RMS"              ,&H_RMSVec);
     helium3_tree->SetBranchAddress("LayerEnergyVector",&H_EnergyVec);
     helium3_tree->SetBranchAddress("Efrac"            ,&H_Efrac);
     helium3_tree->SetBranchAddress("First_Had_Layer"  ,&H_First_Had_Layer);
-    auto carbon_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Carbon_10GeV.root");
+    helium3_tree->SetBranchAddress("Total_E"          ,&H_Total_E);
+
+    auto carbon_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Carbon_PowerLaw.root");
     auto carbon_tree = (TTree*)carbon_file->Get("B4");
     carbon_tree->SetBranchAddress("RMS"              ,&c_RMSVec);
     carbon_tree->SetBranchAddress("LayerEnergyVector",&c_EnergyVec);
     carbon_tree->SetBranchAddress("Efrac"            ,&c_Efrac);
     carbon_tree->SetBranchAddress("First_Had_Layer"  ,&c_First_Had_Layer);
+    carbon_tree->SetBranchAddress("Total_E"          ,&c_Total_E);
 
     cout  << proton_tree->GetEntries() << endl;
-    auto h1_p = new TH1D("h1_p","h1_p",50,-5,0);  
-    auto h1_d = new TH1D("h1_d","h1_d",50,-5,0);  
-    auto h1_e = new TH1D("h1_e","h1_e",50,-5,0);  
-    auto h1_h = new TH1D("h1_h","h1_h",50,-5,0);  
-    auto h1_H = new TH1D("h1_H","h1_H",50,-5,0);  
-    auto h1_c = new TH1D("h1_c","h1_c",50,-5,0);  
+    auto h1_p = new TH1D("h1_p","h1_p",60,-2.5,3.5);  
+    auto h1_d = new TH1D("h1_d","h1_d",60,-2.5,3.5);  
+    auto h1_e = new TH1D("h1_e","h1_e",60,-2.5,3.5);  
+    auto h1_h = new TH1D("h1_h","h1_h",60,-2.5,3.5);  
+    auto h1_H = new TH1D("h1_H","h1_H",60,-2.5,3.5);  
+    auto h1_c = new TH1D("h1_c","h1_c",60,-2.5,3.5);  
 
+    int k = 0; // Energy Range log10
+    int j = 0; // Layer
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     {
-        proton_tree->GetEntry(entry);   if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_EnergyVec)[2] > 0.23 && (*p_EnergyVec)[0] > 0.046) h1_p->Fill(log10((*p_Efrac)[0]));
-        deuteron_tree->GetEntry(entry); if ((*d_EnergyVec)[0] > 0.23 && (*d_EnergyVec)[1] > 0.23 && (*d_EnergyVec)[2] > 0.23 && (*d_EnergyVec)[0] > 0.046) h1_d->Fill(log10((*d_Efrac)[0]));
-        electron_tree->GetEntry(entry); if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_EnergyVec)[2] > 0.23 && (*e_EnergyVec)[0] > 0.046) h1_e->Fill(log10((*e_Efrac)[0]));
-        helium4_tree->GetEntry(entry);  if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_EnergyVec)[2] > 0.23 && (*h_EnergyVec)[0] > 0.046) h1_h->Fill(log10((*h_Efrac)[0]));
-        helium3_tree->GetEntry(entry);  if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_EnergyVec)[2] > 0.23 && (*H_EnergyVec)[0] > 0.046) h1_H->Fill(log10((*H_Efrac)[0]));
-        carbon_tree->GetEntry(entry);   if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_EnergyVec)[2] > 0.23 && (*c_EnergyVec)[0] > 0.046) h1_c->Fill(log10((*c_Efrac)[0]));
+        proton_tree->GetEntry(entry);   if (p_Total_E > pow(10,0.2*k) && p_Total_E <= pow(10,0.2*(k+1)) ) h1_p->Fill(log10((*p_EnergyVec)[j]));
+        deuteron_tree->GetEntry(entry); if (d_Total_E > pow(10,0.2*k) && d_Total_E <= pow(10,0.2*(k+1)) ) h1_d->Fill(log10((*d_EnergyVec)[j]));
+        electron_tree->GetEntry(entry); if (e_Total_E > pow(10,0.2*k) && e_Total_E <= pow(10,0.2*(k+1)) ) h1_e->Fill(log10((*e_EnergyVec)[j]));
+        helium4_tree->GetEntry(entry);  if (h_Total_E > pow(10,0.2*k) && h_Total_E <= pow(10,0.2*(k+1)) ) h1_h->Fill(log10((*h_EnergyVec)[j]));
+        helium3_tree->GetEntry(entry);  if (H_Total_E > pow(10,0.2*k) && H_Total_E <= pow(10,0.2*(k+1)) ) h1_H->Fill(log10((*H_EnergyVec)[j]));
+        carbon_tree->GetEntry(entry);   if (c_Total_E > pow(10,0.2*k) && c_Total_E <= pow(10,0.2*(k+1)) ) h1_c->Fill(log10((*c_EnergyVec)[j]));
     }
     h1_p->Sumw2(); h1_p->Scale(1.0/h1_p->Integral());h1_p->SetLineColor(kRed);     h1_p->SetMarkerColor(kRed);     h1_p->SetLineWidth(2);
     h1_d->Sumw2(); h1_d->Scale(1.0/h1_d->Integral());h1_d->SetLineColor(kBlue);    h1_d->SetMarkerColor(kBlue);    h1_d->SetLineWidth(2);
@@ -67,7 +80,8 @@ void Longti_Efrac_Single()
     h1_h->Sumw2(); h1_h->Scale(1.0/h1_h->Integral());h1_h->SetLineColor(kGreen-3); h1_h->SetMarkerColor(kGreen-3); h1_h->SetLineWidth(2);
     h1_H->Sumw2(); h1_H->Scale(1.0/h1_H->Integral());h1_H->SetLineColor(kGreen-3); h1_H->SetMarkerColor(kGreen-3); h1_H->SetLineWidth(2);
     h1_c->Sumw2(); h1_c->Scale(1.0/h1_c->Integral());h1_c->SetLineColor(kMagenta); h1_c->SetMarkerColor(kGreen-3); h1_c->SetLineWidth(2);
-    h1_p->GetYaxis()->SetRangeUser(0,0.25);h1_p->SetTitle("100 GeV incident EdepRatio Distrubution in L0;log_{10}(Energy Deposit in Layer/ Total Deposit);Normalized Count");
+    h1_p->GetYaxis()->SetRangeUser(0,0.25);h1_p->SetTitleSetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] Deposit Energy Distrubution in L%d;log_{10}(Energy Deposit in Layer/GeV);Normalized Count", 1+0.2*k ,1.2+0.2*k ,j ));
+
     auto c1 = new TCanvas("c1","c1",900,600);
     c1->cd();
     c1->Clear();
