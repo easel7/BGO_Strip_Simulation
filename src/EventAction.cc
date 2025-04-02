@@ -137,47 +137,42 @@ void EventAction::EndOfEventAction(const G4Event* event)
   double  Xw2[14]       = {0};
 
   // G4cout << "Total HitCollection Entries !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<< absoHC->entries() << G4endl;
-  for (int i = 0; i < absoHC->entries() - 15 ; ++i) // 336 bar + 14 Layer + 1 Total 
+  for (int i = 0; i < absoHC->entries(); ++i) //
   {
     auto absoperHit = (*absoHC)[i];
     if (absoperHit) 
     {
       // G4cout << "id = " <<  i << " Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
-      fCalEdep[i] = absoperHit->GetEdep() / CLHEP::GeV;  // 给Vector赋值
-      fCalLeng[i] = absoperHit->GetTrackLength() / CLHEP::m;  // 给Vector赋值
-      if( fCalEdep[i] > 0 || fCalLeng[i] > 0)
+      if( absoperHit->GetEdep() / CLHEP::GeV > 1E-2 && absoperHit->GetTrackLength() / CLHEP::m > 0)
       {
         // G4cout << " i =" << i << " bar " << i%22 << " x pos " <<  ((int(i%22)-10)*25-12.5) << G4endl;
+        // G4cout << "Check id = " <<  i << " bar, Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
+
+        fCalEdep[i] = absoperHit->GetEdep() / CLHEP::GeV;  // 给Vector赋值
+        fCalLeng[i] = absoperHit->GetTrackLength() / CLHEP::m;  // 给Vector赋值
         HitsArray[int(i/22)] += 1;
         EdepArray[int(i/22)] += fCalEdep[i];
         LengArray[int(i/22)] += fCalLeng[i];
         Xw[int(i/22)]        += ((int(i%22)-10)*25-12.5) * fCalEdep[i];
         Xw2[int(i/22)]       += ((int(i%22)-10)*25-12.5) * ((int(i%22)-10)*25-12.5) * fCalEdep[i];
+        EdepArray[14]        += fCalEdep[i];
+        LengArray[14]        += fCalLeng[i];
+        HitsArray[14]        += 1;
       }
     }
   }
-  auto absoperHit = (*absoHC)[absoHC->entries()-1];
-  EdepArray[14] = absoperHit->GetEdep() / CLHEP::GeV  ;
-  LengArray[14] = absoperHit->GetTrackLength() / CLHEP::m;
-  // G4cout << "Check Total Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m " << G4endl;
   for (int i = 0; i < 14; ++i) // 308 bar + 14 Layer + 1 Total = 323
   {
-    auto absoperHit = (*absoHC)[absoHC->entries() - 15 + i];
-    if (absoperHit) 
-    {
-      HitsArray[14] += HitsArray[i];
-      fLayHits[i] = HitsArray[i];
-      fLayEdep[i] = absoperHit->GetEdep() / CLHEP::GeV;  // 给Vector赋值
-      fLayLeng[i] = absoperHit->GetTrackLength() / CLHEP::m;  // 给Vector赋值 
-      Xw[i]       = Xw[i]  / fLayEdep[i];
-      Xw2[i]      = Xw2[i] / fLayEdep[i];
-      fEfrac[i]   = fLayEdep[i] / EdepArray[14];
-      fRMS[i]     = sqrt(Xw2[i] - Xw[i] * Xw[i]);
-      fFval[i]    = fRMS[i] * fEfrac[i];
-      // G4cout << "Layer = " <<  i << " Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
-      // G4cout << "Check Layer = " <<  i << " Edep " << EdepArray[i] << " GeV, Length " << LengArray[i] << " m, Fired Bars " << HitsArray[i] << G4endl;
-      // G4cout << "Efrac = " <<  fEfrac[i] << " fRMS " << fRMS[i] << G4endl;
-    }
+    fLayHits[i] = HitsArray[i];
+    fLayEdep[i] = EdepArray[i];
+    fLayLeng[i] = LengArray[i];
+    Xw[i]       = Xw[i]  / fLayEdep[i];
+    Xw2[i]      = Xw2[i] / fLayEdep[i];
+    fEfrac[i]   = fLayEdep[i] / EdepArray[14];
+    fRMS[i]     = sqrt(Xw2[i] - Xw[i] * Xw[i]);
+    fFval[i]    = fRMS[i] * fEfrac[i];
+    // G4cout << "Check Layer = " <<  i << " Edep " << EdepArray[i] << " GeV, Length " << LengArray[i] << " m, Fired Bars " << HitsArray[i] << G4endl;
+    // G4cout << "Efrac = " <<  fEfrac[i] << " fRMS " << fRMS[i] << G4endl;
   }
   // G4cout << "Check Total Edep " << EdepArray[14] << " GeV, Length " << LengArray[14] << " m, Fire Bars " << HitsArray[14] << G4endl;
 
