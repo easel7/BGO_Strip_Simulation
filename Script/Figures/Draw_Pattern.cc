@@ -2,7 +2,9 @@ void Draw_Pattern()
 {
     std::vector<double>* energyVec = nullptr;
     std::vector<double>* p_RMSVec = nullptr;
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
+    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test.root");
+
     auto proton_tree = (TTree*)proton_file->Get("B4");
 
     // Set the branch address to the vector pointer
@@ -11,11 +13,11 @@ void Draw_Pattern()
 
     cout  << proton_tree->GetEntries() << endl;
     auto c1    = new TCanvas("c1","c1",1800,600);
-    auto hXZ   = new TH2D("hXZ","BGO X-Z Plane",24,-12,12,14,0,14);
-    auto hYZ   = new TH2D("hYZ","BGO Y-Z Plane",24,-12,12,14,0,14);
-    auto h3box = new TH3D("h3box","3D View Deuteron_1000GeV Cascade",24,-12,12,24,-12,12,14,0,14);
+    auto hXZ   = new TH2D("hXZ","BGO X-Z Plane",22,-11,11,14,0,14);
+    auto hYZ   = new TH2D("hYZ","BGO Y-Z Plane",22,-11,11,14,0,14);
+    auto h3box = new TH3D("h3box","3D View Proton_1000GeV Cascade",22,-11,11,22,-11,11,14,0,14);
 
-    double minVal = -3;  // 设置最小值
+    double minVal = -2;  // 设置最小值
     double maxVal = 2;  // 设置最大值
     // for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     for (Long64_t entry = 0; entry < 10; ++entry)
@@ -28,26 +30,26 @@ void Draw_Pattern()
             int layer = i / 22; 
             int bar = i % 22;
             double energy = 0;
-            if ((*energyVec)[i] < 1e-3)  {energy = -5;              }
+            if ((*energyVec)[i] < 1e-2)  {energy = -5;              }
             else                         {energy = log10((*energyVec)[i]);}
             // std::cout << "ECEnergyVector[" << i << "] = " << (*energyVec)[i] << " , layer " <<  layer  << " , bar " <<  bar << " Calculated Energy " << energy << " , "<< layer % 2 << std::endl;
             if(layer % 2 == 0)
             {
-                hXZ->SetBinContent(bar+2, 14-layer, energy);
-                hYZ->SetBinContent(bar+2, 14-layer, -5);
+                hXZ->SetBinContent(bar+1, 14-layer, energy);
+                hYZ->SetBinContent(bar+1, 14-layer, -5);
                 for(int j = 0 ; j<24 ; ++j)
                 {
-                    h3box->SetBinContent(bar+2 , j+1  , 14-layer , (*energyVec)[i]);
+                    h3box->SetBinContent(bar+1 , j+1  , 14-layer , (*energyVec)[i]);
                 }
                 
             }
             else
             {
-                hYZ->SetBinContent(bar+2, 14-layer, energy);
-                hXZ->SetBinContent(bar+2, 14-layer, -5);
+                hYZ->SetBinContent(bar+1, 14-layer, energy);
+                hXZ->SetBinContent(bar+1, 14-layer, -5);
                 for(int j = 0 ; j<24 ; ++j)
                 {
-                    h3box->SetBinContent(j+1 , bar+2, 14-layer ,(*energyVec)[i]);
+                    h3box->SetBinContent(j+1 , bar+1, 14-layer ,(*energyVec)[i]);
                 }
             }
         }
@@ -64,7 +66,7 @@ void Draw_Pattern()
         hXZ->SetMaximum(maxVal); 
         hYZ->SetMinimum(minVal); 
         hYZ->SetMaximum(maxVal); 
-        h3box->SetMinimum(1e-3); 
+        h3box->SetMinimum(1e-2); 
         h3box->SetMaximum(12); 
         c1->Clear();
         TLatex latex;
@@ -108,7 +110,7 @@ void Draw_Pattern()
         auto  *palette3 = (TPaletteAxis*) h3box->GetListOfFunctions()->FindObject("palette");
         latex.DrawLatexNDC(0.8, 0.92, "(Edep/GeV)");
 
-        c1->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/Deuteron_1000GeV_%d.root",entry));
+        c1->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/Proton_1000GeV_%lld.root",entry));
     }
 
 }
