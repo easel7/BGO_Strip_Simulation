@@ -131,7 +131,7 @@ void Lateral_RMS()
         legend1->AddEntry(h1_H[0], "Helium3", "l");         
         legend1->AddEntry(h1_c[0], "Carbon", "l");         
         legend1->Draw();       
-        c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Lateral_MonoE/Lateral_RMS_%dGeV.pdf",int(Energy[i])));
+        // c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Lateral_MonoE/Lateral_RMS_%dGeV.pdf",int(Energy[i])));
 
         auto c2 = new TCanvas("c2","c2",1500,1000);
         c2->cd();
@@ -187,7 +187,7 @@ void Lateral_RMS()
         legend2->AddEntry(gre_c, "HET Carbon", "ep");
         legend2->Draw();
 
-        c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Lateral_MonoE/Lateral_RMS_BGOLayer_%dGeV.pdf",int(Energy[i])));
+        // c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Lateral_MonoE/Lateral_RMS_BGOLayer_%dGeV.pdf",int(Energy[i])));
     }
 
 }

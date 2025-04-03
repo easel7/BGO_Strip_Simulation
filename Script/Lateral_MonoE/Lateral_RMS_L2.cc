@@ -7,8 +7,9 @@ void Lateral_RMS_L2()
     int H_First_Had_Layer;   int H_First_Had_Type; double H_E_total;    std::vector<double>* H_RMSVec = nullptr;    std::vector<double>* H_EnergyVec = nullptr;    std::vector<double>* H_Efrac = nullptr;
     int c_First_Had_Layer;   int c_First_Had_Type; double c_E_total;    std::vector<double>* c_RMSVec = nullptr;    std::vector<double>* c_EnergyVec = nullptr;    std::vector<double>* c_Efrac = nullptr;
 
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
+    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
     // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test2.root");
 
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);

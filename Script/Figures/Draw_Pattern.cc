@@ -3,7 +3,7 @@ void Draw_Pattern()
     std::vector<double>* energyVec = nullptr;
     std::vector<double>* p_RMSVec = nullptr;
     // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test1.root");
 
     auto proton_tree = (TTree*)proton_file->Get("B4");
 

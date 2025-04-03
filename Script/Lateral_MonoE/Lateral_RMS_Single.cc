@@ -7,7 +7,8 @@ void Lateral_RMS_Single()
     int H_First_Had_Layer;    std::vector<double>* H_RMSVec = nullptr;    std::vector<double>* H_EnergyVec = nullptr;    std::vector<double>* H_Efrac = nullptr;
     int c_First_Had_Layer;    std::vector<double>* c_RMSVec = nullptr;    std::vector<double>* c_EnergyVec = nullptr;    std::vector<double>* c_Efrac = nullptr;
 
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
+    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test2.root");
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
     proton_tree->SetBranchAddress("LayerEnergyVector",&p_EnergyVec);
@@ -45,13 +46,13 @@ void Lateral_RMS_Single()
     carbon_tree->SetBranchAddress("First_Had_Layer"  ,&c_First_Had_Layer);
 
     cout  << proton_tree->GetEntries() << endl;
-    auto h1_p = new TH1D("h1_p","h1_p",75,0,150);  
-    auto h1_d = new TH1D("h1_d","h1_d",75,0,150);  
-    auto h1_e = new TH1D("h1_e","h1_e",75,0,150);  
-    auto h1_h = new TH1D("h1_h","h1_h",75,0,150);  
-    auto h1_H = new TH1D("h1_H","h1_H",75,0,150);  
-    auto h1_c = new TH1D("h1_c","h1_c",75,0,150);  
-    int k =13;
+    auto h1_p = new TH1D("h1_p","h1_p",100,0,400);  
+    auto h1_d = new TH1D("h1_d","h1_d",100,0,400);  
+    auto h1_e = new TH1D("h1_e","h1_e",100,0,400);  
+    auto h1_h = new TH1D("h1_h","h1_h",100,0,400);  
+    auto h1_H = new TH1D("h1_H","h1_H",100,0,400);  
+    auto h1_c = new TH1D("h1_c","h1_c",100,0,400);  
+    int k = 4;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     {
         proton_tree->GetEntry(entry);   /* if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_EnergyVec)[2] > 0.23 && (*p_EnergyVec)[0] > 0.046) */ h1_p->Fill((*p_RMSVec)[k]);

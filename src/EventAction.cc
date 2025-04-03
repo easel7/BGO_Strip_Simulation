@@ -135,6 +135,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
   double  LengArray[15] = {0};
   double  Xw[14]        = {0};
   double  Xw2[14]       = {0};
+  double  COG[14]       = {0};
 
   // G4cout << "Total HitCollection Entries !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<< absoHC->entries() << G4endl;
   for (int i = 0; i < absoHC->entries(); ++i) //
@@ -153,26 +154,74 @@ void EventAction::EndOfEventAction(const G4Event* event)
         HitsArray[int(i/22)] += 1;
         EdepArray[int(i/22)] += fCalEdep[i];
         LengArray[int(i/22)] += fCalLeng[i];
-        Xw[int(i/22)]        += ((int(i%22)-10)*25-12.5) * fCalEdep[i];
-        Xw2[int(i/22)]       += ((int(i%22)-10)*25-12.5) * ((int(i%22)-10)*25-12.5) * fCalEdep[i];
+        // Xw[int(i/22)]        += ((int(i%22)-10)*25-12.5) * fCalEdep[i];
+        // Xw2[int(i/22)]       += ((int(i%22)-10)*25-12.5) * ((int(i%22)-10)*25-12.5) * fCalEdep[i];
         EdepArray[14]        += fCalEdep[i];
         LengArray[14]        += fCalLeng[i];
         HitsArray[14]        += 1;
       }
     }
   }
+
+
   for (int i = 0; i < 14; ++i) // 308 bar + 14 Layer + 1 Total = 323
   {
     fLayHits[i] = HitsArray[i];
     fLayEdep[i] = EdepArray[i];
     fLayLeng[i] = LengArray[i];
-    Xw[i]       = Xw[i]  / fLayEdep[i];
-    Xw2[i]      = Xw2[i] / fLayEdep[i];
     fEfrac[i]   = fLayEdep[i] / EdepArray[14];
-    fRMS[i]     = sqrt(Xw2[i] - Xw[i] * Xw[i]);
+
+    if (fLayEdep[i] > 0 )
+    {
+      double p_maxVal = 0.0;
+      int    p_maxInd = -1;
+      for (size_t k = 22 * i; k < 22 * (i + 1); ++k)
+      {
+          if (fCalEdep[k] > p_maxVal)
+          {
+            p_maxVal = fCalEdep[k];
+            p_maxInd = k;
+          }
+      }
+
+      if (p_maxInd != -1)
+      {
+          int barIndex = p_maxInd % 22;
+
+          if (barIndex == 0 || barIndex == 21)
+          {
+            COG[i] = (barIndex - 10) * 25 - 12.5;
+          }
+          else
+          {
+            double left  = (barIndex - 11) * 25 - 12.5;
+            double mid   = (barIndex - 10) * 25 - 12.5;
+            double right = (barIndex - 9) * 25 - 12.5;
+
+            double edepL = fCalEdep[p_maxInd - 1];
+            double edepM = fCalEdep[p_maxInd];
+            double edepR = fCalEdep[p_maxInd + 1];
+
+            COG[i] = (mid * edepM + left * edepL + right * edepR) / (edepL + edepM + edepR);
+          }
+      }
+
+      Xw2[i] = 0.0;
+      for (size_t k = 22*i; k < 22*(i+1); ++k)
+      {
+        double pos = (int(k%22) - 10) * 25 - 12.5;
+        Xw2[i] += pow(pos - COG[i], 2) * fCalEdep[k];
+        // G4cout << " Layer " << i << " bar id" << k << " bar number " << k%22 << " pos = " <<  pos << " COG = " << COG[i] <<  G4endl;
+      }
+      fRMS[i]     = sqrt(Xw2[i]/fLayEdep[i]);
+      // G4cout << "Check Layer = " <<  i << " Edep " << EdepArray[i] << " GeV, Length " << LengArray[i] << " m, Fired Bars " << HitsArray[i] << G4endl;
+      // G4cout << "Efrac = " <<  fEfrac[i] << " fRMS " << fRMS[i] << G4endl;
+    }
+    else
+    {
+      fRMS[i]     = 0;
+    }
     fFval[i]    = fRMS[i] * fEfrac[i];
-    // G4cout << "Check Layer = " <<  i << " Edep " << EdepArray[i] << " GeV, Length " << LengArray[i] << " m, Fired Bars " << HitsArray[i] << G4endl;
-    // G4cout << "Efrac = " <<  fEfrac[i] << " fRMS " << fRMS[i] << G4endl;
   }
   // G4cout << "Check Total Edep " << EdepArray[14] << " GeV, Length " << LengArray[14] << " m, Fire Bars " << HitsArray[14] << G4endl;
 
