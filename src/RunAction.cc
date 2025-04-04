@@ -67,14 +67,14 @@ RunAction::RunAction(B4::EventAction* eventAction) : fEventAction(eventAction)
     analysisManager->CreateNtupleDColumn("BarEnergyVector"  , fEventAction->GetEmCalEdep());
     analysisManager->CreateNtupleDColumn("BarLengthVector"  , fEventAction->GetEmCalLeng());
     analysisManager->CreateNtupleDColumn("RMS"              , fEventAction->GetRMS()      );
-    analysisManager->CreateNtupleDColumn("RMS2"             , fEventAction->GetRMS2()     );
+    // analysisManager->CreateNtupleDColumn("RMS2"             , fEventAction->GetRMS2()     );
     analysisManager->CreateNtupleDColumn("Efrac"            , fEventAction->GetEfrac()    );
     analysisManager->CreateNtupleDColumn("Fval"             , fEventAction->GetFval()     );
   }
+  analysisManager->CreateNtupleDColumn("Zeta");
   analysisManager->CreateNtupleIColumn("Nhits");
   analysisManager->CreateNtupleDColumn("Total_E");
   analysisManager->CreateNtupleDColumn("Total_L");
-  analysisManager->CreateNtupleDColumn("Zeta");
 
   analysisManager->FinishNtuple();
 }
