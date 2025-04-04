@@ -19,13 +19,13 @@ void Draw_Pattern()
 
     double minVal = -2;  // 设置最小值
     double maxVal = 2;  // 设置最大值
-    // for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
-    for (Long64_t entry = 0; entry < 10; ++entry)
+    // for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
+    for (Long64_t entry = 0; entry < 10; entry++)
     {
         proton_tree->GetEntry(entry);
         cout << " RMS at 0 layer = " << (*p_RMSVec)[0] << endl;
 
-        for(size_t i = 0; i < energyVec->size(); ++i) 
+        for(size_t i = 0; i < energyVec->size(); i++) 
         {
             int layer = i / 22; 
             int bar = i % 22;
@@ -37,7 +37,7 @@ void Draw_Pattern()
             {
                 hXZ->SetBinContent(bar+1, 14-layer, energy);
                 hYZ->SetBinContent(bar+1, 14-layer, -5);
-                for(int j = 0 ; j<24 ; ++j)
+                for(int j = 0 ; j<24 ; j++)
                 {
                     h3box->SetBinContent(bar+1 , j+1  , 14-layer , (*energyVec)[i]);
                 }
@@ -47,14 +47,14 @@ void Draw_Pattern()
             {
                 hYZ->SetBinContent(bar+1, 14-layer, energy);
                 hXZ->SetBinContent(bar+1, 14-layer, -5);
-                for(int j = 0 ; j<24 ; ++j)
+                for(int j = 0 ; j<24 ; j++)
                 {
                     h3box->SetBinContent(j+1 , bar+1, 14-layer ,(*energyVec)[i]);
                 }
             }
         }
 
-        for (int layer = 0; layer < 14; ++layer) {
+        for (int layer = 0; layer < 14; layer++) {
             hXZ->SetBinContent(1, 14-layer, -5);
             hXZ->SetBinContent(24, 14-layer, -5);
             hYZ->SetBinContent(1, 14-layer, -5);

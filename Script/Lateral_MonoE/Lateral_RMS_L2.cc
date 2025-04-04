@@ -9,7 +9,7 @@ void Lateral_RMS_L2()
 
     // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
     // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test2.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test_22.root");
 
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);

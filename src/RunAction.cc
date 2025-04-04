@@ -50,7 +50,7 @@ RunAction::RunAction(B4::EventAction* eventAction) : fEventAction(eventAction)
   analysisManager->SetFileName("B4");
   analysisManager->CreateNtuple("B4", "Edep and TrackL");
   analysisManager->CreateNtupleIColumn("Particle");
-  analysisManager->CreateNtupleDColumn("Energy"); // (MeV)
+  analysisManager->CreateNtupleDColumn("Energy"); // (GeV)
   analysisManager->CreateNtupleDColumn("First_Depth"); // Depth ()
   analysisManager->CreateNtupleIColumn("First_Layer"); // Layer (0,1,2...)
   analysisManager->CreateNtupleIColumn("First_Second"); // Number of Secondaries
@@ -67,12 +67,15 @@ RunAction::RunAction(B4::EventAction* eventAction) : fEventAction(eventAction)
     analysisManager->CreateNtupleDColumn("BarEnergyVector"  , fEventAction->GetEmCalEdep());
     analysisManager->CreateNtupleDColumn("BarLengthVector"  , fEventAction->GetEmCalLeng());
     analysisManager->CreateNtupleDColumn("RMS"              , fEventAction->GetRMS()      );
+    analysisManager->CreateNtupleDColumn("RMS2"             , fEventAction->GetRMS2()     );
     analysisManager->CreateNtupleDColumn("Efrac"            , fEventAction->GetEfrac()    );
     analysisManager->CreateNtupleDColumn("Fval"             , fEventAction->GetFval()     );
   }
   analysisManager->CreateNtupleIColumn("Nhits");
   analysisManager->CreateNtupleDColumn("Total_E");
   analysisManager->CreateNtupleDColumn("Total_L");
+  analysisManager->CreateNtupleDColumn("Zeta");
+
   analysisManager->FinishNtuple();
 }
 

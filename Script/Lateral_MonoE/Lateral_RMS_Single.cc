@@ -8,7 +8,7 @@ void Lateral_RMS_Single()
     int c_First_Had_Layer;    std::vector<double>* c_RMSVec = nullptr;    std::vector<double>* c_EnergyVec = nullptr;    std::vector<double>* c_Efrac = nullptr;
 
     // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test2.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test_3.root");
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
     proton_tree->SetBranchAddress("LayerEnergyVector",&p_EnergyVec);
@@ -46,21 +46,21 @@ void Lateral_RMS_Single()
     carbon_tree->SetBranchAddress("First_Had_Layer"  ,&c_First_Had_Layer);
 
     cout  << proton_tree->GetEntries() << endl;
-    auto h1_p = new TH1D("h1_p","h1_p",100,0,400);  
-    auto h1_d = new TH1D("h1_d","h1_d",100,0,400);  
-    auto h1_e = new TH1D("h1_e","h1_e",100,0,400);  
-    auto h1_h = new TH1D("h1_h","h1_h",100,0,400);  
-    auto h1_H = new TH1D("h1_H","h1_H",100,0,400);  
-    auto h1_c = new TH1D("h1_c","h1_c",100,0,400);  
-    int k = 4;
-    for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
+    auto h1_p = new TH1D("h1_p","h1_p",75,0,150);  
+    auto h1_d = new TH1D("h1_d","h1_d",75,0,150);  
+    auto h1_e = new TH1D("h1_e","h1_e",75,0,150);  
+    auto h1_h = new TH1D("h1_h","h1_h",75,0,150);  
+    auto h1_H = new TH1D("h1_H","h1_H",75,0,150);  
+    auto h1_c = new TH1D("h1_c","h1_c",75,0,150);  
+    int k = 0;
+    for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
     {
-        proton_tree->GetEntry(entry);   /* if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_EnergyVec)[2] > 0.23 && (*p_EnergyVec)[0] > 0.046) */ h1_p->Fill((*p_RMSVec)[k]);
-        deuteron_tree->GetEntry(entry); /* if ((*d_EnergyVec)[0] > 0.23 && (*d_EnergyVec)[1] > 0.23 && (*d_EnergyVec)[2] > 0.23 && (*d_EnergyVec)[0] > 0.046) */ h1_d->Fill((*d_RMSVec)[k]);
-        electron_tree->GetEntry(entry); /* if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_EnergyVec)[2] > 0.23 && (*e_EnergyVec)[0] > 0.046) */ h1_e->Fill((*e_RMSVec)[k]);
-        helium4_tree->GetEntry(entry);  /* if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_EnergyVec)[2] > 0.23 && (*h_EnergyVec)[0] > 0.046) */ h1_h->Fill((*h_RMSVec)[k]);
-        helium3_tree->GetEntry(entry);  /* if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_EnergyVec)[2] > 0.23 && (*H_EnergyVec)[0] > 0.046) */ h1_H->Fill((*H_RMSVec)[k]);
-        carbon_tree->GetEntry(entry);   /* if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_EnergyVec)[2] > 0.23 && (*c_EnergyVec)[0] > 0.046) */ h1_c->Fill((*c_RMSVec)[k]);
+        proton_tree->GetEntry(entry);    if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_EnergyVec)[2] > 0.23 && (*p_EnergyVec)[0] > 0.046)  h1_p->Fill((*p_RMSVec)[k]);
+        deuteron_tree->GetEntry(entry);  if ((*d_EnergyVec)[0] > 0.23 && (*d_EnergyVec)[1] > 0.23 && (*d_EnergyVec)[2] > 0.23 && (*d_EnergyVec)[0] > 0.046)  h1_d->Fill((*d_RMSVec)[k]);
+        electron_tree->GetEntry(entry);  if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_EnergyVec)[2] > 0.23 && (*e_EnergyVec)[0] > 0.046)  h1_e->Fill((*e_RMSVec)[k]);
+        helium4_tree->GetEntry(entry);   if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_EnergyVec)[2] > 0.23 && (*h_EnergyVec)[0] > 0.046)  h1_h->Fill((*h_RMSVec)[k]);
+        helium3_tree->GetEntry(entry);   if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_EnergyVec)[2] > 0.23 && (*H_EnergyVec)[0] > 0.046)  h1_H->Fill((*H_RMSVec)[k]);
+        carbon_tree->GetEntry(entry);    if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_EnergyVec)[2] > 0.23 && (*c_EnergyVec)[0] > 0.046)  h1_c->Fill((*c_RMSVec)[k]);
     }
     h1_p->Sumw2(); h1_p->Scale(1.0/h1_p->Integral());h1_p->SetLineColor(kRed);     h1_p->SetMarkerColor(kRed);     h1_p->SetLineWidth(2);
     h1_d->Sumw2(); h1_d->Scale(1.0/h1_d->Integral());h1_d->SetLineColor(kBlue);    h1_d->SetMarkerColor(kBlue);    h1_d->SetLineWidth(2);

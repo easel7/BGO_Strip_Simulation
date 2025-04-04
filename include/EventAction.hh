@@ -93,6 +93,7 @@ class EventAction : public G4UserEventAction
     std::vector<G4double>& GetLayerEdep() { return fLayEdep; }
     std::vector<G4double>& GetLayerLeng() { return fLayLeng; }
     std::vector<G4double>&       GetRMS() { return fRMS    ; }
+    std::vector<G4double>&      GetRMS2() { return fRMS2   ; }
     std::vector<G4double>&     GetEfrac() { return fEfrac  ; }
     std::vector<G4double>&      GetFval() { return fFval   ; }
 
@@ -123,10 +124,9 @@ class EventAction : public G4UserEventAction
     std::vector<G4double> fLayLeng{ std::vector<G4double>(kNofEmLayers, 0.) };
 
     std::vector<G4double>     fRMS{ std::vector<G4double>(kNofEmLayers, 0.) };
+    std::vector<G4double>    fRMS2{ std::vector<G4double>(kNofEmLayers, 0.) };
     std::vector<G4double>   fEfrac{ std::vector<G4double>(kNofEmLayers, 0.) };
     std::vector<G4double>    fFval{ std::vector<G4double>(kNofEmLayers, 0.) };
-
-
 };
 
 }  // namespace B4
