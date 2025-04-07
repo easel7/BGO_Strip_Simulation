@@ -179,12 +179,12 @@ void Lateral_RMS()
 
         auto legend2 = new TLegend(0.72, 0.68, 0.88, 0.88);
         legend2->SetNColumns(2);
-        legend2->AddEntry(gre_p, "HET Proton", "ep");
-        legend2->AddEntry(gre_d, "HET Deuteron", "ep");
-        legend2->AddEntry(gre_e, "HET Electron", "ep");
-        legend2->AddEntry(gre_h, "HET Helium4", "ep");
-        legend2->AddEntry(gre_H, "HET Helium3", "ep");
-        legend2->AddEntry(gre_c, "HET Carbon", "ep");
+        legend2->AddEntry(gre_p, "Proton", "ep");
+        legend2->AddEntry(gre_d, "Deuteron", "ep");
+        legend2->AddEntry(gre_e, "Electron", "ep");
+        legend2->AddEntry(gre_h, "Helium4", "ep");
+        legend2->AddEntry(gre_H, "Helium3", "ep");
+        legend2->AddEntry(gre_c, "Carbon", "ep");
         legend2->Draw();
 
         c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Lateral_MonoE/Lateral_RMS_BGOLayer_%dGeV.pdf",int(Energy[i])));

@@ -74,16 +74,15 @@ EventAction::EventAction()
 
 void EventAction::BeginOfEventAction(const G4Event* /*event*/) 
 {
-    fFirstInteraction = G4ThreeVector(-1e9, -1e9, -1e9);  
-    fInteractionDepth = -1;
-    fInteractionLayer = -1;
-    fSecondaries = -1;
-    fInteractionType = -1;
-    fHadrInteractionDepth = -1;
-    fHadrInteractionLayer = -1;
-    fHadrSecondaries = -1;
-    fHadronicTag=-1; 
-
+  fFirstInteraction = G4ThreeVector(-1e9, -1e9, -1e9);  
+  fInteractionDepth = -1;
+  fInteractionLayer = -1;
+  fSecondaries = -1;
+  fInteractionType = -1;
+  fHadrInteractionDepth = -1;
+  fHadrInteractionLayer = -1;
+  fHadrSecondaries = -1;
+  fHadronicTag=-1; 
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -114,7 +113,6 @@ void EventAction::EndOfEventAction(const G4Event* event)
   // G4cout << "!! particleName: " << particleName << " ,Kinetic Energy = " << energy << "MeV" << G4endl;
 
   auto eventID = event->GetEventID();
-
   // Fill histograms, ntuple
   // get analysis manager
   auto analysisManager = G4AnalysisManager::Instance();
@@ -150,8 +148,11 @@ void EventAction::EndOfEventAction(const G4Event* event)
       // G4cout << "id = " <<  i << " Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
       if( absoperHit->GetEdep() / CLHEP::GeV > 1E-2 && absoperHit->GetTrackLength() / CLHEP::m > 0)
       {
-        // G4cout << " i =" << i << " bar " << i%22 << " x pos " <<  ((int(i%22)-10)*25-12.5) << G4endl;
-        // G4cout << "Check id = " <<  i << " bar, Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
+        // if(eventID ==73)
+        // {
+          // G4cout << " i =" << i << " bar " << i%22 << " x pos " <<  ((int(i%22)-10)*25-12.5) << G4endl;
+          G4cout << "Check id = " <<  i << " bar, Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
+        // }
         fCalEdep[i] = absoperHit->GetEdep() / CLHEP::GeV;  // 给Vector赋值
         fCalLeng[i] = absoperHit->GetTrackLength() / CLHEP::m;  // 给Vector赋值
         HitsArray[int(i/22)] += 1;
@@ -176,46 +177,14 @@ void EventAction::EndOfEventAction(const G4Event* event)
     Xw2[i]      = Xw2[i] / fLayEdep[i];
     fRMS[i]     = sqrt(Xw2[i] - Xw[i] * Xw[i]);
     if (fLayEdep[i] > 1E-2 ) { lastNonZeroFEfrac = fEfrac[i]; }
-    // {
-    //   double p_maxVal = 0.0;
-    //   int    p_maxInd = -1;
-    //   lastNonZeroFEfrac = fEfrac[i];  // 更新最后一个大于 0 的值
-    //   for (int k = 22 * i; k < 22 * (i + 1); ++k)
-    //   {
-    //       if (fCalEdep[k] > p_maxVal)
-    //       {
-    //         p_maxVal = fCalEdep[k];
-    //         p_maxInd = k;
-    //       }
-    //   }
-    //   if (p_maxInd != -1)
-    //   {
-    //       int barIndex = p_maxInd % 22;
-    //       if (barIndex == 0 || barIndex == 21)     {   COG[i] = (barIndex - 10) * 25 - 12.5;         }
-    //       else  {
-    //         double left  = (barIndex - 11) * 25 - 12.5;          double edepL = fCalEdep[p_maxInd - 1];
-    //         double mid   = (barIndex - 10) * 25 - 12.5;          double edepM = fCalEdep[p_maxInd];
-    //         double right = (barIndex - 9) * 25 - 12.5;           double edepR = fCalEdep[p_maxInd + 1];
-    //         COG[i] = (mid * edepM + left * edepL + right * edepR) / (edepL + edepM + edepR);
-    //         // G4cout << " max id" << p_maxInd << " bar number " <<  barIndex  <<" Max energy " << fCalEdep[p_maxInd] << "Postion " << mid << " Left " <<  edepL << " Right " << edepR << " COG " << COG[i] << G4endl;
-    //       }
-    //   }
-    //   for (int k = 22*i; k < 22*(i+1); ++k)
-    //   {
-    //     double pos = ((int(k%22)-10)*25-12.5);
-    //     Xw3[i] += pow(pos - COG[i], 2) * fCalEdep[k];
-    //     // if(fCalEdep[k]>0) G4cout << " Layer " << i << " bar id" << k << " bar number " << k%22 << " energy " << fCalEdep[k] << " pos = " <<  pos << " COG = " << COG[i] <<  G4endl;
-    //   }
-    //   fRMS2[i]     = sqrt(Xw3[i] / fLayEdep[i]);
-    //   // G4cout << "Check Layer = " <<  i << " Edep " << EdepArray[i] << " GeV, Length " << LengArray[i] << " m, Fired Bars " << HitsArray[i] << G4endl;
-    //   // G4cout << "Efrac = " <<  fEfrac[i] << " fRMS " << fRMS[i] << " RMS paul " << fRMS2[i] << G4endl;
-    // }
-    // else     {      fRMS2[i]     = 0;    }
     Sum_RMS      += fRMS[i];
     fFval[i]      = fRMS[i] * fEfrac[i];
   }
   Zeta = pow(Sum_RMS,4) * lastNonZeroFEfrac / 8e6;
-  // G4cout << "Check Total Edep " << EdepArray[14] << " GeV, Length " << LengArray[14] << " m, Fire Bars " << HitsArray[14] << " Sum RMS2 = " << Sum_RMS << " FL "<<  lastNonZeroFEfrac <<" Zeta " << Zeta << G4endl;
+  // if(eventID ==73)
+  {
+    G4cout << "Check Total Edep " << EdepArray[14] << " GeV, Length " << LengArray[14] << " m, Fire Bars " << HitsArray[14] << " FL "<<  lastNonZeroFEfrac <<" Zeta " << Zeta << G4endl;
+  }
   analysisManager->FillNtupleDColumn(18, Zeta);
   analysisManager->FillNtupleIColumn(19, HitsArray[14]); 
   analysisManager->FillNtupleDColumn(20, EdepArray[14]);
@@ -235,3 +204,38 @@ void EventAction::EndOfEventAction(const G4Event* event)
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 }  // namespace B4
+// {
+//   double p_maxVal = 0.0;
+//   int    p_maxInd = -1;
+//   lastNonZeroFEfrac = fEfrac[i];  // 更新最后一个大于 0 的值
+//   for (int k = 22 * i; k < 22 * (i + 1); ++k)
+//   {
+//       if (fCalEdep[k] > p_maxVal)
+//       {
+//         p_maxVal = fCalEdep[k];
+//         p_maxInd = k;
+//       }
+//   }
+//   if (p_maxInd != -1)
+//   {
+//       int barIndex = p_maxInd % 22;
+//       if (barIndex == 0 || barIndex == 21)     {   COG[i] = (barIndex - 10) * 25 - 12.5;         }
+//       else  {
+//         double left  = (barIndex - 11) * 25 - 12.5;          double edepL = fCalEdep[p_maxInd - 1];
+//         double mid   = (barIndex - 10) * 25 - 12.5;          double edepM = fCalEdep[p_maxInd];
+//         double right = (barIndex - 9) * 25 - 12.5;           double edepR = fCalEdep[p_maxInd + 1];
+//         COG[i] = (mid * edepM + left * edepL + right * edepR) / (edepL + edepM + edepR);
+//         // G4cout << " max id" << p_maxInd << " bar number " <<  barIndex  <<" Max energy " << fCalEdep[p_maxInd] << "Postion " << mid << " Left " <<  edepL << " Right " << edepR << " COG " << COG[i] << G4endl;
+//       }
+//   }
+//   for (int k = 22*i; k < 22*(i+1); ++k)
+//   {
+//     double pos = ((int(k%22)-10)*25-12.5);
+//     Xw3[i] += pow(pos - COG[i], 2) * fCalEdep[k];
+//     // if(fCalEdep[k]>0) G4cout << " Layer " << i << " bar id" << k << " bar number " << k%22 << " energy " << fCalEdep[k] << " pos = " <<  pos << " COG = " << COG[i] <<  G4endl;
+//   }
+//   fRMS2[i]     = sqrt(Xw3[i] / fLayEdep[i]);
+//   // G4cout << "Check Layer = " <<  i << " Edep " << EdepArray[i] << " GeV, Length " << LengArray[i] << " m, Fired Bars " << HitsArray[i] << G4endl;
+//   // G4cout << "Efrac = " <<  fEfrac[i] << " fRMS " << fRMS[i] << " RMS paul " << fRMS2[i] << G4endl;
+// }
+// else     {      fRMS2[i]     = 0;    }

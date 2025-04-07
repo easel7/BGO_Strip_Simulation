@@ -40,41 +40,42 @@ void Lateral_RMS_L2()
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     // for (Long64_t entry = 0; entry < 1; ++entry)
     {
-
+        
         proton_tree->GetEntry(entry);    
-        for (size_t i = 22*k; i < 22*(k+1); i += 22)
+        if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15)
         {
-            auto p_start = p_EnergyVec->begin() + i;  auto p_end = (i + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal = *std::max_element(p_start, p_end); 
-            if(k>0 && k<13)
+            for (size_t i = 22*k; i < 22*(k+1); i += 22)
             {
-                h1_p->Fill((*p_RMSVec)[k]);
-                if(p_First_Had_Layer==k) { h1_d->Fill((*p_RMSVec)[k]); }
-                if(p_First_Had_Layer==-1) { h1_h->Fill((*p_RMSVec)[k]); }
-                if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1              && p_First_Had_Type == 1) { h1_e->Fill((*p_RMSVec)[k]); }
-                if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1) { h1_H->Fill((*p_RMSVec)[k]); }
-                if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2) { h1_c->Fill((*p_RMSVec)[k]); }
-                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 1 ) { h1_E->Fill((*p_RMSVec)[k]); }
-                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 2 ) { h1_C->Fill((*p_RMSVec)[k]); }
+                auto p_start = p_EnergyVec->begin() + i;  auto p_end = (i + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal = *std::max_element(p_start, p_end); 
+                if(k>0 && k<13)
+                {
+                    h1_p->Fill((*p_RMSVec)[k]);
+                    if(p_First_Had_Layer==k) { h1_d->Fill((*p_RMSVec)[k]); }
+                    if(p_First_Had_Layer==-1) { h1_h->Fill((*p_RMSVec)[k]); }
+                    if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1              && p_First_Had_Type == 1) { h1_e->Fill((*p_RMSVec)[k]); }
+                    if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1) { h1_H->Fill((*p_RMSVec)[k]); }
+                    if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2) { h1_c->Fill((*p_RMSVec)[k]); }
+                    if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 1 ) { h1_E->Fill((*p_RMSVec)[k]); }
+                    if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 2 ) { h1_C->Fill((*p_RMSVec)[k]); }
+                }
+                else if (k==0)
+                {
+                    h1_p->Fill((*p_RMSVec)[k]);
+                    if(p_First_Had_Layer==k) { h1_d->Fill((*p_RMSVec)[k]); }
+                    if(p_First_Had_Layer==-1) { h1_h->Fill((*p_RMSVec)[k]); }
+                    if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 1) { h1_e->Fill((*p_RMSVec)[k]); }
+                    if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 2) { h1_E->Fill((*p_RMSVec)[k]); }
+                }
+                else if (k==13)
+                {
+                    h1_p->Fill((*p_RMSVec)[k]);
+                    if(p_First_Had_Layer==k) { h1_d->Fill((*p_RMSVec)[k]); }
+                    if(p_First_Had_Layer==-1) { h1_h->Fill((*p_RMSVec)[k]); }
+                    if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1              && p_First_Had_Type == 1) { h1_e->Fill((*p_RMSVec)[k]); }
+                    if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1) { h1_H->Fill((*p_RMSVec)[k]); }
+                    if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2) { h1_c->Fill((*p_RMSVec)[k]); }
+                }
             }
-            else if (k==0)
-            {
-                h1_p->Fill((*p_RMSVec)[k]);
-                if(p_First_Had_Layer==k) { h1_d->Fill((*p_RMSVec)[k]); }
-                if(p_First_Had_Layer==-1) { h1_h->Fill((*p_RMSVec)[k]); }
-                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 1) { h1_e->Fill((*p_RMSVec)[k]); }
-                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 2) { h1_E->Fill((*p_RMSVec)[k]); }
-            }
-            else if (k==13)
-            {
-                h1_p->Fill((*p_RMSVec)[k]);
-                if(p_First_Had_Layer==k) { h1_d->Fill((*p_RMSVec)[k]); }
-                if(p_First_Had_Layer==-1) { h1_h->Fill((*p_RMSVec)[k]); }
-                if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1              && p_First_Had_Type == 1) { h1_e->Fill((*p_RMSVec)[k]); }
-                if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1) { h1_H->Fill((*p_RMSVec)[k]); }
-                if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2) { h1_c->Fill((*p_RMSVec)[k]); }
-            }
-            
-            
         }
     }
 

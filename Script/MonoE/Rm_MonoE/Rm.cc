@@ -103,12 +103,12 @@ void Rm()
             for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
             {
                 
-                auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal[int(k/22)] = *std::max_element(p_start, p_end);  if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15) h1_p[int(k/22)]->Fill(log10(p_maxVal[int(k/22)]/p_E_total));
-                auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal[int(k/22)] = *std::max_element(d_start, d_end);  if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15) h1_d[int(k/22)]->Fill(log10(d_maxVal[int(k/22)]/d_E_total));
-                auto e_start = e_EnergyVec->begin() + k;  auto e_end = (k + 22 < e_EnergyVec->size() ) ? e_start + 22 : e_EnergyVec->end();  e_maxVal[int(k/22)] = *std::max_element(e_start, e_end);  if((*e_RMSVec)[0]>15 && (*e_RMSVec)[1]>15) h1_e[int(k/22)]->Fill(log10(e_maxVal[int(k/22)]/e_E_total));
-                auto h_start = h_EnergyVec->begin() + k;  auto h_end = (k + 22 < h_EnergyVec->size() ) ? h_start + 22 : h_EnergyVec->end();  h_maxVal[int(k/22)] = *std::max_element(h_start, h_end);  if((*h_RMSVec)[0]>15 && (*h_RMSVec)[1]>15) h1_h[int(k/22)]->Fill(log10(h_maxVal[int(k/22)]/h_E_total));
-                auto H_start = H_EnergyVec->begin() + k;  auto H_end = (k + 22 < H_EnergyVec->size() ) ? H_start + 22 : H_EnergyVec->end();  H_maxVal[int(k/22)] = *std::max_element(H_start, H_end);  if((*H_RMSVec)[0]>15 && (*H_RMSVec)[1]>15) h1_H[int(k/22)]->Fill(log10(H_maxVal[int(k/22)]/H_E_total));
-                auto c_start = c_EnergyVec->begin() + k;  auto c_end = (k + 22 < c_EnergyVec->size() ) ? c_start + 22 : c_EnergyVec->end();  c_maxVal[int(k/22)] = *std::max_element(c_start, c_end);  if((*c_RMSVec)[0]>15 && (*c_RMSVec)[1]>15) h1_c[int(k/22)]->Fill(log10(c_maxVal[int(k/22)]/c_E_total));
+                auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal[int(k/22)] = *std::max_element(p_start, p_end); if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15) h1_p[int(k/22)]->Fill(log10(p_maxVal[int(k/22)]/p_E_total));
+                auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal[int(k/22)] = *std::max_element(d_start, d_end); if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15) h1_d[int(k/22)]->Fill(log10(d_maxVal[int(k/22)]/d_E_total));
+                auto e_start = e_EnergyVec->begin() + k;  auto e_end = (k + 22 < e_EnergyVec->size() ) ? e_start + 22 : e_EnergyVec->end();  e_maxVal[int(k/22)] = *std::max_element(e_start, e_end); if((*e_RMSVec)[0]>15 && (*e_RMSVec)[1]>15) h1_e[int(k/22)]->Fill(log10(e_maxVal[int(k/22)]/e_E_total));
+                auto h_start = h_EnergyVec->begin() + k;  auto h_end = (k + 22 < h_EnergyVec->size() ) ? h_start + 22 : h_EnergyVec->end();  h_maxVal[int(k/22)] = *std::max_element(h_start, h_end); if((*h_RMSVec)[0]>15 && (*h_RMSVec)[1]>15) h1_h[int(k/22)]->Fill(log10(h_maxVal[int(k/22)]/h_E_total));
+                auto H_start = H_EnergyVec->begin() + k;  auto H_end = (k + 22 < H_EnergyVec->size() ) ? H_start + 22 : H_EnergyVec->end();  H_maxVal[int(k/22)] = *std::max_element(H_start, H_end); if((*H_RMSVec)[0]>15 && (*H_RMSVec)[1]>15) h1_H[int(k/22)]->Fill(log10(H_maxVal[int(k/22)]/H_E_total));
+                auto c_start = c_EnergyVec->begin() + k;  auto c_end = (k + 22 < c_EnergyVec->size() ) ? c_start + 22 : c_EnergyVec->end();  c_maxVal[int(k/22)] = *std::max_element(c_start, c_end); if((*c_RMSVec)[0]>15 && (*c_RMSVec)[1]>15) h1_c[int(k/22)]->Fill(log10(c_maxVal[int(k/22)]/c_E_total));
                 // cout << " bar " << k << " Layer " << int(k/22) <<endl; 
                 // std::copy(p_start, p_end, std::ostream_iterator<double>(std::cout, ", "));
                 // cout << " max = "<< p_maxVal[int(k/22)] <<  endl;
@@ -135,12 +135,12 @@ void Rm()
             h1_d[j]->Draw("histsame");
 
             double quantiles[3] = {0.16, 0.50, 0.84};  // Percentiles
-            double p_values[3];  h1_p[j]->GetQuantiles(3, p_values, quantiles);  Proton_Ratio[j] = p_values[1];     Proton_Ratio_LL[j]  = p_values[1] - p_values[0];   Proton_Ratio_UL[j]= p_values[2] - p_values[1];
-            double d_values[3];  h1_d[j]->GetQuantiles(3, d_values, quantiles);  Deuteron_Ratio[j] = d_values[1];   Deuteron_Ratio_LL[j]= d_values[1] - d_values[0];   Deuteron_Ratio_UL[j]= d_values[2] - d_values[1];
-            double e_values[3];  h1_e[j]->GetQuantiles(3, e_values, quantiles);  Electron_Ratio[j] = e_values[1];   Electron_Ratio_LL[j]= e_values[1] - e_values[0];   Electron_Ratio_UL[j]= e_values[2] - e_values[1];
-            double h_values[3];  h1_h[j]->GetQuantiles(3, h_values, quantiles);  Helium4_Ratio[j] = h_values[1];    Helium4_Ratio_LL[j] = h_values[1] - h_values[0];   Helium4_Ratio_UL[j]= h_values[2] - h_values[1];
-            double H_values[3];  h1_H[j]->GetQuantiles(3, H_values, quantiles);  Helium3_Ratio[j] = H_values[1];    Helium3_Ratio_LL[j] = H_values[1] - H_values[0];   Helium3_Ratio_UL[j]= H_values[2] - H_values[1];
-            double c_values[3];  h1_c[j]->GetQuantiles(3, c_values, quantiles);  Carbon_Ratio[j] = c_values[1];     Carbon_Ratio_LL[j] = c_values[1] - c_values[0];    Carbon_Ratio_UL[j]= c_values[2] - c_values[1];
+            double p_values[3];  h1_p[j]->GetQuantiles(3, p_values, quantiles);  Proton_Ratio[j]   = pow(10,p_values[1]);     Proton_Ratio_LL[j] = pow(10,p_values[1]) - pow(10,p_values[0]);   Proton_Ratio_UL[j]   = pow(10,p_values[2]) - pow(10,p_values[1]);
+            double d_values[3];  h1_d[j]->GetQuantiles(3, d_values, quantiles);  Deuteron_Ratio[j] = pow(10,d_values[1]);   Deuteron_Ratio_LL[j] = pow(10,d_values[1]) - pow(10,d_values[0]);   Deuteron_Ratio_UL[j] = pow(10,d_values[2]) - pow(10,d_values[1]);
+            double e_values[3];  h1_e[j]->GetQuantiles(3, e_values, quantiles);  Electron_Ratio[j] = pow(10,e_values[1]);   Electron_Ratio_LL[j] = pow(10,e_values[1]) - pow(10,e_values[0]);   Electron_Ratio_UL[j] = pow(10,e_values[2]) - pow(10,e_values[1]);
+            double h_values[3];  h1_h[j]->GetQuantiles(3, h_values, quantiles);  Helium4_Ratio[j]  = pow(10,h_values[1]);    Helium4_Ratio_LL[j] = pow(10,h_values[1]) - pow(10,h_values[0]);   Helium4_Ratio_UL[j]  = pow(10,h_values[2]) - pow(10,h_values[1]);
+            double H_values[3];  h1_H[j]->GetQuantiles(3, H_values, quantiles);  Helium3_Ratio[j]  = pow(10,H_values[1]);    Helium3_Ratio_LL[j] = pow(10,H_values[1]) - pow(10,H_values[0]);   Helium3_Ratio_UL[j]  = pow(10,H_values[2]) - pow(10,H_values[1]);
+            double c_values[3];  h1_c[j]->GetQuantiles(3, c_values, quantiles);  Carbon_Ratio[j]   = pow(10,c_values[1]);     Carbon_Ratio_LL[j] = pow(10,c_values[1]) - pow(10,c_values[0]);    Carbon_Ratio_UL[j]  = pow(10,c_values[2]) - pow(10,c_values[1]);
 
 
 
@@ -177,7 +177,7 @@ void Rm()
         gre_H->SetMarkerStyle(32);gre_H->SetMarkerColor(kGreen-3); gre_H->SetLineColor(kGreen-3); gre_H->SetLineWidth(2);gre_H->SetLineStyle(2);
         gre_c->SetMarkerStyle(23);gre_c->SetMarkerColor(kMagenta); gre_c->SetLineColor(kMagenta); gre_c->SetLineWidth(2);       
 
-        gre_e->GetYaxis()->SetRangeUser(-5,0);
+        gre_e->GetYaxis()->SetRangeUser(0,0.1);
         gre_e->GetXaxis()->SetLimits(0,14);
         gre_e->Draw("AP");
         gre_h->Draw("PSAME");
@@ -186,7 +186,7 @@ void Rm()
         gre_d->Draw("PSAME");
         gre_p->Draw("PSAME");
 
-        auto axis_top = new TGaxis(0, 0, 14, 0, 0, 32, 510, "-L"); 
+        auto axis_top = new TGaxis(0, 0.1, 14, 0.1, 0, 32, 510, "-L"); 
         axis_top->SetTitle("Radiation Length"); // 设置顶部X轴的标题
         axis_top->SetLabelSize(0.03);  // 设置刻度数字大小
         axis_top->SetTitleSize(0.03);  // 设置标题大小
@@ -195,12 +195,12 @@ void Rm()
 
         auto legend2 = new TLegend(0.42, 0.12, 0.58, 0.32);
         legend2->SetNColumns(2);
-        legend2->AddEntry(gre_p, "HET Proton", "ep");
-        legend2->AddEntry(gre_d, "HET Deuteron", "ep");
-        legend2->AddEntry(gre_e, "HET Electron", "ep");
-        legend2->AddEntry(gre_h, "HET Helium4", "ep");
-        legend2->AddEntry(gre_H, "HET Helium3", "ep");
-        legend2->AddEntry(gre_c, "HET Carbon", "ep");
+        legend2->AddEntry(gre_p, "Proton", "ep");
+        legend2->AddEntry(gre_d, "Deuteron", "ep");
+        legend2->AddEntry(gre_e, "Electron", "ep");
+        legend2->AddEntry(gre_h, "Helium4", "ep");
+        legend2->AddEntry(gre_H, "Helium3", "ep");
+        legend2->AddEntry(gre_c, "Carbon", "ep");
         legend2->Draw();
 
         c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/Rm_BGOLayer_%dGeV.pdf",int(Energy[i])));

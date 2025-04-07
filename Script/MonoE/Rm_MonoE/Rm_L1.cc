@@ -7,8 +7,8 @@ void Rm_L1()
     int H_First_Had_Layer;   int H_First_Had_Type; double H_E_total;    std::vector<double>* H_RMSVec = nullptr;    std::vector<double>* H_EnergyVec = nullptr;    std::vector<double>* H_Efrac = nullptr;
     int c_First_Had_Layer;   int c_First_Had_Type; double c_E_total;    std::vector<double>* c_RMSVec = nullptr;    std::vector<double>* c_EnergyVec = nullptr;    std::vector<double>* c_Efrac = nullptr;
 
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
-    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
+    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_10000GeV.root");
 
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
@@ -34,47 +34,49 @@ void Rm_L1()
     double H_maxVal;
     double c_maxVal;
 
-    int k =0;
+    int k = 3;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     // for (Long64_t entry = 0; entry < 1; ++entry)
     {
 
         proton_tree->GetEntry(entry);    
-        for (size_t i = 22*k; i < 22*(k+1); i += 22)
+        if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]>15 && (*p_RMSVec)[3]>15)
         {
-            auto p_start = p_EnergyVec->begin() + i;  auto p_end = (i + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal = *std::max_element(p_start, p_end); 
-            if(k>0 && k<13)
+            for (size_t i = 22*k; i < 22*(k+1); i += 22)
             {
-                h1_p->Fill(log10(p_maxVal/p_E_total));
-                if(p_First_Had_Layer==k) { h1_d->Fill(log10(p_maxVal/p_E_total)); }
-                if(p_First_Had_Layer==-1) { h1_h->Fill(log10(p_maxVal/p_E_total)); }
-                if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1              && p_First_Had_Type == 1) { h1_e->Fill(log10(p_maxVal/p_E_total)); }
-                if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1) { h1_H->Fill(log10(p_maxVal/p_E_total)); }
-                if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2)                                                  { h1_c->Fill(log10(p_maxVal/p_E_total)); }
-                if(p_First_Had_Layer>=k+1) { h1_E->Fill(log10(p_maxVal/p_E_total)); }
-                
+                auto p_start = p_EnergyVec->begin() + i;  auto p_end = (i + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal = *std::max_element(p_start, p_end); 
+                if(k>0 && k<13)
+                {
+                    h1_p->Fill(log10(p_maxVal/p_E_total));
+                    if(p_First_Had_Layer==k) { h1_d->Fill(log10(p_maxVal/p_E_total)); }
+                    if(p_First_Had_Layer==-1) { h1_h->Fill(log10(p_maxVal/p_E_total)); }
+                    if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1              && p_First_Had_Type == 1) { h1_e->Fill(log10(p_maxVal/p_E_total)); }
+                    if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1) { h1_H->Fill(log10(p_maxVal/p_E_total)); }
+                    if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2)                                                  { h1_c->Fill(log10(p_maxVal/p_E_total)); }
+                    if(p_First_Had_Layer>=k+1) { h1_E->Fill(log10(p_maxVal/p_E_total)); }
+                    
+                }
+                else if (k==0)
+                {
+                    h1_p->Fill(log10(p_maxVal/p_E_total));
+                    if(p_First_Had_Layer==k) { h1_d->Fill(log10(p_maxVal/p_E_total)); }
+                    if(p_First_Had_Layer==-1) { h1_h->Fill(log10(p_maxVal/p_E_total)); }
+                    if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 1) { h1_e->Fill(log10(p_maxVal/p_E_total)); }
+                    if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 2) { h1_E->Fill(log10(p_maxVal/p_E_total)); }
+                }
+                else if (k==13)
+                {
+                    h1_p->Fill(log10(p_maxVal/p_E_total));
+                    if(p_First_Had_Layer==k) { h1_d->Fill(log10(p_maxVal/p_E_total)); }
+                    if(p_First_Had_Layer==-1) { h1_h->Fill(log10(p_maxVal/p_E_total)); }
+                    if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1              && p_First_Had_Type == 1) { h1_e->Fill(log10(p_maxVal/p_E_total)); }
+                    if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1) { h1_H->Fill(log10(p_maxVal/p_E_total)); }
+                    if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2) { h1_c->Fill(log10(p_maxVal/p_E_total)); }
+                }
             }
-            else if (k==0)
-            {
-                h1_p->Fill(log10(p_maxVal/p_E_total));
-                if(p_First_Had_Layer==k) { h1_d->Fill(log10(p_maxVal/p_E_total)); }
-                if(p_First_Had_Layer==-1) { h1_h->Fill(log10(p_maxVal/p_E_total)); }
-                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 1) { h1_e->Fill(log10(p_maxVal/p_E_total)); }
-                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 2) { h1_E->Fill(log10(p_maxVal/p_E_total)); }
-            }
-            else if (k==13)
-            {
-                h1_p->Fill(log10(p_maxVal/p_E_total));
-                if(p_First_Had_Layer==k) { h1_d->Fill(log10(p_maxVal/p_E_total)); }
-                if(p_First_Had_Layer==-1) { h1_h->Fill(log10(p_maxVal/p_E_total)); }
-                if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1              && p_First_Had_Type == 1) { h1_e->Fill(log10(p_maxVal/p_E_total)); }
-                if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1) { h1_H->Fill(log10(p_maxVal/p_E_total)); }
-                if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2) { h1_c->Fill(log10(p_maxVal/p_E_total)); }
-            }
-            
-            
-        }
+        }   
     }
+
 
     h1_p->Sumw2(); /*h1_p->Scale(1.0/h1_p->Integral());*/ h1_p->SetLineColor(kRed);     h1_p->SetMarkerColor(kRed);     h1_p->SetLineWidth(2);
     h1_d->Sumw2(); /*h1_d->Scale(1.0/h1_d->Integral());*/ h1_d->SetLineColor(kBlue);    h1_d->SetMarkerColor(kBlue);    h1_d->SetLineWidth(2);
