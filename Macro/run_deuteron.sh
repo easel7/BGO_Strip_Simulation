@@ -17,4 +17,4 @@ done
 #     ${exe} -m ${Tag}_${energy}GeV.mac
 # done
 
-# ${exe} -m  /Users/xiongzheng/software/B4/B4e/Macro/${Tag}_PowerLaw.mac
+${exe} -m  /Users/xiongzheng/software/B4/B4e/Macro/${Tag}_PowerLaw.mac

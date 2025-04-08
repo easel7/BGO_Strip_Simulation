@@ -63,69 +63,69 @@ void Rm2()
             deuteron_tree->GetEntry(entry); 
             double sum_p = 0;
             double sum_d = 0;
-            // for (size_t k = 0; k < p_EnergyVec->size(); k ++) {sum_d += (*p_EnergyVec)[k];}
-            for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
-            {
-                int index = int(k / 22);  // Get the Layer
-                auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal[index] = *std::max_element(p_start, p_end); 
-                if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15) 
-                {
-                    h1_p[index]->Fill(p_maxVal[index]/p_E_total);
-                    sum_p += p_maxVal[index];
-                    if (p_E_total > 0 && sum_p > 0)
-                    {
-                        hC_p[index]->Fill(sum_p / p_E_total);
-                    }
-                }
-                auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal[index] = *std::max_element(d_start, d_end); 
-                if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15) 
-                {
-                    h1_d[index]->Fill(d_maxVal[index]/d_E_total);
-                    sum_d += d_maxVal[index];
-                    if (d_E_total > 0 && sum_d > 0)
-                    {
-                        hC_d[index]->Fill(sum_d / d_E_total);
-                    }
-                }
+            for (size_t k = 0; k < p_EnergyVec->size(); k ++) {sum_d += (*p_EnergyVec)[k];}
+            // for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
+            // {
+            //     int index = int(k / 22);  // Get the Layer
+            //     auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal[index] = *std::max_element(p_start, p_end); 
+            //     if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15) 
+            //     {
+            //         h1_p[index]->Fill(p_maxVal[index]/p_E_total);
+            //         sum_p += p_maxVal[index];
+            //         if (p_E_total > 0 && sum_p > 0)
+            //         {
+            //             hC_p[index]->Fill(sum_p / p_E_total);
+            //         }
+            //     }
+            //     auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal[index] = *std::max_element(d_start, d_end); 
+            //     if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15) 
+            //     {
+            //         h1_d[index]->Fill(d_maxVal[index]/d_E_total);
+            //         sum_d += d_maxVal[index];
+            //         if (d_E_total > 0 && sum_d > 0)
+            //         {
+            //             hC_d[index]->Fill(sum_d / d_E_total);
+            //         }
+            //     }
                 // cout << " bar " << k << " Layer " << index <<endl; 
                 // std::copy(p_start, p_end, std::ostream_iterator<double>(std::cout, ", "));
                 // cout << " max = "<< p_maxVal[index] <<  endl;
-            }
+            // }
             // cout <<  "sum p = " << sum_p <<  endl;
-            // cout <<  "sum d = " << sum_d <<  endl;
-            // cout << p_E_total << endl;
-            // cout << p_EnergyVec->size() << endl;
+            cout <<  "sum d = " << sum_d <<  endl;
+            cout << p_E_total << endl;
+            cout << p_EnergyVec->size() << endl;
         }
 
-        for (int j = 0; j < 14; j++)
-        {
-            h1_p[j]->SetLineColor(kRed);     h1_p[j]->SetMarkerColor(kRed);     h1_p[j]->SetLineWidth(2);   h1_p[j]->Sumw2();
-            h1_d[j]->SetLineColor(kBlue);    h1_d[j]->SetMarkerColor(kBlue);    h1_d[j]->SetLineWidth(2);   h1_d[j]->Sumw2();
-            hC_p[j]->SetLineColor(kRed);     hC_p[j]->SetMarkerColor(kRed);     hC_p[j]->SetLineWidth(2);   hC_p[j]->Sumw2(); 
-            hC_d[j]->SetLineColor(kBlue);    hC_d[j]->SetMarkerColor(kBlue);    hC_d[j]->SetLineWidth(2);   hC_d[j]->Sumw2(); 
+        // for (int j = 0; j < 14; j++)
+        // {
+        //     h1_p[j]->SetLineColor(kRed);     h1_p[j]->SetMarkerColor(kRed);     h1_p[j]->SetLineWidth(2);   h1_p[j]->Sumw2();
+        //     h1_d[j]->SetLineColor(kBlue);    h1_d[j]->SetMarkerColor(kBlue);    h1_d[j]->SetLineWidth(2);   h1_d[j]->Sumw2();
+        //     hC_p[j]->SetLineColor(kRed);     hC_p[j]->SetMarkerColor(kRed);     hC_p[j]->SetLineWidth(2);   hC_p[j]->Sumw2(); 
+        //     hC_d[j]->SetLineColor(kBlue);    hC_d[j]->SetMarkerColor(kBlue);    hC_d[j]->SetLineWidth(2);   hC_d[j]->Sumw2(); 
 
-            c2->cd(j + 1);
-            /*hC_p[j]->Scale(1.0/hC_p[j]->Integral());*/
-            /*hC_d[j]->Scale(1.0/hC_d[j]->Integral());*/
-            hC_p[j]->SetTitle(Form("%.f GeV incident in L%d;Rm = Max Energy Deposit bar/ Total Deposit;Normalized Count",Energy[i],j));
-            hC_p[j]->Draw("hist");
-            hC_d[j]->Draw("histsame");
+        //     c2->cd(j + 1);
+        //     /*hC_p[j]->Scale(1.0/hC_p[j]->Integral());*/
+        //     /*hC_d[j]->Scale(1.0/hC_d[j]->Integral());*/
+        //     hC_p[j]->SetTitle(Form("%.f GeV incident in L%d;Rm = Max Energy Deposit bar/ Total Deposit;Normalized Count",Energy[i],j));
+        //     hC_p[j]->Draw("hist");
+        //     hC_d[j]->Draw("histsame");
             
-            c1->cd(j + 1);
-            h1_p[j]->Scale(1.0/h1_p[j]->Integral()); 
-            h1_d[j]->Scale(1.0/h1_d[j]->Integral()); 
-            h1_p[j]->GetYaxis()->SetRangeUser(0,0.6);
-            h1_p[j]->SetTitle(Form("%.f GeV incident in L%d;#sum_{0}^{%d}Rm",Energy[i],j,j));
-            h1_p[j]->Draw();
-            h1_p[j]->Draw("hist");
-            h1_d[j]->Draw("histsame");
+        //     c1->cd(j + 1);
+        //     h1_p[j]->Scale(1.0/h1_p[j]->Integral()); 
+        //     h1_d[j]->Scale(1.0/h1_d[j]->Integral()); 
+        //     h1_p[j]->GetYaxis()->SetRangeUser(0,0.6);
+        //     h1_p[j]->SetTitle(Form("%.f GeV incident in L%d;#sum_{0}^{%d}Rm",Energy[i],j,j));
+        //     h1_p[j]->Draw();
+        //     h1_p[j]->Draw("hist");
+        //     h1_d[j]->Draw("histsame");
 
-            double quantiles[3] = {0.16, 0.50, 0.84};  // Percentiles
-            double p_values[3];  h1_p[j]->GetQuantiles(3, p_values, quantiles);  Proton_Ratio[j]   = p_values[1];     Proton_Ratio_LL[j] = p_values[1] - p_values[0];   Proton_Ratio_UL[j]   = p_values[2] - p_values[1];
-            double d_values[3];  h1_d[j]->GetQuantiles(3, d_values, quantiles);  Deuteron_Ratio[j] = d_values[1];   Deuteron_Ratio_LL[j] = d_values[1] - d_values[0];   Deuteron_Ratio_UL[j] = d_values[2] - d_values[1];
-            Layer[j] = 0.5 + j;
-            Layer_Err[j] = 0.5;
-        }
+        //     double quantiles[3] = {0.16, 0.50, 0.84};  // Percentiles
+        //     double p_values[3];  h1_p[j]->GetQuantiles(3, p_values, quantiles);  Proton_Ratio[j]   = p_values[1];     Proton_Ratio_LL[j] = p_values[1] - p_values[0];   Proton_Ratio_UL[j]   = p_values[2] - p_values[1];
+        //     double d_values[3];  h1_d[j]->GetQuantiles(3, d_values, quantiles);  Deuteron_Ratio[j] = d_values[1];   Deuteron_Ratio_LL[j] = d_values[1] - d_values[0];   Deuteron_Ratio_UL[j] = d_values[2] - d_values[1];
+        //     Layer[j] = 0.5 + j;
+        //     Layer_Err[j] = 0.5;
+        // }
 
         // auto c3 = new TCanvas("c3","c3",1000,1000);
         // auto gre_p = new TGraphAsymmErrors(14,Layer,Proton_Ratio  ,Layer_Err,Layer_Err,Proton_Ratio_LL  ,Proton_Ratio_UL);
