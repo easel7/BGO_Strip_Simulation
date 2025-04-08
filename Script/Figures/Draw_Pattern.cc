@@ -2,8 +2,8 @@ void Draw_Pattern()
 {
     std::vector<double>* energyVec = nullptr;
     std::vector<double>* p_RMSVec = nullptr;
-    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test1.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_100GeV.root");
+    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test1.root");
 
     auto proton_tree = (TTree*)proton_file->Get("B4");
 
@@ -15,10 +15,9 @@ void Draw_Pattern()
     auto c1    = new TCanvas("c1","c1",1800,600);
     auto hXZ   = new TH2D("hXZ","BGO X-Z Plane",22,-11,11,14,0,14);
     auto hYZ   = new TH2D("hYZ","BGO Y-Z Plane",22,-11,11,14,0,14);
-    auto h3box = new TH3D("h3box","3D View Proton_1000GeV Cascade",22,-11,11,22,-11,11,14,0,14);
+    auto h3box = new TH3D("h3box","3D View Proton_100GeV Cascade",22,-11,11,22,-11,11,14,0,14);
 
-    double minVal = -2;  // 设置最小值
-    double maxVal = 2;  // 设置最大值
+
     // for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
     for (Long64_t entry = 0; entry < 10; entry++)
     {
@@ -37,7 +36,7 @@ void Draw_Pattern()
             {
                 hXZ->SetBinContent(bar+1, 14-layer, energy);
                 hYZ->SetBinContent(bar+1, 14-layer, -5);
-                for(int j = 0 ; j<24 ; j++)
+                for(int j = 0 ; j<22 ; j++)
                 {
                     h3box->SetBinContent(bar+1 , j+1  , 14-layer , (*energyVec)[i]);
                 }
@@ -47,7 +46,7 @@ void Draw_Pattern()
             {
                 hYZ->SetBinContent(bar+1, 14-layer, energy);
                 hXZ->SetBinContent(bar+1, 14-layer, -5);
-                for(int j = 0 ; j<24 ; j++)
+                for(int j = 0 ; j<22 ; j++)
                 {
                     h3box->SetBinContent(j+1 , bar+1, 14-layer ,(*energyVec)[i]);
                 }
@@ -56,11 +55,12 @@ void Draw_Pattern()
 
         for (int layer = 0; layer < 14; layer++) {
             hXZ->SetBinContent(1, 14-layer, -5);
-            hXZ->SetBinContent(24, 14-layer, -5);
+            hXZ->SetBinContent(22, 14-layer, -5);
             hYZ->SetBinContent(1, 14-layer, -5);
-            hYZ->SetBinContent(24, 14-layer, -5);
+            hYZ->SetBinContent(22, 14-layer, -5);
         }
-
+        double minVal = -2;  // 设置最小值
+        double maxVal = 2;  // 设置最大值
 
         hXZ->SetMinimum(minVal); 
         hXZ->SetMaximum(maxVal); 
@@ -110,7 +110,7 @@ void Draw_Pattern()
         auto  *palette3 = (TPaletteAxis*) h3box->GetListOfFunctions()->FindObject("palette");
         latex.DrawLatexNDC(0.8, 0.92, "(Edep/GeV)");
 
-        c1->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/Proton_1000GeV_%lld.root",entry));
+        c1->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/Proton_100GeV_%lld.root",entry));
     }
 
 }
