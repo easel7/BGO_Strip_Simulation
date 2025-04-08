@@ -156,14 +156,21 @@ void EventAction::EndOfEventAction(const G4Event* event)
         fCalEdep[i] = absoperHit->GetEdep() / CLHEP::GeV;  // 给Vector赋值
         fCalLeng[i] = absoperHit->GetTrackLength() / CLHEP::m;  // 给Vector赋值
         HitsArray[int(i/22)] += 1;
-        EdepArray[int(i/22)] += fCalEdep[i];
-        LengArray[int(i/22)] += fCalLeng[i];
-        Xw[int(i/22)]        += ((int(i%22)-10)*25-12.5) * fCalEdep[i];
-        Xw2[int(i/22)]       += ((int(i%22)-10)*25-12.5) * ((int(i%22)-10)*25-12.5) * fCalEdep[i];
         HitsArray[14]        += 1;
-        EdepArray[14]        += fCalEdep[i];
-        LengArray[14]        += fCalLeng[i];
       }
+      else
+      {
+        fCalEdep[i] = 0;
+        fCalLeng[i] = 0;
+        HitsArray[int(i/22)] += 0;
+        HitsArray[14]        += 0;
+      }
+      Xw[int(i/22)]        += ((int(i%22)-10)*25-12.5) * fCalEdep[i];
+      Xw2[int(i/22)]       += ((int(i%22)-10)*25-12.5) * ((int(i%22)-10)*25-12.5) * fCalEdep[i];
+      EdepArray[int(i/22)] += fCalEdep[i];
+      LengArray[int(i/22)] += fCalLeng[i];
+      EdepArray[14]        += fCalEdep[i];
+      LengArray[14]        += fCalLeng[i];
     }
   }
 
@@ -172,10 +179,11 @@ void EventAction::EndOfEventAction(const G4Event* event)
     fLayHits[i] = HitsArray[i];
     fLayEdep[i] = EdepArray[i];
     fLayLeng[i] = LengArray[i];
-    fEfrac[i]   = fLayEdep[i] / EdepArray[14];
-    Xw[i]       = Xw[i]  / fLayEdep[i];
-    Xw2[i]      = Xw2[i] / fLayEdep[i];
-    fRMS[i]     = sqrt(Xw2[i] - Xw[i] * Xw[i]);
+    fEfrac[i]   = (EdepArray[14] > 0) ? fLayEdep[i] / EdepArray[14] : 0.;
+    Xw[i]       = (fLayEdep[i] > 0)   ? Xw[i]       / fLayEdep[i]   : 0.;
+    Xw2[i]      = (fLayEdep[i] > 0)   ? Xw2[i]      / fLayEdep[i]   : 0.;
+    double variance = Xw2[i] - Xw[i] * Xw[i];
+    fRMS[i] = (variance > 0) ? sqrt(variance) : 0.0;
     if (fLayEdep[i] > 1E-2 ) { lastNonZeroFEfrac = fEfrac[i]; }
     Sum_RMS      += fRMS[i];
     fFval[i]      = fRMS[i] * fEfrac[i];
