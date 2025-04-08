@@ -21,7 +21,8 @@ void Rm2()
         double Layer_Err[14]={0};
 
         // auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Proton_%dGeV.root",int(Energy[i])));
-        auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test_3.root");
+        auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
+        // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test_3.root");
 
         auto proton_tree = (TTree*)proton_file->Get("B4");
         proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
