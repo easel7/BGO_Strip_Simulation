@@ -12,7 +12,7 @@ Tag=Helium4
 #     ${exe} -m ${Tag}_${energy}GeV.mac
 # done
 
-for energy in $(seq 4000 1000 4000)
+for energy in $(seq 6000 1000 6000)
 do
     ${exe} -m ${Tag}_${energy}GeV.mac
 done
