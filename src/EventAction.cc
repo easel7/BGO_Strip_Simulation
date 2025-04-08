@@ -148,11 +148,8 @@ void EventAction::EndOfEventAction(const G4Event* event)
       // G4cout << "id = " <<  i << " Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
       if( absoperHit->GetEdep() / CLHEP::GeV > 1E-2 && absoperHit->GetTrackLength() / CLHEP::m > 0)
       {
-        // if(eventID ==73)
-        // {
-          // G4cout << " i =" << i << " bar " << i%22 << " x pos " <<  ((int(i%22)-10)*25-12.5) << G4endl;
-          G4cout << "Check id = " <<  i << " bar, Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
-        // }
+        // G4cout << " i =" << i << " bar " << i%22 << " x pos " <<  ((int(i%22)-10)*25-12.5) << G4endl;
+        // G4cout << "Check id = " <<  i << " bar, Edep " << absoperHit->GetEdep() / CLHEP::GeV << " GeV, Length " << absoperHit->GetTrackLength() / CLHEP::m << " m "<< G4endl;
         fCalEdep[i] = absoperHit->GetEdep() / CLHEP::GeV;  // 给Vector赋值
         fCalLeng[i] = absoperHit->GetTrackLength() / CLHEP::m;  // 给Vector赋值
         HitsArray[int(i/22)] += 1;
@@ -189,10 +186,7 @@ void EventAction::EndOfEventAction(const G4Event* event)
     fFval[i]      = fRMS[i] * fEfrac[i];
   }
   Zeta = pow(Sum_RMS,4) * lastNonZeroFEfrac / 8e6;
-  // if(eventID ==73)
-  {
-    G4cout << "Check Total Edep " << EdepArray[14] << " GeV, Length " << LengArray[14] << " m, Fire Bars " << HitsArray[14] << " FL "<<  lastNonZeroFEfrac <<" Zeta " << Zeta << G4endl;
-  }
+  // if(eventID ==73) G4cout << "Check Total Edep " << EdepArray[14] << " GeV, Length " << LengArray[14] << " m, Fire Bars " << HitsArray[14] << " FL "<<  lastNonZeroFEfrac <<" Zeta " << Zeta << G4endl;
   analysisManager->FillNtupleDColumn(18, Zeta);
   analysisManager->FillNtupleIColumn(19, HitsArray[14]); 
   analysisManager->FillNtupleDColumn(20, EdepArray[14]);
