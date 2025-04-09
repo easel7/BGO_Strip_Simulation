@@ -91,8 +91,6 @@ void PrimaryGeneratorAction::GeneratePrimaries(G4Event* event)
   fparticleSource->GeneratePrimaryVertex(event);
 }
 
-
-
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 }  // namespace B4

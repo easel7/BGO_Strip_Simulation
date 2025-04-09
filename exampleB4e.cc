@@ -37,7 +37,7 @@
 #include "G4UIcommand.hh"
 #include "G4UImanager.hh"
 #include "G4VisExecutive.hh"
-// #include "Randomize.hh"
+#include "Randomize.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -96,8 +96,8 @@ int main(int argc, char** argv)
   }
 
   // Optionally: choose a different Random engine...
-  // G4Random::setTheEngine(new CLHEP::MTwistEngine);
-
+  G4Random::setTheEngine(new CLHEP::MTwistEngine);
+  G4Random::setTheSeed(time(nullptr)); // 用时间作为种子，每次都不一样
   // Use G4SteppingVerboseWithUnits
   if (verboseBestUnits) {
     G4int precision = 4;
