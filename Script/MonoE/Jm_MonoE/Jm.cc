@@ -102,12 +102,12 @@ void Jm()
             // cout << p_EnergyVec->size() << endl;
             for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
             {
-                auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal[int(k/22)] = *std::max_element(p_start, p_end);  h1_p[int(k/22)]->Fill(log10(p_maxVal[int(k/22)]/(*p_L_EnergyVec)[int(k/22)]));
-                auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal[int(k/22)] = *std::max_element(d_start, d_end);  h1_d[int(k/22)]->Fill(log10(d_maxVal[int(k/22)]/(*d_L_EnergyVec)[int(k/22)]));
-                auto e_start = e_EnergyVec->begin() + k;  auto e_end = (k + 22 < e_EnergyVec->size() ) ? e_start + 22 : e_EnergyVec->end();  e_maxVal[int(k/22)] = *std::max_element(e_start, e_end);  h1_e[int(k/22)]->Fill(log10(e_maxVal[int(k/22)]/(*e_L_EnergyVec)[int(k/22)]));
-                auto h_start = h_EnergyVec->begin() + k;  auto h_end = (k + 22 < h_EnergyVec->size() ) ? h_start + 22 : h_EnergyVec->end();  h_maxVal[int(k/22)] = *std::max_element(h_start, h_end);  h1_h[int(k/22)]->Fill(log10(h_maxVal[int(k/22)]/(*h_L_EnergyVec)[int(k/22)]));
-                auto H_start = H_EnergyVec->begin() + k;  auto H_end = (k + 22 < H_EnergyVec->size() ) ? H_start + 22 : H_EnergyVec->end();  H_maxVal[int(k/22)] = *std::max_element(H_start, H_end);  h1_H[int(k/22)]->Fill(log10(H_maxVal[int(k/22)]/(*H_L_EnergyVec)[int(k/22)]));
-                auto c_start = c_EnergyVec->begin() + k;  auto c_end = (k + 22 < c_EnergyVec->size() ) ? c_start + 22 : c_EnergyVec->end();  c_maxVal[int(k/22)] = *std::max_element(c_start, c_end);  h1_c[int(k/22)]->Fill(log10(c_maxVal[int(k/22)]/(*c_L_EnergyVec)[int(k/22)]));
+                auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal[int(k/22)] = *std::max_element(p_start, p_end);  if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[0]<50 && (*p_RMSVec)[1]<50) h1_p[int(k/22)]->Fill(log10(p_maxVal[int(k/22)]/(*p_L_EnergyVec)[int(k/22)]));
+                auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal[int(k/22)] = *std::max_element(d_start, d_end);  if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[0]<50 && (*d_RMSVec)[1]<50) h1_d[int(k/22)]->Fill(log10(d_maxVal[int(k/22)]/(*d_L_EnergyVec)[int(k/22)]));
+                auto e_start = e_EnergyVec->begin() + k;  auto e_end = (k + 22 < e_EnergyVec->size() ) ? e_start + 22 : e_EnergyVec->end();  e_maxVal[int(k/22)] = *std::max_element(e_start, e_end);  if((*e_RMSVec)[0]>15 && (*e_RMSVec)[1]>15 && (*e_RMSVec)[0]<50 && (*e_RMSVec)[1]<50) h1_e[int(k/22)]->Fill(log10(e_maxVal[int(k/22)]/(*e_L_EnergyVec)[int(k/22)]));
+                auto h_start = h_EnergyVec->begin() + k;  auto h_end = (k + 22 < h_EnergyVec->size() ) ? h_start + 22 : h_EnergyVec->end();  h_maxVal[int(k/22)] = *std::max_element(h_start, h_end);  if((*h_RMSVec)[0]>15 && (*h_RMSVec)[1]>15 && (*h_RMSVec)[0]<50 && (*h_RMSVec)[1]<50) h1_h[int(k/22)]->Fill(log10(h_maxVal[int(k/22)]/(*h_L_EnergyVec)[int(k/22)]));
+                auto H_start = H_EnergyVec->begin() + k;  auto H_end = (k + 22 < H_EnergyVec->size() ) ? H_start + 22 : H_EnergyVec->end();  H_maxVal[int(k/22)] = *std::max_element(H_start, H_end);  if((*H_RMSVec)[0]>15 && (*H_RMSVec)[1]>15 && (*H_RMSVec)[0]<50 && (*H_RMSVec)[1]<50) h1_H[int(k/22)]->Fill(log10(H_maxVal[int(k/22)]/(*H_L_EnergyVec)[int(k/22)]));
+                auto c_start = c_EnergyVec->begin() + k;  auto c_end = (k + 22 < c_EnergyVec->size() ) ? c_start + 22 : c_EnergyVec->end();  c_maxVal[int(k/22)] = *std::max_element(c_start, c_end);  if((*c_RMSVec)[0]>15 && (*c_RMSVec)[1]>15 && (*c_RMSVec)[0]<50 && (*c_RMSVec)[1]<50) h1_c[int(k/22)]->Fill(log10(c_maxVal[int(k/22)]/(*c_L_EnergyVec)[int(k/22)]));
                 // cout << " bar " << k << " Layer " << int(k/22) <<endl; 
                 // std::copy(p_start, p_end, std::ostream_iterator<double>(std::cout, ", "));
                 // cout << " max = "<< p_maxVal[int(k/22)] <<  endl;
@@ -161,7 +161,7 @@ void Jm()
         legend1->AddEntry(h1_H[0], "Helium3", "l");         
         legend1->AddEntry(h1_c[0], "Carbon", "l");         
         legend1->Draw();       
-        c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Jm_MonoE/Jm_%dGeV.pdf",int(Energy[i])));
+        c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Jm_MonoE/PDF/Jm_%dGeV.pdf",int(Energy[i])));
 
         auto c2 = new TCanvas("c2","c2",1000,1000);
         // c2->cd();
@@ -217,7 +217,7 @@ void Jm()
         legend2->AddEntry(gre_c, "HET Carbon", "ep");
         legend2->Draw();
 
-        c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Jm_MonoE/Jm_BGOLayer_%dGeV.pdf",int(Energy[i])));
+        c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Jm_MonoE/PDF/Jm_BGOLayer_%dGeV.pdf",int(Energy[i])));
     }
     
 }

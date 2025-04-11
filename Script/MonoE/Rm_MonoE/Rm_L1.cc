@@ -7,8 +7,8 @@ void Rm_L1()
     int H_First_Had_Layer;   int H_First_Had_Type; double H_E_total;    std::vector<double>* H_RMSVec = nullptr;    std::vector<double>* H_EnergyVec = nullptr;    std::vector<double>* H_Efrac = nullptr;
     int c_First_Had_Layer;   int c_First_Had_Type; double c_E_total;    std::vector<double>* c_RMSVec = nullptr;    std::vector<double>* c_EnergyVec = nullptr;    std::vector<double>* c_Efrac = nullptr;
 
-    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_10000GeV.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
+    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
 
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
@@ -38,9 +38,8 @@ void Rm_L1()
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     // for (Long64_t entry = 0; entry < 1; ++entry)
     {
-
         proton_tree->GetEntry(entry);    
-        if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]>15 && (*p_RMSVec)[3]>15)
+        if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[0]<40 && (*p_RMSVec)[1]<40)
         {
             for (size_t i = 22*k; i < 22*(k+1); i += 22)
             {
@@ -88,7 +87,7 @@ void Rm_L1()
 
    
     // h1_p->GetYaxis()->SetRangeUser(0,0.5);h1_p->SetTitle("1000 GeV incident; log_{10}(Rm) = log_{10}(Max Energy Deposit bar in L0/ Total Deposit);Normalized Count");
-    h1_p->GetYaxis()->SetRangeUser(0,2000);h1_p->SetTitle(Form("1000 GeV incident; log_{10}(Rm) = log_{10}(Max Energy Deposit bar in L%d/ Total Deposit);Count",k));
+    h1_p->GetYaxis()->SetRangeUser(0,300);h1_p->SetTitle(Form("1000 GeV incident; log_{10}(Rm) = log_{10}(Max Energy Deposit bar in L%d/ Total Deposit);Count",k));
     
     auto c1 = new TCanvas("c1","c1",900,600);
     c1->cd();
@@ -100,7 +99,6 @@ void Rm_L1()
     h1_c->Draw("same");h1_c->SetStats(kFALSE); 
 
     auto legend1 = new TLegend(0.12, 0.58, 0.68, 0.88);
- 
 
     if(k>0 && k<13)
     {

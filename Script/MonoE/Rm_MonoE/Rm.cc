@@ -157,7 +157,7 @@ void Rm()
         legend1->AddEntry(h1_H[0], "Helium3", "l");         
         legend1->AddEntry(h1_c[0], "Carbon", "l");         
         legend1->Draw();       
-        c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/Rm_%dGeV.pdf",int(Energy[i])));
+        c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/PDF/Rm_%dGeV.pdf",int(Energy[i])));
 
         auto c2 = new TCanvas("c2","c2",1000,1000);
         // c2->cd();
@@ -203,7 +203,7 @@ void Rm()
         legend2->AddEntry(gre_c, "Carbon", "ep");
         legend2->Draw();
 
-        c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/Rm_BGOLayer_%dGeV.pdf",int(Energy[i])));
+        c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/PDF/Rm_BGOLayer_%dGeV.pdf",int(Energy[i])));
     }
     
 }

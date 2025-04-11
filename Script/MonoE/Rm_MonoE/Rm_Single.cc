@@ -51,12 +51,12 @@ void Rm_Single()
     carbon_tree->SetBranchAddress("Total_E"          ,&c_E_total);
 
     cout  << proton_tree->GetEntries() << endl;
-    auto h1_p = new TH1D("h1_p","h1_p",60,-5,1);      double p_maxVal;
-    auto h1_d = new TH1D("h1_d","h1_d",60,-5,1);      double d_maxVal;
-    auto h1_e = new TH1D("h1_e","h1_e",60,-5,1);      double e_maxVal;
-    auto h1_h = new TH1D("h1_h","h1_h",60,-5,1);      double h_maxVal;
-    auto h1_H = new TH1D("h1_H","h1_H",60,-5,1);      double H_maxVal;
-    auto h1_c = new TH1D("h1_c","h1_c",60,-5,1);      double c_maxVal;
+    auto h1_p = new TH1D("h1_p","h1_p",50,-5,0);      double p_maxVal;
+    auto h1_d = new TH1D("h1_d","h1_d",50,-5,0);      double d_maxVal;
+    auto h1_e = new TH1D("h1_e","h1_e",50,-5,0);      double e_maxVal;
+    auto h1_h = new TH1D("h1_h","h1_h",50,-5,0);      double h_maxVal;
+    auto h1_H = new TH1D("h1_H","h1_H",50,-5,0);      double H_maxVal;
+    auto h1_c = new TH1D("h1_c","h1_c",50,-5,0);      double c_maxVal;
 
     int k = 13;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
@@ -73,12 +73,12 @@ void Rm_Single()
         // for (size_t i = 0; i < 22; i += 22)
         // for (size_t i = 0; i < p_EnergyVec->size(); i += 22)
         {
-            auto p_start = p_EnergyVec->begin() + i;  auto p_end = (i + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal = *std::max_element(p_start, p_end); /*if(p_First_Had_Layer==0)*/{ h1_p->Fill(log10(p_maxVal/p_E_total)); }
-            auto d_start = d_EnergyVec->begin() + i;  auto d_end = (i + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal = *std::max_element(d_start, d_end); /*if(d_First_Had_Layer==0)*/{ h1_d->Fill(log10(d_maxVal/d_E_total)); }
-            auto e_start = e_EnergyVec->begin() + i;  auto e_end = (i + 22 < e_EnergyVec->size() ) ? e_start + 22 : e_EnergyVec->end();  e_maxVal = *std::max_element(e_start, e_end); /*if(e_First_Had_Layer==0)*/{ h1_e->Fill(log10(e_maxVal/e_E_total)); }
-            auto h_start = h_EnergyVec->begin() + i;  auto h_end = (i + 22 < h_EnergyVec->size() ) ? h_start + 22 : h_EnergyVec->end();  h_maxVal = *std::max_element(h_start, h_end); /*if(h_First_Had_Layer==0)*/{ h1_h->Fill(log10(h_maxVal/h_E_total)); }
-            auto H_start = H_EnergyVec->begin() + i;  auto H_end = (i + 22 < H_EnergyVec->size() ) ? H_start + 22 : H_EnergyVec->end();  H_maxVal = *std::max_element(H_start, H_end); /*if(H_First_Had_Layer==0)*/{ h1_H->Fill(log10(H_maxVal/H_E_total)); }
-            auto c_start = c_EnergyVec->begin() + i;  auto c_end = (i + 22 < c_EnergyVec->size() ) ? c_start + 22 : c_EnergyVec->end();  c_maxVal = *std::max_element(c_start, c_end); /*if(c_First_Had_Layer==0)*/{ h1_c->Fill(log10(c_maxVal/c_E_total)); }
+            auto p_start = p_EnergyVec->begin() + i;  auto p_end = (i + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal = *std::max_element(p_start, p_end); if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15) /*if(p_First_Had_Layer==0)*/{ h1_p->Fill(log10(p_maxVal/p_E_total)); }
+            auto d_start = d_EnergyVec->begin() + i;  auto d_end = (i + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal = *std::max_element(d_start, d_end); if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15) /*if(d_First_Had_Layer==0)*/{ h1_d->Fill(log10(d_maxVal/d_E_total)); }
+            auto e_start = e_EnergyVec->begin() + i;  auto e_end = (i + 22 < e_EnergyVec->size() ) ? e_start + 22 : e_EnergyVec->end();  e_maxVal = *std::max_element(e_start, e_end); if((*e_RMSVec)[0]>15 && (*e_RMSVec)[1]>15) /*if(e_First_Had_Layer==0)*/{ h1_e->Fill(log10(e_maxVal/e_E_total)); }
+            auto h_start = h_EnergyVec->begin() + i;  auto h_end = (i + 22 < h_EnergyVec->size() ) ? h_start + 22 : h_EnergyVec->end();  h_maxVal = *std::max_element(h_start, h_end); if((*h_RMSVec)[0]>15 && (*h_RMSVec)[1]>15) /*if(h_First_Had_Layer==0)*/{ h1_h->Fill(log10(h_maxVal/h_E_total)); }
+            auto H_start = H_EnergyVec->begin() + i;  auto H_end = (i + 22 < H_EnergyVec->size() ) ? H_start + 22 : H_EnergyVec->end();  H_maxVal = *std::max_element(H_start, H_end); if((*H_RMSVec)[0]>15 && (*H_RMSVec)[1]>15) /*if(H_First_Had_Layer==0)*/{ h1_H->Fill(log10(H_maxVal/H_E_total)); }
+            auto c_start = c_EnergyVec->begin() + i;  auto c_end = (i + 22 < c_EnergyVec->size() ) ? c_start + 22 : c_EnergyVec->end();  c_maxVal = *std::max_element(c_start, c_end); if((*c_RMSVec)[0]>15 && (*c_RMSVec)[1]>15) /*if(c_First_Had_Layer==0)*/{ h1_c->Fill(log10(c_maxVal/c_E_total)); }
             
             // cout << " bar " << i << " Layer " << int(i/22) <<endl; 
             // std::copy(p_start, p_end, std::ostream_iterator<double>(std::cout, " "));
@@ -104,24 +104,6 @@ void Rm_Single()
     h1_h->Draw("same");h1_h->SetStats(kFALSE); 
     // h1_H->Draw("same");h1_H->SetStats(kFALSE); 
     h1_c->Draw("same");h1_c->SetStats(kFALSE); 
-
-    double quantiles[3] = {0.16, 0.50, 0.84};  // Percentiles
-    double p_values[3];      h1_p->GetQuantiles(3, p_values, quantiles);    TLine *l_p[3];
-    double d_values[3];      h1_d->GetQuantiles(3, d_values, quantiles);    TLine *l_d[3];
-    double e_values[3];      h1_e->GetQuantiles(3, e_values, quantiles);    TLine *l_e[3];
-    double h_values[3];      h1_h->GetQuantiles(3, h_values, quantiles);    TLine *l_h[3];
-    double H_values[3];      h1_H->GetQuantiles(3, H_values, quantiles);    TLine *l_H[3];
-    double c_values[3];      h1_c->GetQuantiles(3, c_values, quantiles);    TLine *l_c[3];
-
-    for (int ii = 0 ;ii< 3 ; ii++)
-    {
-        l_p[ii] = new TLine(p_values[ii],0,p_values[ii],h1_p->GetBinContent(h1_p->FindBin(p_values[ii])));l_p[ii]->SetLineColor(kRed);     l_p[ii]->SetLineWidth(2);l_p[ii]->Draw();
-        l_d[ii] = new TLine(d_values[ii],0,d_values[ii],h1_d->GetBinContent(h1_d->FindBin(d_values[ii])));l_d[ii]->SetLineColor(kBlue);    l_d[ii]->SetLineWidth(2);l_d[ii]->Draw();
-        l_e[ii] = new TLine(e_values[ii],0,e_values[ii],h1_e->GetBinContent(h1_e->FindBin(e_values[ii])));l_e[ii]->SetLineColor(kOrange-3);l_e[ii]->SetLineWidth(2);l_e[ii]->Draw();
-        l_h[ii] = new TLine(h_values[ii],0,h_values[ii],h1_h->GetBinContent(h1_h->FindBin(h_values[ii])));l_h[ii]->SetLineColor(kGreen-3); l_h[ii]->SetLineWidth(2);l_h[ii]->Draw();
-        l_H[ii] = new TLine(H_values[ii],0,H_values[ii],h1_H->GetBinContent(h1_H->FindBin(H_values[ii])));l_H[ii]->SetLineColor(kGreen-3); l_H[ii]->SetLineWidth(2);l_H[ii]->Draw();l_H[ii]->SetLineStyle(2);
-        l_c[ii] = new TLine(c_values[ii],0,c_values[ii],h1_c->GetBinContent(h1_c->FindBin(c_values[ii])));l_c[ii]->SetLineColor(kMagenta); l_c[ii]->SetLineWidth(2);l_c[ii]->Draw();
-    }
 
     auto legend1 = new TLegend(0.12, 0.68, 0.28, 0.88);
     legend1->AddEntry(h1_p, "Proton", "el");

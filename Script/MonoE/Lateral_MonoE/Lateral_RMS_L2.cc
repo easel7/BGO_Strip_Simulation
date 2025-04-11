@@ -36,13 +36,13 @@ void Lateral_RMS_L2()
     double H_maxVal;
     double c_maxVal;
 
-    int k = 3;
+    int k = 1;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     // for (Long64_t entry = 0; entry < 1; ++entry)
     {
         
         proton_tree->GetEntry(entry);    
-        if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15)
+        if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[0]<60 && (*p_RMSVec)[1]<60)
         {
             for (size_t i = 22*k; i < 22*(k+1); i += 22)
             {
@@ -89,7 +89,7 @@ void Lateral_RMS_L2()
     h1_C->Sumw2(); /*h1_C->Scale(1.0/h1_C->Integral());*/ h1_C->SetLineColor(kGray);   h1_C->SetMarkerColor(kGray);   h1_C->SetLineWidth(2);
 
     // h1_p->GetYaxis()->SetRangeUser(0,0.5);
-    h1_p->GetYaxis()->SetRangeUser(0,2000);
+    h1_p->GetYaxis()->SetRangeUser(0,200);
     h1_p->SetTitle(Form("1000 GeV incident; RMS L%d;Count",k));
     
     auto c1 = new TCanvas("c1","c1",900,600);

@@ -51,15 +51,15 @@ void Lateral_RMS_Single()
     auto h1_h = new TH1D("h1_h","h1_h",75,0,150);  
     auto h1_H = new TH1D("h1_H","h1_H",75,0,150);  
     auto h1_c = new TH1D("h1_c","h1_c",75,0,150);  
-    int k = 3;
+    int k = 0;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
     {
-        proton_tree->GetEntry(entry);   if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15) /* if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_EnergyVec)[2] > 0.23 && (*p_EnergyVec)[0] > 0.046) */  h1_p->Fill((*p_RMSVec)[k]);
-        deuteron_tree->GetEntry(entry); if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15) /* if ((*d_EnergyVec)[0] > 0.23 && (*d_EnergyVec)[1] > 0.23 && (*d_EnergyVec)[2] > 0.23 && (*d_EnergyVec)[0] > 0.046) */  h1_d->Fill((*d_RMSVec)[k]);
-        electron_tree->GetEntry(entry); if((*e_RMSVec)[0]>15 && (*e_RMSVec)[1]>15) /* if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_EnergyVec)[2] > 0.23 && (*e_EnergyVec)[0] > 0.046) */  h1_e->Fill((*e_RMSVec)[k]);
-        helium4_tree->GetEntry(entry);  if((*h_RMSVec)[0]>15 && (*h_RMSVec)[1]>15) /* if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_EnergyVec)[2] > 0.23 && (*h_EnergyVec)[0] > 0.046) */  h1_h->Fill((*h_RMSVec)[k]);
-        helium3_tree->GetEntry(entry);  if((*H_RMSVec)[0]>15 && (*H_RMSVec)[1]>15) /* if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_EnergyVec)[2] > 0.23 && (*H_EnergyVec)[0] > 0.046) */  h1_H->Fill((*H_RMSVec)[k]);
-        carbon_tree->GetEntry(entry);   if((*c_RMSVec)[0]>15 && (*c_RMSVec)[1]>15) /* if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_EnergyVec)[2] > 0.23 && (*c_EnergyVec)[0] > 0.046) */  h1_c->Fill((*c_RMSVec)[k]);
+        proton_tree->GetEntry(entry);   if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[0]<50 && (*p_RMSVec)[1]<50) /* if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_EnergyVec)[2] > 0.23 && (*p_EnergyVec)[0] > 0.046) */  h1_p->Fill((*p_RMSVec)[k]);
+        deuteron_tree->GetEntry(entry); if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[0]<50 && (*d_RMSVec)[1]<50) /* if ((*d_EnergyVec)[0] > 0.23 && (*d_EnergyVec)[1] > 0.23 && (*d_EnergyVec)[2] > 0.23 && (*d_EnergyVec)[0] > 0.046) */  h1_d->Fill((*d_RMSVec)[k]);
+        electron_tree->GetEntry(entry); if((*e_RMSVec)[0]>15 && (*e_RMSVec)[1]>15 && (*e_RMSVec)[0]<50 && (*e_RMSVec)[1]<50) /* if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_EnergyVec)[2] > 0.23 && (*e_EnergyVec)[0] > 0.046) */  h1_e->Fill((*e_RMSVec)[k]);
+        helium4_tree->GetEntry(entry);  if((*h_RMSVec)[0]>15 && (*h_RMSVec)[1]>15 && (*h_RMSVec)[0]<50 && (*h_RMSVec)[1]<50) /* if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_EnergyVec)[2] > 0.23 && (*h_EnergyVec)[0] > 0.046) */  h1_h->Fill((*h_RMSVec)[k]);
+        helium3_tree->GetEntry(entry);  if((*H_RMSVec)[0]>15 && (*H_RMSVec)[1]>15 && (*H_RMSVec)[0]<50 && (*H_RMSVec)[1]<50) /* if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_EnergyVec)[2] > 0.23 && (*H_EnergyVec)[0] > 0.046) */  h1_H->Fill((*H_RMSVec)[k]);
+        carbon_tree->GetEntry(entry);   if((*c_RMSVec)[0]>15 && (*c_RMSVec)[1]>15 && (*c_RMSVec)[0]<50 && (*c_RMSVec)[1]<50) /* if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_EnergyVec)[2] > 0.23 && (*c_EnergyVec)[0] > 0.046) */  h1_c->Fill((*c_RMSVec)[k]);
     }
     h1_p->Sumw2(); h1_p->Scale(1.0/h1_p->Integral());h1_p->SetLineColor(kRed);     h1_p->SetMarkerColor(kRed);     h1_p->SetLineWidth(2);
     h1_d->Sumw2(); h1_d->Scale(1.0/h1_d->Integral());h1_d->SetLineColor(kBlue);    h1_d->SetMarkerColor(kBlue);    h1_d->SetLineWidth(2);
@@ -80,7 +80,7 @@ void Lateral_RMS_Single()
 
     auto legend1 = new TLegend(0.12, 0.68, 0.28, 0.88);
     legend1->AddEntry(h1_p, "Proton", "el");
-    legend1->AddEntry(h1_d, "Deuteron", "el");
+    legend1->AddEntry(h1_d, "Deuteron", "el"); 
     legend1->AddEntry(h1_e, "Electron", "el");
     legend1->AddEntry(h1_h, "Helium4", "el");         
     legend1->AddEntry(h1_H, "Helium3", "el");         

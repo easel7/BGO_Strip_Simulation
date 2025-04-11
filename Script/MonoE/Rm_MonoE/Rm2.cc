@@ -1,7 +1,7 @@
 void Rm2()
 {
     double Energy[19]={0};
-    for (int i = 0; i < 19; i++) // Energy
+    for (int i = 18; i < 19; i++) // Energy
     {
         if(i<9)  {Energy[i] =  (i+1)*10;}
         else if(i>=9 && i < 19)   {Energy[i] =  i*100-800;}
@@ -12,6 +12,9 @@ void Rm2()
 
         TH1D *h1_p[14];  TH1D *hC_p[14];  TF1  *fitFunc_p[14]; double p_maxVal[14]={0};
         TH1D *h1_d[14];  TH1D *hC_d[14];  TF1  *fitFunc_d[14]; double d_maxVal[14]={0};
+
+        TH2D *h2_p = new TH2D("h2_p","h2_p",14,0,14,50,-5,0);
+        TH2D *h2_d = new TH2D("h2_d","h2_d",14,0,14,50,-5,0);
     
         double Proton_Ratio[14]={0};     double Deuteron_Ratio[14]={0};    
         double Proton_Ratio_LL[14]={0};  double Deuteron_Ratio_LL[14]={0}; 
@@ -32,7 +35,6 @@ void Rm2()
         auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Proton_%dGeV.root",int(Energy[i])));
         // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
         // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test_3.root");
-
         auto proton_tree = (TTree*)proton_file->Get("B4");
         proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
         proton_tree->SetBranchAddress("BarEnergyVector",  &p_EnergyVec);
@@ -78,25 +80,27 @@ void Rm2()
             {
                 int index = int(k / 22);  // Get the Layer
                 auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal[index] = *std::max_element(p_start, p_end); 
-                if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15) 
+                // if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[0]<40 && (*p_RMSVec)[1]<40) 
                 {
                     h1_p[index]->Fill(p_maxVal[index]/p_E_total);
                     sum_p += p_maxVal[index];
                     if (p_E_total > 0 && sum_p > 0)
                     {
                         hC_p[index]->Fill(sum_p / p_E_total);
-                        gr_proton->SetPoint(point_counter_p++, index, sum_p / p_E_total);
+                        gr_proton->SetPoint(point_counter_p++, index+0.9, sum_p / p_E_total);
+                        h2_p->Fill(index,log10(sum_p / p_E_total));
                     }
                 }
                 auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal[index] = *std::max_element(d_start, d_end); 
-                if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15) 
+                // if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[0]<40 && (*d_RMSVec)[1]<40) 
                 {
                     h1_d[index]->Fill(d_maxVal[index]/d_E_total);
                     sum_d += d_maxVal[index];
                     if (d_E_total > 0 && sum_d > 0)
                     {
                         hC_d[index]->Fill(sum_d / d_E_total);
-                        gr_deuteron->SetPoint(point_counter_d++, index+0.1, sum_d / d_E_total);
+                        gr_deuteron->SetPoint(point_counter_d++, index+1.1, sum_d / d_E_total);
+                        h2_d->Fill(index,log10(sum_d / d_E_total));
                     }
                 }
                 // cout << " bar " << k << " Layer " << index << " p_max" << p_maxVal[index] << " Sum p_max " << sum_p << endl; 
@@ -142,13 +146,18 @@ void Rm2()
             Layer[j] = 0.5 + j;
             Layer_Err[j] = 0.5;
         }        
-        c2->cd(15);
+        c1->cd(15);
         TLatex *tex = new TLatex(0.1,0.9,Form("IncidentParicle %dGeV",int(Energy[i])));tex->SetNDC();tex->Draw(); 
         auto legend1 = new TLegend(0.12, 0.12, 0.88, 0.88);
         legend1->AddEntry(hC_p[0], "Proton", "l");
         legend1->AddEntry(hC_d[0], "Deuteron", "l");
         legend1->Draw();       
-        c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/Rm_DP_%dGeV.pdf",int(Energy[i])));
+
+        c2->cd(15);
+        tex->Draw();
+        legend1->Draw();       
+
+        c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/CDF/Rm_DP_%dGeV.pdf",int(Energy[i])));
 
         auto c3 = new TCanvas("c3","c3",1000,1000);
         auto gre_p = new TGraphAsymmErrors(14,Layer,Proton_Ratio  ,Layer_Err,Layer_Err,Proton_Ratio_LL  ,Proton_Ratio_UL);
@@ -156,7 +165,7 @@ void Rm2()
 
         gre_p->SetMarkerStyle(20);gre_p->SetMarkerColor(kRed);     gre_p->SetLineColor(kRed);     gre_p->SetLineWidth(2);
         gre_d->SetMarkerStyle(21);gre_d->SetMarkerColor(kBlue);    gre_d->SetLineColor(kBlue);    gre_d->SetLineWidth(2);  
-        gre_d->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; log_{10}(Rm) = log_{10}( (dE/dx) / Edep)",int(Energy[i])));
+        gre_d->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; Rm = (dE/dx) / Edep",int(Energy[i])));
 
         gre_d->GetYaxis()->SetRangeUser(0,0.2);
         gre_d->GetXaxis()->SetLimits(0,14);
@@ -174,16 +183,19 @@ void Rm2()
         legend3->AddEntry(gre_p, "Proton", "ep");
         legend3->AddEntry(gre_d, "Deuteron", "ep");
         legend3->Draw();
-        c3->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/Rm_BGOLayer_DP_%dGeV.pdf",int(Energy[i])));
+        c3->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/CDF/Rm_BGOLayer_DP_%dGeV.pdf",int(Energy[i])));
 
 
         auto c4 = new TCanvas("c4","c4",1500,1000);
+        gPad->SetLogy(1);
+
         auto SUM_gre_p = new TGraphAsymmErrors(14,Layer,SUM_Proton_Ratio  ,Layer_Err,Layer_Err,SUM_Proton_Ratio_LL  ,SUM_Proton_Ratio_UL);
         auto SUM_gre_d = new TGraphAsymmErrors(14,Layer,SUM_Deuteron_Ratio,Layer_Err,Layer_Err,SUM_Deuteron_Ratio_LL,SUM_Deuteron_Ratio_UL);
         SUM_gre_p->SetMarkerStyle(20);    SUM_gre_p->SetMarkerColor(kRed);     SUM_gre_p->SetLineColor(kRed);     SUM_gre_p->SetLineWidth(2);
         SUM_gre_d->SetMarkerStyle(21);    SUM_gre_d->SetMarkerColor(kBlue);    SUM_gre_d->SetLineColor(kBlue);    SUM_gre_d->SetLineWidth(2);  
         SUM_gre_d->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; #sum(Rm)",int(Energy[i])));
-        SUM_gre_d->GetYaxis()->SetRangeUser(0,1);
+    
+        SUM_gre_d->GetYaxis()->SetRangeUser(1e-5,1);
         SUM_gre_d->GetXaxis()->SetLimits(0,14);
         SUM_gre_d->Draw("AP");
         SUM_gre_p->Draw("PSAME");
@@ -194,35 +206,52 @@ void Rm2()
         SUM_axis_top->SetTitleSize(0.02);  // 设置标题大小
         SUM_axis_top->SetTitleOffset(1.2); // 设置标题偏移
         SUM_axis_top->Draw();
-        auto legend4 = new TLegend(0.12, 0.80, 0.32, 0.88);
+        auto legend4 = new TLegend(0.75, 0.12, 0.88, 0.32);
         legend4->SetNColumns(2);
         legend4->AddEntry(SUM_gre_p, "Proton", "ep");
         legend4->AddEntry(SUM_gre_d, "Deuteron", "ep");
         legend4->Draw();
-        c4->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/Rm_BGOLayer_SUM_DP_%dGeV.pdf",int(Energy[i])));
+        c4->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/CDF/Rm_BGOLayer_SUM_DP_%dGeV.pdf",int(Energy[i])));
 
 
         auto c5 = new TCanvas("c5", "c5", 1500, 1000);
+        gPad->SetLogy(1);
         gr_proton->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; #sum(Rm)",int(Energy[i])));
-        gr_proton->GetYaxis()->SetRangeUser(0,1);
+        gr_proton->GetYaxis()->SetRangeUser(1e-5,1);
 
         gr_proton->SetMarkerStyle(20);  // proton: circle
-        gr_proton->SetMarkerColor(kBlue);
+        gr_proton->SetMarkerColorAlpha(kRed, 0.1);  // 0.0 = fully transparent, 1.0 = fully opaque
         gr_proton->SetMarkerSize(0.8);
 
         gr_deuteron->SetMarkerStyle(21);  // deuteron: square
-        gr_deuteron->SetMarkerColor(kRed);
+        gr_deuteron->SetMarkerColorAlpha(kBlue, 0.1);
         gr_deuteron->SetMarkerSize(0.8);
 
         gr_proton->Draw("AP");
         gr_deuteron->Draw("P SAME");
         SUM_axis_top->Draw();
-        auto legend5 = new TLegend(0.12, 0.75, 0.32, 0.88);
+        auto legend5 = new TLegend(0.75, 0.12, 0.88, 0.32);
         legend5->AddEntry(gr_proton, "Proton", "p");
         legend5->AddEntry(gr_deuteron, "Deuteron", "p");
         legend5->Draw();
-        c5->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/Rm_BGOLayer_SCAT_DP_%dGeV.pdf",int(Energy[i])));
+        c5->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/CDF/Rm_BGOLayer_SCAT_DP_%dGeV.pdf",int(Energy[i])));
 
+        auto c6 = new TCanvas("c6", "c6", 1500, 1000);
+        h2_p->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; #sum(Rm)",int(Energy[i])));
+        h2_p->GetYaxis()->SetRangeUser(-5,0.2);
+        h2_p->SetBarWidth(0.4);
+        h2_p->SetBarOffset(-0.25);
+        h2_p->SetFillColorAlpha(kRed,0.5);
+        h2_p->SetLineColorAlpha(kRed,0.5);
+      
+        h2_d->SetBarWidth(0.4);
+        h2_d->SetBarOffset(0.25);
+        h2_d->SetFillColorAlpha(kBlue,0.5);
+        h2_d->SetLineColorAlpha(kBlue,0.5);
+        h2_p->Draw("CANDLEX(112111)");
+        h2_d->Draw("CANDLEX(112111) same");
+        axis_top->Draw();
+        legend5->Draw();
 
     }
 }

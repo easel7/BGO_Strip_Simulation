@@ -20,109 +20,111 @@ void Efficiency_UBT()
     double Proton_Eff_HET[19]={0};
     double Proton_Eff_UBT[19]={0};
     double Proton_Eff_MIT[19]={0};
+    double Proton_Eff_RMS[19]={0};
 
     double Deuteron_Eff_HET[19]={0};
     double Deuteron_Eff_UBT[19]={0};
     double Deuteron_Eff_MIT[19]={0};
+    double Deuteron_Eff_RMS[19]={0};
 
     double Electron_Eff_HET[19]={0};
     double Electron_Eff_UBT[19]={0};
     double Electron_Eff_MIT[19]={0};
+    double Electron_Eff_RMS[19]={0};
 
     double Helium4_Eff_HET[19]={0};
     double Helium4_Eff_UBT[19]={0};
     double Helium4_Eff_MIT[19]={0};
-
+    double Helium4_Eff_RMS[19]={0};
+    
     double Helium3_Eff_HET[19]={0};
     double Helium3_Eff_UBT[19]={0};
     double Helium3_Eff_MIT[19]={0};
+    double Helium3_Eff_RMS[19]={0};
 
     double Carbon_Eff_HET[19]={0};
     double Carbon_Eff_UBT[19]={0};
     double Carbon_Eff_MIT[19]={0};
+    double Carbon_Eff_RMS[19]={0};
 
-    std::vector<double>* p_EnergyVec = nullptr;    double p_Total_E; double p_Energy;
-    std::vector<double>* d_EnergyVec = nullptr;    double d_Total_E; double d_Energy;
-    std::vector<double>* e_EnergyVec = nullptr;    double e_Total_E; double e_Energy;
-    std::vector<double>* h_EnergyVec = nullptr;    double h_Total_E; double h_Energy;
-    std::vector<double>* H_EnergyVec = nullptr;    double H_Total_E; double H_Energy;
-    std::vector<double>* c_EnergyVec = nullptr;    double c_Total_E; double c_Energy;
+    std::vector<double>* p_EnergyVec = nullptr;    double p_Total_E; double p_Energy; std::vector<double>* p_RMSVec = nullptr;
+    std::vector<double>* d_EnergyVec = nullptr;    double d_Total_E; double d_Energy; std::vector<double>* d_RMSVec = nullptr;
+    std::vector<double>* e_EnergyVec = nullptr;    double e_Total_E; double e_Energy; std::vector<double>* e_RMSVec = nullptr;
+    std::vector<double>* h_EnergyVec = nullptr;    double h_Total_E; double h_Energy; std::vector<double>* h_RMSVec = nullptr;
+    std::vector<double>* H_EnergyVec = nullptr;    double H_Total_E; double H_Energy; std::vector<double>* H_RMSVec = nullptr;
+    std::vector<double>* c_EnergyVec = nullptr;    double c_Total_E; double c_Energy; std::vector<double>* c_RMSVec = nullptr;
     double Energy[19]={0};
     double Energy_Err[19]={0};
     double Uncertainty[19]={0};
     double n_BGO = TMath::Na()*7.13/1245.8344; // cm-3
-    TH1D *h1_p[19]; TH1D *h2_p[19]; TH1D *h3_p[19]; TH1D *h4_p[19];
-    TH1D *h1_d[19]; TH1D *h2_d[19]; TH1D *h3_d[19]; TH1D *h4_d[19];
-    TH1D *h1_e[19]; TH1D *h2_e[19]; TH1D *h3_e[19]; TH1D *h4_e[19];
-    TH1D *h1_h[19]; TH1D *h2_h[19]; TH1D *h3_h[19]; TH1D *h4_h[19];
-    TH1D *h1_H[19]; TH1D *h2_H[19]; TH1D *h3_H[19]; TH1D *h4_H[19];
-    TH1D *h1_c[19]; TH1D *h2_c[19]; TH1D *h3_c[19]; TH1D *h4_c[19];
+    TH1D *h1_p[19]; TH1D *h2_p[19]; TH1D *h3_p[19]; TH1D *h4_p[19]; TH1D *h5_p[19];
+    TH1D *h1_d[19]; TH1D *h2_d[19]; TH1D *h3_d[19]; TH1D *h4_d[19]; TH1D *h5_d[19];
+    TH1D *h1_e[19]; TH1D *h2_e[19]; TH1D *h3_e[19]; TH1D *h4_e[19]; TH1D *h5_e[19];
+    TH1D *h1_h[19]; TH1D *h2_h[19]; TH1D *h3_h[19]; TH1D *h4_h[19]; TH1D *h5_h[19];
+    TH1D *h1_H[19]; TH1D *h2_H[19]; TH1D *h3_H[19]; TH1D *h4_H[19]; TH1D *h5_H[19];
+    TH1D *h1_c[19]; TH1D *h2_c[19]; TH1D *h3_c[19]; TH1D *h4_c[19]; TH1D *h5_c[19];
 
     for (int i = 0; i < 19; i++)
     {
 
         if(i<10)  {Energy[i] =  (i+1)*10; Energy_Err[i] = 5;}
         else   {Energy[i] =  i*100-800;Energy_Err[i] = 50;}
-        h1_p[i] = new TH1D(Form("h1_p[%d]",i),Form("h1_p[%d]",i),100,0,1);
-        h2_p[i] = new TH1D(Form("h2_p[%d]",i),Form("h2_p[%d]",i),100,0,1);
-        h3_p[i] = new TH1D(Form("h3_p[%d]",i),Form("h3_p[%d]",i),100,0,1);
-        h4_p[i] = new TH1D(Form("h4_p[%d]",i),Form("h4_p[%d]",i),100,0,1);
-        h1_d[i] = new TH1D(Form("h1_d[%d]",i),Form("h1_d[%d]",i),100,0,1);
-        h2_d[i] = new TH1D(Form("h2_d[%d]",i),Form("h2_d[%d]",i),100,0,1);
-        h3_d[i] = new TH1D(Form("h3_d[%d]",i),Form("h3_d[%d]",i),100,0,1);
-        h4_d[i] = new TH1D(Form("h4_d[%d]",i),Form("h4_d[%d]",i),100,0,1);
-        h1_e[i] = new TH1D(Form("h1_e[%d]",i),Form("h1_e[%d]",i),100,0,1);
-        h2_e[i] = new TH1D(Form("h2_e[%d]",i),Form("h2_e[%d]",i),100,0,1);
-        h3_e[i] = new TH1D(Form("h3_e[%d]",i),Form("h3_e[%d]",i),100,0,1);
-        h4_e[i] = new TH1D(Form("h4_e[%d]",i),Form("h4_e[%d]",i),100,0,1);
-        h1_h[i] = new TH1D(Form("h1_h[%d]",i),Form("h1_h[%d]",i),100,0,1);
-        h2_h[i] = new TH1D(Form("h2_h[%d]",i),Form("h2_h[%d]",i),100,0,1);
-        h3_h[i] = new TH1D(Form("h3_h[%d]",i),Form("h3_h[%d]",i),100,0,1);
-        h4_h[i] = new TH1D(Form("h4_h[%d]",i),Form("h4_h[%d]",i),100,0,1);
-        h1_H[i] = new TH1D(Form("h1_H[%d]",i),Form("h1_H[%d]",i),100,0,1);
-        h2_H[i] = new TH1D(Form("h2_H[%d]",i),Form("h2_H[%d]",i),100,0,1);
-        h3_H[i] = new TH1D(Form("h3_H[%d]",i),Form("h3_H[%d]",i),100,0,1);
-        h4_H[i] = new TH1D(Form("h4_H[%d]",i),Form("h4_H[%d]",i),100,0,1);
-        h1_c[i] = new TH1D(Form("h1_c[%d]",i),Form("h1_c[%d]",i),100,0,1);
-        h2_c[i] = new TH1D(Form("h2_c[%d]",i),Form("h2_c[%d]",i),100,0,1);
-        h3_c[i] = new TH1D(Form("h3_c[%d]",i),Form("h3_c[%d]",i),100,0,1);
-        h4_c[i] = new TH1D(Form("h4_c[%d]",i),Form("h4_c[%d]",i),100,0,1);
+        h1_p[i] = new TH1D(Form("h1_p[%d]",i),Form("h1_p[%d]",i),100,0,1);         h1_d[i] = new TH1D(Form("h1_d[%d]",i),Form("h1_d[%d]",i),100,0,1);         h1_e[i] = new TH1D(Form("h1_e[%d]",i),Form("h1_e[%d]",i),100,0,1);
+        h2_p[i] = new TH1D(Form("h2_p[%d]",i),Form("h2_p[%d]",i),100,0,1);         h2_d[i] = new TH1D(Form("h2_d[%d]",i),Form("h2_d[%d]",i),100,0,1);         h2_e[i] = new TH1D(Form("h2_e[%d]",i),Form("h2_e[%d]",i),100,0,1);
+        h3_p[i] = new TH1D(Form("h3_p[%d]",i),Form("h3_p[%d]",i),100,0,1);         h3_d[i] = new TH1D(Form("h3_d[%d]",i),Form("h3_d[%d]",i),100,0,1);         h3_e[i] = new TH1D(Form("h3_e[%d]",i),Form("h3_e[%d]",i),100,0,1);
+        h4_p[i] = new TH1D(Form("h4_p[%d]",i),Form("h4_p[%d]",i),100,0,1);         h4_d[i] = new TH1D(Form("h4_d[%d]",i),Form("h4_d[%d]",i),100,0,1);         h4_e[i] = new TH1D(Form("h4_e[%d]",i),Form("h4_e[%d]",i),100,0,1);
+        h5_p[i] = new TH1D(Form("h5_p[%d]",i),Form("h5_p[%d]",i),100,0,1);         h5_d[i] = new TH1D(Form("h5_d[%d]",i),Form("h5_d[%d]",i),100,0,1);         h5_e[i] = new TH1D(Form("h5_e[%d]",i),Form("h5_e[%d]",i),100,0,1);
+
+        h1_h[i] = new TH1D(Form("h1_h[%d]",i),Form("h1_h[%d]",i),100,0,1);        h1_H[i] = new TH1D(Form("h1_H[%d]",i),Form("h1_H[%d]",i),100,0,1);        h1_c[i] = new TH1D(Form("h1_c[%d]",i),Form("h1_c[%d]",i),100,0,1);
+        h2_h[i] = new TH1D(Form("h2_h[%d]",i),Form("h2_h[%d]",i),100,0,1);        h2_H[i] = new TH1D(Form("h2_H[%d]",i),Form("h2_H[%d]",i),100,0,1);        h2_c[i] = new TH1D(Form("h2_c[%d]",i),Form("h2_c[%d]",i),100,0,1);
+        h3_h[i] = new TH1D(Form("h3_h[%d]",i),Form("h3_h[%d]",i),100,0,1);        h3_H[i] = new TH1D(Form("h3_H[%d]",i),Form("h3_H[%d]",i),100,0,1);        h3_c[i] = new TH1D(Form("h3_c[%d]",i),Form("h3_c[%d]",i),100,0,1);
+        h4_h[i] = new TH1D(Form("h4_h[%d]",i),Form("h4_h[%d]",i),100,0,1);        h4_H[i] = new TH1D(Form("h4_H[%d]",i),Form("h4_H[%d]",i),100,0,1);        h4_c[i] = new TH1D(Form("h4_c[%d]",i),Form("h4_c[%d]",i),100,0,1);
+        h5_h[i] = new TH1D(Form("h5_h[%d]",i),Form("h5_h[%d]",i),100,0,1);        h5_H[i] = new TH1D(Form("h5_H[%d]",i),Form("h5_H[%d]",i),100,0,1);        h5_c[i] = new TH1D(Form("h5_c[%d]",i),Form("h5_c[%d]",i),100,0,1);
 
         auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Proton_%dGeV.root",int(Energy[i])));
         auto proton_tree = (TTree*)proton_file->Get("B4");
         proton_tree->SetBranchAddress("LayerEnergyVector",&p_EnergyVec);
         proton_tree->SetBranchAddress("Total_E",&p_Total_E);
         proton_tree->SetBranchAddress("Energy",&p_Energy);
+        proton_tree->SetBranchAddress("RMS",&p_RMSVec);
 
         auto deuteron_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_%dGeV.root",int(Energy[i])));
         auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
         deuteron_tree->SetBranchAddress("LayerEnergyVector",&d_EnergyVec);
         deuteron_tree->SetBranchAddress("Total_E",&d_Total_E);
         deuteron_tree->SetBranchAddress("Energy",&d_Energy);
+        deuteron_tree->SetBranchAddress("RMS",&d_RMSVec);
+
 
         auto electron_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Electron_%dGeV.root",int(Energy[i])));
         auto electron_tree = (TTree*)electron_file->Get("B4");
         electron_tree->SetBranchAddress("LayerEnergyVector",&e_EnergyVec);
         electron_tree->SetBranchAddress("Total_E",&e_Total_E);
         electron_tree->SetBranchAddress("Energy",&e_Energy);
+        electron_tree->SetBranchAddress("RMS",&e_RMSVec);
 
         auto helium4_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Helium4_%dGeV.root",int(Energy[i])));
         auto helium4_tree = (TTree*)helium4_file->Get("B4");
         helium4_tree->SetBranchAddress("LayerEnergyVector",&h_EnergyVec);
         helium4_tree->SetBranchAddress("Total_E",&h_Total_E);
         helium4_tree->SetBranchAddress("Energy",&h_Energy);
+        helium4_tree->SetBranchAddress("RMS",&h_RMSVec);
+
 
         auto helium3_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Helium3_%dGeV.root",int(Energy[i])));
         auto helium3_tree = (TTree*)helium3_file->Get("B4");
         helium3_tree->SetBranchAddress("LayerEnergyVector",&H_EnergyVec);
         helium3_tree->SetBranchAddress("Total_E",&H_Total_E);
         helium3_tree->SetBranchAddress("Energy",&H_Energy);
+        helium3_tree->SetBranchAddress("RMS",&H_RMSVec);
+
 
         auto carbon_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Carbon_%dGeV.root",int(Energy[i])));
         auto carbon_tree = (TTree*)carbon_file->Get("B4");
         carbon_tree->SetBranchAddress("LayerEnergyVector",&c_EnergyVec);
         carbon_tree->SetBranchAddress("Total_E",&c_Total_E);
         carbon_tree->SetBranchAddress("Energy",&c_Energy);
+        carbon_tree->SetBranchAddress("RMS",&c_RMSVec);
 
         for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
         {
@@ -131,54 +133,85 @@ void Efficiency_UBT()
             if ( (*p_EnergyVec)[0] > 0.0092 && (*p_EnergyVec)[1]  > 0.0092) h3_p[i]->Fill(p_Total_E/p_Energy); 
             if ( (*p_EnergyVec)[0] > 0.23   && (*p_EnergyVec)[1]  > 0.23   && (*p_EnergyVec)[2]  > 0.23     &&  (*p_EnergyVec)[3] > 0.046) h2_p[i]->Fill(p_Total_E/p_Energy); 
             if (((*p_EnergyVec)[2] > 0.0092 && (*p_EnergyVec)[10] > 0.0092 && (*p_EnergyVec)[12] > 0.0092 ) || ((*p_EnergyVec)[3] > 0.0092 && (*p_EnergyVec)[11] > 0.0092 && (*p_EnergyVec)[13] > 0.0092 )) h4_p[i]->Fill(p_Total_E/p_Energy);
+            // if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 ) h5_p[i]->Fill(p_Total_E/p_Energy);
+            if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[0]<40 && (*p_RMSVec)[1]<40) h5_p[i]->Fill(p_Total_E/p_Energy);
+
+
             
             deuteron_tree->GetEntry(entry); 
             h1_d[i]->Fill(d_Total_E/d_Energy); 
             if ( (*d_EnergyVec)[0] > 0.0092 && (*d_EnergyVec)[1] > 0.0092) h3_d[i]->Fill(d_Total_E/d_Energy); 
             if ( (*d_EnergyVec)[0] > 0.23   && (*d_EnergyVec)[1] > 0.23 && (*d_EnergyVec)[2] > 0.23 && (*d_EnergyVec)[3] > 0.046) h2_d[i]->Fill(d_Total_E/d_Energy); 
             if (((*d_EnergyVec)[2] > 0.0092 && (*d_EnergyVec)[10] > 0.0092 && (*d_EnergyVec)[12] > 0.0092 ) || ((*d_EnergyVec)[3] > 0.0092 && (*d_EnergyVec)[11] > 0.0092 && (*d_EnergyVec)[13] > 0.0092 )) h4_d[i]->Fill(d_Total_E/d_Energy);
+            // if ((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 ) h5_d[i]->Fill(d_Total_E/d_Energy);
+            if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[0]<40 && (*d_RMSVec)[1]<40) h5_d[i]->Fill(d_Total_E/d_Energy);
+
             
             electron_tree->GetEntry(entry); 
             h1_e[i]->Fill(e_Total_E/e_Energy); 
             if ((*e_EnergyVec)[0] > 0.0092 && (*e_EnergyVec)[1] > 0.0092) h3_e[i]->Fill(e_Total_E/e_Energy); 
             if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_EnergyVec)[2] > 0.23 && (*e_EnergyVec)[3] > 0.046) h2_e[i]->Fill(e_Total_E/e_Energy); 
             if (((*e_EnergyVec)[2] > 0.0092 && (*e_EnergyVec)[10] > 0.0092 && (*e_EnergyVec)[12] > 0.0092 ) || ((*e_EnergyVec)[3] > 0.0092 && (*e_EnergyVec)[11] > 0.0092 && (*e_EnergyVec)[13] > 0.0092 )) h4_e[i]->Fill(e_Total_E/e_Energy);
+            // if ((*e_RMSVec)[0]>15 && (*e_RMSVec)[1]>15) h5_e[i]->Fill(e_Total_E/e_Energy);
+            if((*e_RMSVec)[0]>15 && (*e_RMSVec)[1]>15 && (*e_RMSVec)[0]<40 && (*e_RMSVec)[1]<40) h5_e[i]->Fill(e_Total_E/e_Energy);
+
             
             helium4_tree->GetEntry(entry);  
             h1_h[i]->Fill(h_Total_E/h_Energy); 
             if ((*h_EnergyVec)[0] > 0.0092 && (*h_EnergyVec)[1] > 0.0092) h3_h[i]->Fill(h_Total_E/h_Energy); 
             if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_EnergyVec)[2] > 0.23 && (*h_EnergyVec)[3] > 0.046) h2_h[i]->Fill(h_Total_E/h_Energy); 
             if (((*h_EnergyVec)[2] > 0.0092 && (*h_EnergyVec)[10] > 0.0092 && (*h_EnergyVec)[12] > 0.0092 ) || ((*h_EnergyVec)[3] > 0.0092 && (*h_EnergyVec)[11] > 0.0092 && (*h_EnergyVec)[13] > 0.0092 )) h4_h[i]->Fill(h_Total_E/h_Energy);
+            // if ((*h_RMSVec)[0]>15 && (*h_RMSVec)[1]>15) h5_h[i]->Fill(h_Total_E/h_Energy);
+            if((*h_RMSVec)[0]>15 && (*h_RMSVec)[1]>15 && (*h_RMSVec)[0]<40 && (*h_RMSVec)[1]<40) h5_h[i]->Fill(h_Total_E/h_Energy);
+            
             helium3_tree->GetEntry(entry);  
             h1_H[i]->Fill(H_Total_E/H_Energy); 
             if ((*H_EnergyVec)[0] > 0.0092 && (*H_EnergyVec)[1] > 0.0092) h3_H[i]->Fill(H_Total_E/H_Energy); 
             if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_EnergyVec)[2] > 0.23 && (*H_EnergyVec)[3] > 0.046) h2_H[i]->Fill(H_Total_E/H_Energy); 
             if (((*H_EnergyVec)[2] > 0.0092 && (*H_EnergyVec)[10] > 0.0092 && (*H_EnergyVec)[12] > 0.0092 ) || ((*H_EnergyVec)[3] > 0.0092 && (*H_EnergyVec)[11] > 0.0092 && (*H_EnergyVec)[13] > 0.0092 )) h4_H[i]->Fill(H_Total_E/H_Energy);
+            // if ((*H_RMSVec)[0]>15 && (*H_RMSVec)[1]>15) h5_H[i]->Fill(H_Total_E/H_Energy);
+            if((*H_RMSVec)[0]>15 && (*H_RMSVec)[1]>15 && (*H_RMSVec)[0]<40 && (*H_RMSVec)[1]<40) h5_H[i]->Fill(H_Total_E/H_Energy);
+
+            
             carbon_tree->GetEntry(entry);   
             h1_c[i]->Fill(c_Total_E/c_Energy); 
             if ((*c_EnergyVec)[0] > 0.0092 && (*c_EnergyVec)[1] > 0.0092) h3_c[i]->Fill(c_Total_E/c_Energy); 
             if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_EnergyVec)[2] > 0.23 && (*c_EnergyVec)[3] > 0.046) h2_c[i]->Fill(c_Total_E/c_Energy); 
             if (((*c_EnergyVec)[2] > 0.0092 && (*c_EnergyVec)[10] > 0.0092 && (*c_EnergyVec)[12] > 0.0092 ) || ((*c_EnergyVec)[3] > 0.0092 && (*c_EnergyVec)[11] > 0.0092 && (*c_EnergyVec)[13] > 0.0092 )) h4_c[i]->Fill(c_Total_E/c_Energy);
+            // if ((*c_RMSVec)[0]>15 && (*c_RMSVec)[1]>15) h5_c[i]->Fill(c_Total_E/c_Energy);
+            if((*c_RMSVec)[0]>15 && (*c_RMSVec)[1]>15 && (*c_RMSVec)[0]<40 && (*c_RMSVec)[1]<40) h5_c[i]->Fill(c_Total_E/c_Energy);
+
         }
 
         Proton_Eff_HET[i]   = h2_p[i]->Integral()/h1_p[i]->Integral();
         Proton_Eff_UBT[i]   = h3_p[i]->Integral()/h1_p[i]->Integral();
         Proton_Eff_MIT[i]   = h4_p[i]->Integral()/h1_p[i]->Integral();
+        Proton_Eff_RMS[i]   = h5_p[i]->Integral()/h1_p[i]->Integral();
+
         Deuteron_Eff_HET[i] = h2_d[i]->Integral()/h1_d[i]->Integral();
         Deuteron_Eff_UBT[i] = h3_d[i]->Integral()/h1_d[i]->Integral();
         Deuteron_Eff_MIT[i] = h4_d[i]->Integral()/h1_d[i]->Integral();
+        Deuteron_Eff_RMS[i] = h5_d[i]->Integral()/h1_d[i]->Integral();
+
         Electron_Eff_HET[i] = h2_e[i]->Integral()/h1_e[i]->Integral();
         Electron_Eff_UBT[i] = h3_e[i]->Integral()/h1_e[i]->Integral();
         Electron_Eff_MIT[i] = h4_e[i]->Integral()/h1_e[i]->Integral();
+        Electron_Eff_RMS[i] = h5_e[i]->Integral()/h1_e[i]->Integral();
+
         Helium4_Eff_HET[i]  = h2_h[i]->Integral()/h1_h[i]->Integral();
         Helium4_Eff_UBT[i]  = h3_h[i]->Integral()/h1_h[i]->Integral();
         Helium4_Eff_MIT[i]  = h4_h[i]->Integral()/h1_h[i]->Integral();
+        Helium4_Eff_RMS[i]  = h5_h[i]->Integral()/h1_h[i]->Integral();
+
         Helium3_Eff_HET[i]  = h2_H[i]->Integral()/h1_H[i]->Integral();
         Helium3_Eff_UBT[i]  = h3_H[i]->Integral()/h1_H[i]->Integral();
         Helium3_Eff_MIT[i]  = h4_H[i]->Integral()/h1_H[i]->Integral();
+        Helium3_Eff_RMS[i]  = h5_H[i]->Integral()/h1_H[i]->Integral();
+
         Carbon_Eff_HET[i]   = h2_c[i]->Integral()/h1_c[i]->Integral();
         Carbon_Eff_UBT[i]   = h3_c[i]->Integral()/h1_c[i]->Integral();
         Carbon_Eff_MIT[i]   = h4_c[i]->Integral()/h1_c[i]->Integral();
+        Carbon_Eff_RMS[i]   = h5_c[i]->Integral()/h1_c[i]->Integral();
 
         cout << "Energy = " << int(Energy[i]) << " GeV !  ele Total eff : " << h1_e[i]->Integral() << " ele HET eff : " <<  h2_e[i]->Integral() <<" ele UBT eff : " << h3_e[i]->Integral() <<" ele MIP eff : " << h4_e[i]->Integral() <<endl;
     }
@@ -186,26 +219,33 @@ void Efficiency_UBT()
     auto gre_p_HET = CreateGraphWithProperties(19, Energy, Proton_Eff_HET, Energy_Err, Uncertainty, 20, kRed, kRed, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_p_UBT = CreateGraphWithProperties(19, Energy, Proton_Eff_UBT, Energy_Err, Uncertainty, 20, kRed, kRed, "Unbiased Trigger;Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_p_MIT = CreateGraphWithProperties(19, Energy, Proton_Eff_MIT, Energy_Err, Uncertainty, 20, kRed, kRed, "MIP Trigger;Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_p_RMS = CreateGraphWithProperties(19, Energy, Proton_Eff_RMS, Energy_Err, Uncertainty, 20, kRed, kRed, "RMS_{0}>15 && RMS_{1}>15;Kinetic Energy (GeV); Trigger Efficiency");
+
 
     auto gre_d_HET = CreateGraphWithProperties(19, Energy, Deuteron_Eff_HET, Energy_Err, Uncertainty, 21, kBlue, kBlue, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_d_UBT = CreateGraphWithProperties(19, Energy, Deuteron_Eff_UBT, Energy_Err, Uncertainty, 21, kBlue, kBlue, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_d_MIT = CreateGraphWithProperties(19, Energy, Deuteron_Eff_MIT, Energy_Err, Uncertainty, 21, kBlue, kBlue, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_d_RMS = CreateGraphWithProperties(19, Energy, Deuteron_Eff_RMS, Energy_Err, Uncertainty, 21, kBlue, kBlue,  "RMS_{0}>15 && RMS_{1}>15;Kinetic Energy (GeV); Trigger Efficiency");
 
     auto gre_e_HET = CreateGraphWithProperties(19, Energy, Electron_Eff_HET, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_e_UBT = CreateGraphWithProperties(19, Energy, Electron_Eff_UBT, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_e_MIT = CreateGraphWithProperties(19, Energy, Electron_Eff_MIT, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_e_RMS = CreateGraphWithProperties(19, Energy, Electron_Eff_RMS, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3,  "RMS_{0}>15 && RMS_{1}>15;Kinetic Energy (GeV); Trigger Efficiency");
 
     auto gre_h_HET = CreateGraphWithProperties(19, Energy, Helium4_Eff_HET, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_h_UBT = CreateGraphWithProperties(19, Energy, Helium4_Eff_UBT, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_h_MIT = CreateGraphWithProperties(19, Energy, Helium4_Eff_MIT, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_h_RMS = CreateGraphWithProperties(19, Energy, Helium4_Eff_RMS, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "RMS_{0}>15 && RMS_{1}>15;Kinetic Energy (GeV); Trigger Efficiency");
 
     auto gre_H_HET = CreateGraphWithProperties(19, Energy, Helium3_Eff_HET, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_H_UBT = CreateGraphWithProperties(19, Energy, Helium3_Eff_UBT, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_H_MIT = CreateGraphWithProperties(19, Energy, Helium3_Eff_MIT, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_H_RMS = CreateGraphWithProperties(19, Energy, Helium3_Eff_RMS, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "RMS_{0}>15 && RMS_{1}>15;Kinetic Energy (GeV); Trigger Efficiency");
 
     auto gre_c_HET = CreateGraphWithProperties(19, Energy, Carbon_Eff_HET, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_c_UBT = CreateGraphWithProperties(19, Energy, Carbon_Eff_UBT, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_c_MIT = CreateGraphWithProperties(19, Energy, Carbon_Eff_MIT, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_c_RMS = CreateGraphWithProperties(19, Energy, Carbon_Eff_RMS, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "RMS_{0}>15 && RMS_{1}>15;Kinetic Energy (GeV); Trigger Efficiency");
 
     auto c0 = new TCanvas("c0","c0",1200,1200);
     c0->Clear();
@@ -276,5 +316,27 @@ void Efficiency_UBT()
     legend2->AddEntry(gre_H_MIT, "MIP Trigger Helium3", "ep");
     legend2->AddEntry(gre_c_MIT, "MIP Trigger Carbon", "ep");
     legend2->Draw();
+
+    auto c3 = new TCanvas("c3","c3",1200,1200);
+    c3->Clear();
+    c3->cd();
+    gPad->SetLogx();
+    gre_p_RMS->Draw("AP");
+    gre_d_RMS->Draw("PSAME");
+    gre_e_RMS->Draw("PSAME");
+    gre_h_RMS->Draw("PSAME");
+    gre_c_RMS->Draw("PSAME");
+    gre_p_RMS->GetYaxis()->SetRangeUser(0., 1.05);
+    gre_p_RMS->GetYaxis()->SetNdivisions(505);
+
+    auto legend3 = new TLegend(0.62, 0.58, 0.88, 0.78);
+    legend3->SetNColumns(2);
+    legend3->AddEntry(gre_p_MIT, "RMS_{0}>15 && RMS_{1}>15 Proton", "ep");
+    legend3->AddEntry(gre_d_MIT, "RMS_{0}>15 && RMS_{1}>15 Deuteron", "ep");
+    legend3->AddEntry(gre_e_MIT, "RMS_{0}>15 && RMS_{1}>15 Electron", "ep");
+    legend3->AddEntry(gre_h_MIT, "RMS_{0}>15 && RMS_{1}>15 Helium4", "ep");
+    legend3->AddEntry(gre_H_MIT, "RMS_{0}>15 && RMS_{1}>15 Helium3", "ep");
+    legend3->AddEntry(gre_c_MIT, "RMS_{0}>15 && RMS_{1}>15 Carbon", "ep");
+    legend3->Draw();
 
 }
