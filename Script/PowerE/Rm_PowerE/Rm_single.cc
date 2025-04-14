@@ -51,7 +51,7 @@ void Rm_Single()
     }
     h1_p->Sumw2(); h1_p->Scale(1.0/h1_p->Integral()); h1_p->SetLineColor(kRed);     h1_p->SetMarkerColor(kRed);     h1_p->SetLineWidth(2);
     h1_d->Sumw2(); h1_d->Scale(1.0/h1_d->Integral()); h1_d->SetLineColor(kBlue);    h1_d->SetMarkerColor(kBlue);    h1_d->SetLineWidth(2);
-    h1_p->GetYaxis()->SetRangeUser(0,0.25);h1_p->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV]; log_{10}(Rm) = log_{10}(Max Energy Deposit bar in L%d/ Total Deposit);Count", 1+0.2*j ,1.2+0.2*j ,k ));
+    h1_p->GetYaxis()->SetRangeUser(0,0.5);h1_p->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV]; log_{10}(Rm) = log_{10}(Max Energy Deposit bar in L%d/ Total Deposit);Count", 1+0.2*j ,1.2+0.2*j ,k ));
 
     auto c1 = new TCanvas("c1","c1",900,600);
     c1->cd();
