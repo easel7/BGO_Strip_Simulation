@@ -10,22 +10,16 @@ void Rm2()
         int p_First_Had_Layer; double p_E_total;   std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr;
         int d_First_Had_Layer; double d_E_total;   std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr;
 
-        TH1D *h1_p[14];  TH1D *hC_p[14];  TF1  *fitFunc_p[14]; double p_maxVal[14]={0};
-        TH1D *h1_d[14];  TH1D *hC_d[14];  TF1  *fitFunc_d[14]; double d_maxVal[14]={0};
+        TH1D *h1_p[14];  TH1D *hC_p[14];  TF1  *fitFunc_p[14]; double p_maxVal[14]={0};         double Layer[14]={0};
+        TH1D *h1_d[14];  TH1D *hC_d[14];  TF1  *fitFunc_d[14]; double d_maxVal[14]={0};         double Layer_Err[14]={0};
 
         TH2D *h2_p = new TH2D("h2_p","h2_p",14,0,14,50,-5,0);
         TH2D *h2_d = new TH2D("h2_d","h2_d",14,0,14,50,-5,0);
     
-        double Proton_Ratio[14]={0};     double Deuteron_Ratio[14]={0};    
-        double Proton_Ratio_LL[14]={0};  double Deuteron_Ratio_LL[14]={0}; 
-        double Proton_Ratio_UL[14]={0};  double Deuteron_Ratio_UL[14]={0}; 
+        double Proton_Ratio[14]={0};     double Deuteron_Ratio[14]={0};            double SUM_Proton_Ratio[14]={0};     double SUM_Deuteron_Ratio[14]={0};    
+        double Proton_Ratio_LL[14]={0};  double Deuteron_Ratio_LL[14]={0};         double SUM_Proton_Ratio_LL[14]={0};  double SUM_Deuteron_Ratio_LL[14]={0}; 
+        double Proton_Ratio_UL[14]={0};  double Deuteron_Ratio_UL[14]={0};         double SUM_Proton_Ratio_UL[14]={0};  double SUM_Deuteron_Ratio_UL[14]={0}; 
 
-        double SUM_Proton_Ratio[14]={0};     double SUM_Deuteron_Ratio[14]={0};    
-        double SUM_Proton_Ratio_LL[14]={0};  double SUM_Deuteron_Ratio_LL[14]={0}; 
-        double SUM_Proton_Ratio_UL[14]={0};  double SUM_Deuteron_Ratio_UL[14]={0}; 
-
-        double Layer[14]={0};
-        double Layer_Err[14]={0};
 
         auto *gr_proton = new TGraph();
         auto *gr_deuteron = new TGraph();
