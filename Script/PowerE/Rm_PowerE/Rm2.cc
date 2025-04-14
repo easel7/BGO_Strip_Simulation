@@ -153,8 +153,6 @@ void Rm2()
             hC_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] in L%d;#sum_{0}^{%d}Rm",pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j,j));
             hC_p[i][j]->Draw("hist");
             hC_d[i][j]->Draw("histsame");
-
-        
         }
         c1->cd(15);
         auto tex = new TLatex(0.1,0.9,Form("Deposit Energy[%.2fGeV, %.2fGeV]",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));

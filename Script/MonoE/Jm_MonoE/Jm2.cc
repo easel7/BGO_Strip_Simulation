@@ -1,7 +1,7 @@
 void Jm2()
 {
     double Energy[19]={0};
-    for (int i = 18; i < 19; i++) // Energy
+    for (int i = 0; i < 19; i++) // Energy
     {
         if(i<9)  {Energy[i] =  (i+1)*10;}
         else if(i>=9 && i < 19)   {Energy[i] =  i*100-800;}
@@ -10,8 +10,8 @@ void Jm2()
         int p_First_Had_Layer; double p_E_total;   std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr; std::vector<double>* p_L_EnergyVec = nullptr;
         int d_First_Had_Layer; double d_E_total;   std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr; std::vector<double>* d_L_EnergyVec = nullptr;
 
-        TH1D *h1_p[14];  TH1D *hC_p[14];  TF1  *fitFunc_p[14]; double p_maxVal[14]={0};
-        TH1D *h1_d[14];  TH1D *hC_d[14];  TF1  *fitFunc_d[14]; double d_maxVal[14]={0};
+        TH1D *h1_p[14];  TH1D *hC_p[14];  TF1  *fitFunc_p[14]; 
+        TH1D *h1_d[14];  TH1D *hC_d[14];  TF1  *fitFunc_d[14]; 
 
         TH2D *h2_p = new TH2D("h2_p","h2_p",14,0,14,100,-2,0);
         TH2D *h2_d = new TH2D("h2_d","h2_d",14,0,14,100,-2,0);
@@ -79,6 +79,8 @@ void Jm2()
             double sum_d = 0;
             double sum_p_total = 0;
             double sum_d_total = 0;
+            double p_maxVal[14]={0};
+            double d_maxVal[14]={0};
             // for (size_t k = 0; k < p_EnergyVec->size(); k ++) {sum_d += (*p_EnergyVec)[k];}
             for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
             {

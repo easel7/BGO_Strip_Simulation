@@ -35,45 +35,45 @@ void Jm_L1()
     double H_maxVal;
     double c_maxVal;
 
-    int k = 13;
+    int k = 0;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     {
 
         proton_tree->GetEntry(entry);    
-        for (size_t i = 22*k; i < 22*(k+1); i += 22)
+        if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15)
         {
-            auto p_start = p_EnergyVec->begin() + i;  auto p_end = (i + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal = *std::max_element(p_start, p_end); 
-            if(k>0 && k<13)
+            for (size_t i = 22*k; i < 22*(k+1); i += 22)
             {
-                h1_p->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k]));
-                if(p_First_Had_Layer==k) { h1_d->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer==-1) { h1_h->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1             && p_First_Had_Type == 1) { h1_e->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1)  { h1_H->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2)                                                   { h1_c->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 1 )                                                  { h1_E->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 2 )                                                  { h1_C->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                
+                auto p_start = p_EnergyVec->begin() + i;  auto p_end = (i + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal = *std::max_element(p_start, p_end); 
+                if(k>0 && k<13)
+                {
+                    h1_p->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k]));
+                    if(p_First_Had_Layer==k) { h1_d->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                    if(p_First_Had_Layer==-1) { h1_h->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                    if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1             && p_First_Had_Type == 1) { h1_e->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                    if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2)   && p_First_Had_Type == 1)  { h1_H->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                    if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2)                                                   { h1_c->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                    if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 1 )                                                  { h1_E->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                    if(p_First_Had_Layer>=k+1 && p_First_Had_Type == 2 )                                                  { h1_C->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                }
+                else if (k==0)
+                {
+                    h1_p->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k]));
+                    if(p_First_Had_Layer==0)                                                                             { h1_d->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                    if(p_First_Had_Layer==-1)                                                                            { h1_h->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                    if(p_First_Had_Layer>=1 && p_First_Had_Type == 1)                                                   { h1_e->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                    if(p_First_Had_Layer>=1 && p_First_Had_Type == 2)                                                    { h1_c->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                }
+                else if (k==13)
+                {
+                    h1_p->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k]));
+                    if(p_First_Had_Layer==k)                                                                            { h1_d->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                    if(p_First_Had_Layer==-1)                                                                           { h1_h->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                    if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1           && p_First_Had_Type == 1)  { h1_e->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                    if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2) && p_First_Had_Type == 1)  { h1_H->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                    if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2)                                                 { h1_c->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
+                }       
             }
-            else if (k==0)
-            {
-                h1_p->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k]));
-                if(p_First_Had_Layer==0)                                                                             { h1_d->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer==-1)                                                                            { h1_h->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer>=1 && p_First_Had_Type == 1)                                                   { h1_e->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer>=1 && p_First_Had_Type == 2)                                                    { h1_c->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-            }
-            else if (k==13)
-            {
-                h1_p->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k]));
-                if(p_First_Had_Layer==k)                                                                            { h1_d->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer==-1)                                                                           { h1_h->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer>=floor((k-1)/2) && p_First_Had_Layer<=k-1           && p_First_Had_Type == 1)  { h1_e->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer>=0              && p_First_Had_Layer<floor((k-1)/2) && p_First_Had_Type == 1)  { h1_H->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-                if(p_First_Had_Layer<=k-1 && p_First_Had_Type == 2)                                                 { h1_c->Fill(log10(p_maxVal/(*p_L_EnergyVec)[k])); }
-            }
-            
-            
         }
     }
 

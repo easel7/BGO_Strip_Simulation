@@ -167,10 +167,10 @@ void Rm2()
         gre_p->Draw("PSAME");
 
         auto axis_top = new TGaxis(0, 0.2, 14, 0.2, 0, 32, 510, "-L"); 
-        axis_top->SetTitle("Radiation Length"); // 设置顶部X轴的标题
-        axis_top->SetLabelSize(0.03);  // 设置刻度数字大小
-        axis_top->SetTitleSize(0.03);  // 设置标题大小
-        axis_top->SetTitleOffset(1.2); // 设置标题偏移
+        axis_top->SetTitle("Radiation Length"); 
+        axis_top->SetLabelSize(0.03);  
+        axis_top->SetTitleSize(0.03);  
+        axis_top->SetTitleOffset(1.2); 
         axis_top->Draw();
         auto legend3 = new TLegend(0.70, 0.80, 0.88, 0.88);
         legend3->SetNColumns(2);
