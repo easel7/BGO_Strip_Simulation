@@ -1,7 +1,7 @@
 void Jm2()
 {
     double Energy[19]={0};
-    for (int i = 0; i < 19; i++) // Energy
+    for (int i = 18; i < 19; i++) // Energy
     {
         if(i<9)  {Energy[i] =  (i+1)*10;}
         else if(i>=9 && i < 19)   {Energy[i] =  i*100-800;}
@@ -74,21 +74,17 @@ void Jm2()
         // for (Long64_t entry = 0; entry < 1; ++entry)
         {
             proton_tree->GetEntry(entry);   
-            deuteron_tree->GetEntry(entry); 
             double sum_p = 0;
-            double sum_d = 0;
             double sum_p_total = 0;
-            double sum_d_total = 0;
             double p_maxVal[14]={0};
-            double d_maxVal[14]={0};
-            // for (size_t k = 0; k < p_EnergyVec->size(); k ++) {sum_d += (*p_EnergyVec)[k];}
-            for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
+            // if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[0]<40 && (*p_RMSVec)[1]<40) 
+            if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15) 
             {
-                int index = int(k / 22);  // Get the Layer
-                auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal[index] = *std::max_element(p_start, p_end); 
-                if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[0]<40 && (*p_RMSVec)[1]<40) 
-                // if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15) 
+                // for (size_t k = 0; k < p_EnergyVec->size(); k ++) {sum_d += (*p_EnergyVec)[k];}
+                for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
                 {
+                    int index = int(k / 22);  // Get the Layer
+                    auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal[index] = *std::max_element(p_start, p_end); 
                     h1_p[index]->Fill(p_maxVal[index]/(*p_L_EnergyVec)[index]);
                     sum_p       += p_maxVal[index];
                     sum_p_total += (*p_L_EnergyVec)[index];
@@ -98,32 +94,47 @@ void Jm2()
                         gr_proton->SetPoint(point_counter_p++, index+0.9, sum_p / sum_p_total);
                         h2_p->Fill(index,log10(sum_p / sum_p_total));
                     }
+                    // cout << " bar " << k << " Layer " << index << " p_max" << p_maxVal[index] << " Sum p_max " << sum_p << endl; 
+                    // std::copy(p_start, p_end, std::ostream_iterator<double>(std::cout, ", "));
+                    // cout << " max = "<< p_maxVal[index] <<  endl;
                 }
-                auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal[index] = *std::max_element(d_start, d_end); 
-                if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[0]<40 && (*d_RMSVec)[1]<40) 
-                // if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15) 
-                {
-                    h1_d[index]->Fill(d_maxVal[index]/(*d_L_EnergyVec)[index]);
-                    sum_d       += d_maxVal[index];
-                    sum_d_total += (*d_L_EnergyVec)[index];
-
-                    if ((*d_L_EnergyVec)[index] > 0 && sum_d > 0)
-                    {
-                        hC_d[index]->Fill(sum_d / sum_d_total);
-                        gr_deuteron->SetPoint(point_counter_d++, index+1.1, sum_d / sum_d_total);
-                        h2_d->Fill(index,log10(sum_d / sum_d_total));
-                    }
-                }
-                // cout << " bar " << k << " Layer " << index << " p_max" << p_maxVal[index] << " Sum p_max " << sum_p << endl; 
-                // std::copy(p_start, p_end, std::ostream_iterator<double>(std::cout, ", "));
-                // cout << " max = "<< p_maxVal[index] <<  endl;
             }
+            
             // cout <<  "sum p = " << sum_p <<  endl;
-            // cout <<  "sum d = " << sum_d <<  endl;
             // cout << "Total " << (*p_L_EnergyVec)[index] << endl;
             // cout << p_EnergyVec->size() << endl;
         }
+        
+        for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
+        {
+            deuteron_tree->GetEntry(entry); 
+            double sum_d = 0;
+            double sum_d_total = 0;
+            double d_maxVal[14]={0};
+            if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15) 
+            {
+                for (size_t k = 0; k < d_EnergyVec->size(); k += 22)
+                {
+                    int index = int(k / 22);  // Get the Layer
+                    auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal[index] = *std::max_element(d_start, d_end); 
 
+                    {
+                        h1_d[index]->Fill(d_maxVal[index]/(*d_L_EnergyVec)[index]);
+                        sum_d       += d_maxVal[index];
+                        sum_d_total += (*d_L_EnergyVec)[index];
+
+                        if ((*d_L_EnergyVec)[index] > 0 && sum_d > 0)
+                        {
+                            hC_d[index]->Fill(sum_d / sum_d_total);
+                            gr_deuteron->SetPoint(point_counter_d++, index+1.1, sum_d / sum_d_total);
+                            h2_d->Fill(index,log10(sum_d / sum_d_total));
+                        }
+                    }
+                }
+            }
+            // cout <<  "sum d = " << sum_d <<  endl;
+        }
+        
         for (int j = 0; j < 14; j++)
         {
             h1_p[j]->SetLineColor(kRed);     h1_p[j]->SetMarkerColor(kRed);     h1_p[j]->SetLineWidth(2);   h1_p[j]->Sumw2();

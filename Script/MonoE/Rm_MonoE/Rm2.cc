@@ -1,7 +1,7 @@
 void Rm2()
 {
     double Energy[19]={0};
-    for (int i = 18; i < 19; i++) // Energy
+    for (int i = 0; i < 19; i++) // Energy
     {
         if(i<9)  {Energy[i] =  (i+1)*10;}
         else if(i>=9 && i < 19)   {Energy[i] =  i*100-800;}
@@ -10,8 +10,8 @@ void Rm2()
         int p_First_Had_Layer; double p_E_total;   std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr;
         int d_First_Had_Layer; double d_E_total;   std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr;
 
-        TH1D *h1_p[14];  TH1D *hC_p[14];  TF1  *fitFunc_p[14]; double p_maxVal[14]={0};         double Layer[14]={0};
-        TH1D *h1_d[14];  TH1D *hC_d[14];  TF1  *fitFunc_d[14]; double d_maxVal[14]={0};         double Layer_Err[14]={0};
+        TH1D *h1_p[14];  TH1D *hC_p[14];  TF1  *fitFunc_p[14];         double Layer[14]={0};
+        TH1D *h1_d[14];  TH1D *hC_d[14];  TF1  *fitFunc_d[14];          double Layer_Err[14]={0};
 
         TH2D *h2_p = new TH2D("h2_p","h2_p",14,0,14,50,-5,0);
         TH2D *h2_d = new TH2D("h2_d","h2_d",14,0,14,50,-5,0);
@@ -66,16 +66,15 @@ void Rm2()
         // for (Long64_t entry = 0; entry < 1; ++entry)
         {
             proton_tree->GetEntry(entry);   
-            deuteron_tree->GetEntry(entry); 
             double sum_p = 0;
-            double sum_d = 0;
-            // for (size_t k = 0; k < p_EnergyVec->size(); k ++) {sum_d += (*p_EnergyVec)[k];}
-            for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
+            double p_maxVal[14]={0}; 
+            if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15) // && (*p_RMSVec)[0]<40 && (*p_RMSVec)[1]<40
             {
-                int index = int(k / 22);  // Get the Layer
-                auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal[index] = *std::max_element(p_start, p_end); 
-                // if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[0]<40 && (*p_RMSVec)[1]<40) 
+                // for (size_t k = 0; k < p_EnergyVec->size(); k ++) {sum_d += (*p_EnergyVec)[k];}
+                for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
                 {
+                    int index = int(k / 22);  // Get the Layer
+                    auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal[index] = *std::max_element(p_start, p_end); 
                     h1_p[index]->Fill(p_maxVal[index]/p_E_total);
                     sum_p += p_maxVal[index];
                     if (p_E_total > 0 && sum_p > 0)
@@ -85,9 +84,26 @@ void Rm2()
                         h2_p->Fill(index,log10(sum_p / p_E_total));
                     }
                 }
-                auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal[index] = *std::max_element(d_start, d_end); 
-                // if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[0]<40 && (*d_RMSVec)[1]<40) 
+                // cout << " bar " << k << " Layer " << index << " p_max" << p_maxVal[index] << " Sum p_max " << sum_p << endl; 
+                // std::copy(p_start, p_end, std::ostream_iterator<double>(std::cout, ", "));
+                // cout << " max = "<< p_maxVal[index] <<  endl;
+            }
+            // cout <<  "sum p = " << sum_p <<  endl;
+            // cout << "Total " << p_E_total << endl;
+            // cout << p_EnergyVec->size() << endl;
+        }
+
+        for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
+        {
+            deuteron_tree->GetEntry(entry); 
+            double sum_d = 0;
+            double d_maxVal[14]={0};
+            if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15) //  && (*d_RMSVec)[0]<40 && (*d_RMSVec)[1]<40
+            {
+                for (size_t k = 0; k < d_EnergyVec->size(); k += 22)
                 {
+                    int index = int(k / 22);  // Get the Layer
+                    auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal[index] = *std::max_element(d_start, d_end); 
                     h1_d[index]->Fill(d_maxVal[index]/d_E_total);
                     sum_d += d_maxVal[index];
                     if (d_E_total > 0 && sum_d > 0)
@@ -97,14 +113,8 @@ void Rm2()
                         h2_d->Fill(index,log10(sum_d / d_E_total));
                     }
                 }
-                // cout << " bar " << k << " Layer " << index << " p_max" << p_maxVal[index] << " Sum p_max " << sum_p << endl; 
-                // std::copy(p_start, p_end, std::ostream_iterator<double>(std::cout, ", "));
-                // cout << " max = "<< p_maxVal[index] <<  endl;
             }
-            // cout <<  "sum p = " << sum_p <<  endl;
             // cout <<  "sum d = " << sum_d <<  endl;
-            // cout << "Total " << p_E_total << endl;
-            // cout << p_EnergyVec->size() << endl;
         }
 
         for (int j = 0; j < 14; j++)
@@ -117,7 +127,7 @@ void Rm2()
             c2->cd(j + 1);
             hC_p[j]->Scale(1.0/hC_p[j]->Integral());
             hC_d[j]->Scale(1.0/hC_d[j]->Integral());
-            hC_p[j]->SetTitle(Form("%.f GeV incident in L%d;#sum_{0}^{%d}Rm",Energy[i],j,j));
+            hC_p[j]->SetTitle(Form("%.f GeV incident in L%d;#sum Rm = #sum_{L0}^{L%d} Max Energy Deposit barRm",Energy[i],j,j));
             hC_p[j]->Draw("hist");
             hC_d[j]->Draw("histsame");
             
@@ -187,7 +197,7 @@ void Rm2()
         auto SUM_gre_d = new TGraphAsymmErrors(14,Layer,SUM_Deuteron_Ratio,Layer_Err,Layer_Err,SUM_Deuteron_Ratio_LL,SUM_Deuteron_Ratio_UL);
         SUM_gre_p->SetMarkerStyle(20);    SUM_gre_p->SetMarkerColor(kRed);     SUM_gre_p->SetLineColor(kRed);     SUM_gre_p->SetLineWidth(2);
         SUM_gre_d->SetMarkerStyle(21);    SUM_gre_d->SetMarkerColor(kBlue);    SUM_gre_d->SetLineColor(kBlue);    SUM_gre_d->SetLineWidth(2);  
-        SUM_gre_d->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; #sum(Rm)",int(Energy[i])));
+        SUM_gre_d->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; #sum Rm = #sum Max Energy Deposit bar/ Total Deposit ",int(Energy[i])));
     
         SUM_gre_d->GetYaxis()->SetRangeUser(1e-5,1);
         SUM_gre_d->GetXaxis()->SetLimits(0,14);
@@ -210,7 +220,7 @@ void Rm2()
 
         auto c5 = new TCanvas("c5", "c5", 1500, 1000);
         gPad->SetLogy(1);
-        gr_proton->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; #sum(Rm)",int(Energy[i])));
+        gr_proton->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; #sum Rm = #sum Max Energy Deposit bar/ Total Deposit ",int(Energy[i])));
         gr_proton->GetYaxis()->SetRangeUser(1e-5,1);
 
         gr_proton->SetMarkerStyle(20);  // proton: circle
@@ -231,7 +241,7 @@ void Rm2()
         c5->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/CDF/Rm_BGOLayer_SCAT_DP_%dGeV.pdf",int(Energy[i])));
 
         auto c6 = new TCanvas("c6", "c6", 1500, 1000);
-        h2_p->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; #sum(Rm)",int(Energy[i])));
+        h2_p->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; #sum Rm = #sum Max Energy Deposit bar/ Total Deposit ",int(Energy[i])));
         h2_p->GetYaxis()->SetRangeUser(-5,0.2);
         h2_p->SetBarWidth(0.4);
         h2_p->SetBarOffset(-0.25);
