@@ -58,7 +58,7 @@ void Rm_Single()
     auto h1_H = new TH1D("h1_H","h1_H",50,-5,0);      double H_maxVal;
     auto h1_c = new TH1D("h1_c","h1_c",50,-5,0);      double c_maxVal;
 
-    int k = 13;
+    int k = 0;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     // for (Long64_t entry = 0; entry < 1; ++entry)
     {
@@ -73,12 +73,12 @@ void Rm_Single()
         // for (size_t i = 0; i < 22; i += 22)
         // for (size_t i = 0; i < p_EnergyVec->size(); i += 22)
         {
-            auto p_start = p_EnergyVec->begin() + i;  auto p_end = (i + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal = *std::max_element(p_start, p_end); if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15) /*if(p_First_Had_Layer==0)*/{ h1_p->Fill(log10(p_maxVal/p_E_total)); }
-            auto d_start = d_EnergyVec->begin() + i;  auto d_end = (i + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal = *std::max_element(d_start, d_end); if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15) /*if(d_First_Had_Layer==0)*/{ h1_d->Fill(log10(d_maxVal/d_E_total)); }
-            auto e_start = e_EnergyVec->begin() + i;  auto e_end = (i + 22 < e_EnergyVec->size() ) ? e_start + 22 : e_EnergyVec->end();  e_maxVal = *std::max_element(e_start, e_end); if((*e_RMSVec)[0]>15 && (*e_RMSVec)[1]>15) /*if(e_First_Had_Layer==0)*/{ h1_e->Fill(log10(e_maxVal/e_E_total)); }
-            auto h_start = h_EnergyVec->begin() + i;  auto h_end = (i + 22 < h_EnergyVec->size() ) ? h_start + 22 : h_EnergyVec->end();  h_maxVal = *std::max_element(h_start, h_end); if((*h_RMSVec)[0]>15 && (*h_RMSVec)[1]>15) /*if(h_First_Had_Layer==0)*/{ h1_h->Fill(log10(h_maxVal/h_E_total)); }
-            auto H_start = H_EnergyVec->begin() + i;  auto H_end = (i + 22 < H_EnergyVec->size() ) ? H_start + 22 : H_EnergyVec->end();  H_maxVal = *std::max_element(H_start, H_end); if((*H_RMSVec)[0]>15 && (*H_RMSVec)[1]>15) /*if(H_First_Had_Layer==0)*/{ h1_H->Fill(log10(H_maxVal/H_E_total)); }
-            auto c_start = c_EnergyVec->begin() + i;  auto c_end = (i + 22 < c_EnergyVec->size() ) ? c_start + 22 : c_EnergyVec->end();  c_maxVal = *std::max_element(c_start, c_end); if((*c_RMSVec)[0]>15 && (*c_RMSVec)[1]>15) /*if(c_First_Had_Layer==0)*/{ h1_c->Fill(log10(c_maxVal/c_E_total)); }
+            auto p_start = p_EnergyVec->begin() + i;  auto p_end = (i + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  p_maxVal = *std::max_element(p_start, p_end); if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 ) /*&& (*p_RMSVec)[1] < 45 && (*p_RMSVec)[2] < 45) /*if(p_First_Had_Layer==0)*/{ h1_p->Fill(log10(p_maxVal/p_E_total)); }
+            auto d_start = d_EnergyVec->begin() + i;  auto d_end = (i + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal = *std::max_element(d_start, d_end); if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 ) /*&& (*d_RMSVec)[1] < 45 && (*d_RMSVec)[2] < 45) /*if(d_First_Had_Layer==0)*/{ h1_d->Fill(log10(d_maxVal/d_E_total)); }
+            auto e_start = e_EnergyVec->begin() + i;  auto e_end = (i + 22 < e_EnergyVec->size() ) ? e_start + 22 : e_EnergyVec->end();  e_maxVal = *std::max_element(e_start, e_end); if((*e_RMSVec)[0]>15 && (*e_RMSVec)[1]>15 ) /*&& (*e_RMSVec)[1] < 45 && (*e_RMSVec)[2] < 45) /*if(e_First_Had_Layer==0)*/{ h1_e->Fill(log10(e_maxVal/e_E_total)); }
+            auto h_start = h_EnergyVec->begin() + i;  auto h_end = (i + 22 < h_EnergyVec->size() ) ? h_start + 22 : h_EnergyVec->end();  h_maxVal = *std::max_element(h_start, h_end); if((*h_RMSVec)[0]>15 && (*h_RMSVec)[1]>15 ) /*&& (*h_RMSVec)[1] < 45 && (*h_RMSVec)[2] < 45) /*if(h_First_Had_Layer==0)*/{ h1_h->Fill(log10(h_maxVal/h_E_total)); }
+            auto H_start = H_EnergyVec->begin() + i;  auto H_end = (i + 22 < H_EnergyVec->size() ) ? H_start + 22 : H_EnergyVec->end();  H_maxVal = *std::max_element(H_start, H_end); if((*H_RMSVec)[0]>15 && (*H_RMSVec)[1]>15 ) /*&& (*H_RMSVec)[1] < 45 && (*H_RMSVec)[2] < 45) /*if(H_First_Had_Layer==0)*/{ h1_H->Fill(log10(H_maxVal/H_E_total)); }
+            auto c_start = c_EnergyVec->begin() + i;  auto c_end = (i + 22 < c_EnergyVec->size() ) ? c_start + 22 : c_EnergyVec->end();  c_maxVal = *std::max_element(c_start, c_end); if((*c_RMSVec)[0]>15 && (*c_RMSVec)[1]>15 ) /*&& (*c_RMSVec)[1] < 45 && (*c_RMSVec)[2] < 45) /*if(c_First_Had_Layer==0)*/{ h1_c->Fill(log10(c_maxVal/c_E_total)); }
             
             // cout << " bar " << i << " Layer " << int(i/22) <<endl; 
             // std::copy(p_start, p_end, std::ostream_iterator<double>(std::cout, " "));

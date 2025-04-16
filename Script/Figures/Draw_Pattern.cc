@@ -2,8 +2,9 @@ void Draw_Pattern()
 {
     std::vector<double>* energyVec = nullptr;
     std::vector<double>* p_RMSVec = nullptr;
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_100GeV.root");
-    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/build/Test1.root");
+    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
+    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
 
     auto proton_tree = (TTree*)proton_file->Get("B4");
 
@@ -15,11 +16,11 @@ void Draw_Pattern()
     auto c1    = new TCanvas("c1","c1",1800,600);
     auto hXZ   = new TH2D("hXZ","BGO X-Z Plane",22,-11,11,14,0,14);
     auto hYZ   = new TH2D("hYZ","BGO Y-Z Plane",22,-11,11,14,0,14);
-    auto h3box = new TH3D("h3box","3D View Proton_100GeV Cascade",22,-11,11,22,-11,11,14,0,14);
+    auto h3box = new TH3D("h3box","3D View Proton Cascade",22,-11,11,22,-11,11,14,0,14);
 
-
+    int entry  = 308;   
     // for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
-    for (Long64_t entry = 0; entry < 10; entry++)
+    // for (Long64_t entry = 0; entry < 10; entry++)
     {
         proton_tree->GetEntry(entry);
         cout << " RMS at 0 layer = " << (*p_RMSVec)[0] << endl;
@@ -110,7 +111,7 @@ void Draw_Pattern()
         auto  *palette3 = (TPaletteAxis*) h3box->GetListOfFunctions()->FindObject("palette");
         latex.DrawLatexNDC(0.8, 0.92, "(Edep/GeV)");
 
-        c1->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/Proton_100GeV_%lld.root",entry));
+        c1->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/Proton_PowerLaw_%lld.root",entry));
     }
 
 }

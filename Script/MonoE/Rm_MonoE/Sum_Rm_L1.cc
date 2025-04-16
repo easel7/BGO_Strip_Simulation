@@ -40,14 +40,14 @@ void Sum_Rm_L1()
         h1_c[k] = new TH1D(Form("h1_c[%d]",k),Form("h1_c[%d]",k),100,0,1);  
     }
 
-    int GL = 5; // Goal Layer
+    int GL = 3; // Goal Layer
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     // for (Long64_t entry = 0; entry < 1; ++entry)
     {
         proton_tree->GetEntry(entry);    
         double sum_p = 0;
         double p_maxVal[14] = {0};
-        if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[0]<40 && (*p_RMSVec)[1]<40) //  
+        if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45  ) //  
         {
             for (size_t j = 0; j < p_EnergyVec->size(); j += 22)
             {
@@ -98,7 +98,7 @@ void Sum_Rm_L1()
    
     // h1_p->GetYaxis()->SetRangeUser(0,0.5);h1_p->SetTitle("1000 GeV incident; log_{10}(Rm) = log_{10}(Max Energy Deposit bar in L0/ Total Deposit);Normalized Count");
     h1_p[GL]->GetYaxis()->SetRangeUser(0,200);
-    h1_p[GL]->SetTitle(Form("1000 GeV incident; #sum Rm = #sum_{0}^{L%d} Max Energy Deposit bar/ Total Deposit;Count",GL));
+    h1_p[GL]->SetTitle(Form("1000 GeV incident in L%d; #sum Rm = #sum_{0}^{L%d} Max Energy Deposit bar/ Total Deposit;Count",GL,GL));
     
     auto c1 = new TCanvas("c1","c1",900,600);
     c1->cd();

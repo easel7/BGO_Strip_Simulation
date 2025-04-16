@@ -34,12 +34,12 @@ void Rm_L1()
     double H_maxVal;
     double c_maxVal;
 
-    int k = 3;
+    int k = 0;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     // for (Long64_t entry = 0; entry < 1; ++entry)
     {
         proton_tree->GetEntry(entry);    
-        if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[0]<40 && (*p_RMSVec)[1]<40)
+        if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45)
         {
             for (size_t i = 22*k; i < 22*(k+1); i += 22)
             {

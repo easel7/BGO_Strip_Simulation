@@ -77,8 +77,8 @@ void Jm2()
             double sum_p = 0;
             double sum_p_total = 0;
             double p_maxVal[14]={0};
-            // if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[0]<40 && (*p_RMSVec)[1]<40) 
-            if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15) 
+            if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[0]<45 && (*p_RMSVec)[1]<45) 
+            // if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15) 
             {
                 // for (size_t k = 0; k < p_EnergyVec->size(); k ++) {sum_d += (*p_EnergyVec)[k];}
                 for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
@@ -111,13 +111,13 @@ void Jm2()
             double sum_d = 0;
             double sum_d_total = 0;
             double d_maxVal[14]={0};
-            if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15) 
+            if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[0]<45 && (*d_RMSVec)[1]<45) 
+            // if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15) 
             {
                 for (size_t k = 0; k < d_EnergyVec->size(); k += 22)
                 {
                     int index = int(k / 22);  // Get the Layer
                     auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end();  d_maxVal[index] = *std::max_element(d_start, d_end); 
-
                     {
                         h1_d[index]->Fill(d_maxVal[index]/(*d_L_EnergyVec)[index]);
                         sum_d       += d_maxVal[index];

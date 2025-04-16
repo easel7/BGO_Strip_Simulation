@@ -68,7 +68,7 @@ void Rm2()
             proton_tree->GetEntry(entry);   
             double sum_p = 0;
             double p_maxVal[14]={0}; 
-            if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15) // && (*p_RMSVec)[0]<40 && (*p_RMSVec)[1]<40
+            if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45  ) // && (*p_RMSVec)[0]<40 && (*p_RMSVec)[1]<40
             {
                 // for (size_t k = 0; k < p_EnergyVec->size(); k ++) {sum_d += (*p_EnergyVec)[k];}
                 for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
@@ -98,7 +98,7 @@ void Rm2()
             deuteron_tree->GetEntry(entry); 
             double sum_d = 0;
             double d_maxVal[14]={0};
-            if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15) //  && (*d_RMSVec)[0]<40 && (*d_RMSVec)[1]<40
+            if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[2]<45 && (*d_RMSVec)[3]<45  ) //  && (*d_RMSVec)[0]<40 && (*d_RMSVec)[1]<40
             {
                 for (size_t k = 0; k < d_EnergyVec->size(); k += 22)
                 {
@@ -127,7 +127,7 @@ void Rm2()
             c2->cd(j + 1);
             hC_p[j]->Scale(1.0/hC_p[j]->Integral());
             hC_d[j]->Scale(1.0/hC_d[j]->Integral());
-            hC_p[j]->SetTitle(Form("%.f GeV incident in L%d;#sum Rm = #sum_{L0}^{L%d} Max Energy Deposit barRm",Energy[i],j,j));
+            hC_p[j]->SetTitle(Form("%.f GeV incident in L%d;#sum Rm = #sum_{L0}^{L%d} Max Energy Deposit bar / Total Deposit",Energy[i],j,j));
             hC_p[j]->Draw("hist");
             hC_d[j]->Draw("histsame");
             
@@ -164,6 +164,7 @@ void Rm2()
         c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/CDF/Rm_DP_%dGeV.pdf",int(Energy[i])));
 
         auto c3 = new TCanvas("c3","c3",1000,1000);
+        c3->cd();
         auto gre_p = new TGraphAsymmErrors(14,Layer,Proton_Ratio  ,Layer_Err,Layer_Err,Proton_Ratio_LL  ,Proton_Ratio_UL);
         auto gre_d = new TGraphAsymmErrors(14,Layer,Deuteron_Ratio,Layer_Err,Layer_Err,Deuteron_Ratio_LL,Deuteron_Ratio_UL);
 
@@ -191,6 +192,7 @@ void Rm2()
 
 
         auto c4 = new TCanvas("c4","c4",1500,1000);
+        c4->cd();
         gPad->SetLogy(1);
 
         auto SUM_gre_p = new TGraphAsymmErrors(14,Layer,SUM_Proton_Ratio  ,Layer_Err,Layer_Err,SUM_Proton_Ratio_LL  ,SUM_Proton_Ratio_UL);
@@ -219,6 +221,7 @@ void Rm2()
 
 
         auto c5 = new TCanvas("c5", "c5", 1500, 1000);
+        c5->cd();
         gPad->SetLogy(1);
         gr_proton->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; #sum Rm = #sum Max Energy Deposit bar/ Total Deposit ",int(Energy[i])));
         gr_proton->GetYaxis()->SetRangeUser(1e-5,1);
@@ -241,6 +244,7 @@ void Rm2()
         c5->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/CDF/Rm_BGOLayer_SCAT_DP_%dGeV.pdf",int(Energy[i])));
 
         auto c6 = new TCanvas("c6", "c6", 1500, 1000);
+        c6->cd();
         h2_p->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; #sum Rm = #sum Max Energy Deposit bar/ Total Deposit ",int(Energy[i])));
         h2_p->GetYaxis()->SetRangeUser(-5,0.2);
         h2_p->SetBarWidth(0.4);

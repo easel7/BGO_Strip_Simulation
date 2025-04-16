@@ -31,7 +31,7 @@ void Edep_Ratio()
     TCut HET = "(L0_E>0.23 && L1_E >0.23 && L2_E>0.23 && L3_E>0.046)";
     // TCut HET = "";
 
-    for (int i = 0; i < 19; i++)
+    for (int i = 12; i < 13; i++)
     {
         if(i<9)  {Energy[i] =  (i+1)*10;}
         else   {Energy[i] =  i*100-800;}

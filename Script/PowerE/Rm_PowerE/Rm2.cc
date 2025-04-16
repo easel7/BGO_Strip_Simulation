@@ -30,15 +30,7 @@ void Rm2()
     TH1D *h1_p[15][14];  TH1D *hC_p[15][14];       TH2D *h2_p[15];      TGraph *gr_proton[15];          int point_counter_p = 0;
     TH1D *h1_d[15][14];  TH1D *hC_d[15][14];       TH2D *h2_d[15];      TGraph *gr_deuteron[15];        int point_counter_d = 0;
 
-    auto c1 = new TCanvas("c1","c1",2500,1500);
-    c1->Clear();
-    c1->Divide(5,3);
-    gStyle->SetOptStat(0);
 
-    auto c2 = new TCanvas("c2","c2",2500,1500);
-    c2->Clear();
-    c2->Divide(5,3);
-    gStyle->SetOptStat(0);
 
     for(int i =0 ; i<15 ; i++)
     {
@@ -62,24 +54,24 @@ void Rm2()
     }
     
     // proton_file->cd();
-    for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
-    // for (Long64_t entry = 0; entry < 1; ++entry)
+    // for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
+    for (Long64_t entry = 0; entry < 1e3; ++entry)
     {
         proton_tree->GetEntry(entry);   
         double sum_p = 0;
 
         int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
         if(p_energy_index < 0 || p_energy_index > 14) continue;
-        for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
+        if( (*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45 )  // 
         {
-            int index = int(k / 22);  // Get the Layer
-            auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  
-            double p_maxVal = *std::max_element(p_start, p_end); 
-
-            // std::cout << "k = " << k << std::endl << std::flush;
-            // std::copy(p_start, p_end, std::ostream_iterator<double>(std::cout, ", "));
-            if( (*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 )  // && (*p_RMSVec)[0]<40 && (*p_RMSVec)[1]<40 
+            if (p_energy_index==10) cout << "proton entry = " << entry << endl;
+            for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
             {
+                int index = int(k / 22);  // Get the Layer
+                auto p_start = p_EnergyVec->begin() + k;  auto p_end = (k + 22 < p_EnergyVec->size() ) ? p_start + 22 : p_EnergyVec->end();  
+                double p_maxVal = *std::max_element(p_start, p_end); 
+                // std::cout << "k = " << k << std::endl << std::flush;
+                // std::copy(p_start, p_end, std::ostream_iterator<double>(std::cout, ", "));
                 h1_p[p_energy_index][index]->Fill(log10(p_maxVal/p_Total_E)); 
                 sum_p += p_maxVal;
                 hC_p[p_energy_index][index]->Fill(sum_p / p_Total_E);
@@ -90,8 +82,8 @@ void Rm2()
     }
 
     // deuteron_file->cd();
-    for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
-    // for (Long64_t entry = 0; entry < 1; ++entry)
+    // for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
+    for (Long64_t entry = 0; entry < 1e3; ++entry)
     {
         deuteron_tree->GetEntry(entry); 
         double sum_d = 0;
@@ -99,14 +91,16 @@ void Rm2()
         if(d_energy_index < 0 || d_energy_index > 14) continue;
         // cout << d_Total_E << "," <<  d_energy_index << endl;
         // cout << d_EnergyVec->size() << endl;
-        for (size_t k = 0; k < d_EnergyVec->size(); k += 22)
+        if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[2]<45 && (*d_RMSVec)[3]<45) // 
         {
-            int index = int(k / 22);  // Get the Layer
-            auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end(); 
-            double d_maxVal = *std::max_element(d_start, d_end); 
-            // std::copy(d_start, d_end, std::ostream_iterator<double>(std::cout, ", "));
-            if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15) // && (*d_RMSVec)[0]<40 && (*d_RMSVec)[1]<40
+            if (d_energy_index==10) cout << "deuteron entry = " << entry << endl;
+            for (size_t k = 0; k < d_EnergyVec->size(); k += 22)
             {
+                int index = int(k / 22);  // Get the Layer
+                auto d_start = d_EnergyVec->begin() + k;  auto d_end = (k + 22 < d_EnergyVec->size() ) ? d_start + 22 : d_EnergyVec->end(); 
+                double d_maxVal = *std::max_element(d_start, d_end); 
+                // std::copy(d_start, d_end, std::ostream_iterator<double>(std::cout, ", "));
+
                 h1_d[d_energy_index][index]->Fill(log10(d_maxVal/d_Total_E)); 
                 sum_d += d_maxVal;
                 hC_d[d_energy_index][index]->Fill(sum_d / d_Total_E);
@@ -120,6 +114,15 @@ void Rm2()
 
     for(int i = 0 ; i<15 ; i++) // Energy
     {
+        auto c1 = new TCanvas("c1","c1",2500,1500);
+        c1->Clear();
+        c1->Divide(5,3);
+        gStyle->SetOptStat(0);
+    
+        auto c2 = new TCanvas("c2","c2",2500,1500);
+        c2->Clear();
+        c2->Divide(5,3);
+        gStyle->SetOptStat(0);
         double Proton_Ratio[14]={0};     double Deuteron_Ratio[14]={0};     double SUM_Proton_Ratio[14]={0};     double SUM_Deuteron_Ratio[14]={0};    
         double Proton_Ratio_LL[14]={0};  double Deuteron_Ratio_LL[14]={0};  double SUM_Proton_Ratio_LL[14]={0};  double SUM_Deuteron_Ratio_LL[14]={0}; 
         double Proton_Ratio_UL[14]={0};  double Deuteron_Ratio_UL[14]={0};  double SUM_Proton_Ratio_UL[14]={0};  double SUM_Deuteron_Ratio_UL[14]={0}; 
@@ -135,7 +138,7 @@ void Rm2()
             h1_d[i][j]->Scale(1.0/h1_d[i][j]->Integral()); 
 
             h1_p[i][j]->GetYaxis()->SetRangeUser(0,0.6);
-            h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] in L%d;Rm = Max Energy Deposit bar/ Total Deposit;Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j));
+            h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] in L%d;log10(Rm) = log10(Max Energy Deposit bar/ Total Deposit);Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j));
             h1_p[i][j]->Draw();
             h1_p[i][j]->Draw("hist");
             h1_d[i][j]->Draw("histsame");
@@ -150,12 +153,13 @@ void Rm2()
             c2->cd(j + 1);
             hC_p[i][j]->Scale(1.0/hC_p[i][j]->Integral());
             hC_d[i][j]->Scale(1.0/hC_d[i][j]->Integral());
-            hC_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] in L%d;#sum_{0}^{%d}Rm",pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j,j));
+            hC_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] in L%d;#sum_{0}^{%d} (dE/dx) / Edep",pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j,j));
             hC_p[i][j]->Draw("hist");
             hC_d[i][j]->Draw("histsame");
         }
-        c1->cd(15);
         auto tex = new TLatex(0.1,0.9,Form("Deposit Energy[%.2fGeV, %.2fGeV]",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
+
+        c1->cd(15);
         tex->SetNDC();
         tex->Draw(); 
         auto legend1 = new TLegend(0.12, 0.12, 0.88, 0.88);
@@ -201,7 +205,7 @@ void Rm2()
         auto SUM_gre_d = new TGraphAsymmErrors(14,Layer,SUM_Deuteron_Ratio,Layer_Err,Layer_Err,SUM_Deuteron_Ratio_LL,SUM_Deuteron_Ratio_UL);
         SUM_gre_p->SetMarkerStyle(20);    SUM_gre_p->SetMarkerColor(kRed);     SUM_gre_p->SetLineColor(kRed);     SUM_gre_p->SetLineWidth(2);
         SUM_gre_d->SetMarkerStyle(21);    SUM_gre_d->SetMarkerColor(kBlue);    SUM_gre_d->SetLineColor(kBlue);    SUM_gre_d->SetLineWidth(2);  
-        SUM_gre_d->SetTitle(Form("Deposit Energy [%.2fGeV, %.2fGeV]; BGO Layer; #sum(Rm)",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
+        SUM_gre_d->SetTitle(Form("Deposit Energy [%.2fGeV, %.2fGeV]; BGO Layer; #sum (dE/dx) / Edep",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
     
         SUM_gre_d->GetYaxis()->SetRangeUser(1e-5,1);
         SUM_gre_d->GetXaxis()->SetLimits(0,14);
@@ -223,7 +227,7 @@ void Rm2()
 
         auto c5 = new TCanvas("c5", "c5", 1500, 1000);
         gPad->SetLogy(1);
-        gr_proton[i]->SetTitle(Form("Deposit Energy [%.2fGeV, %.2fGeV]; BGO Layer; #sum(Rm)",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
+        gr_proton[i]->SetTitle(Form("Deposit Energy [%.2fGeV, %.2fGeV]; BGO Layer; #sum (dE/dx) / Edep",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
         gr_proton[i]->GetYaxis()->SetRangeUser(1e-5,1);
 
         gr_proton[i]->SetMarkerStyle(20);  // proton: circle
@@ -244,7 +248,7 @@ void Rm2()
         c5->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Rm_PowerE/CDF/Rm_BGOLayer_SCAT_DP_%.2f_%.2f.pdf",Energy_LL[i],Energy_UL[i]));
 
         auto c6 = new TCanvas("c6", "c6", 1500, 1000);
-        h2_p[i]->SetTitle(Form("Deposit Energy [%.2fGeV, %.2fGeV]; BGO Layer; #sum(Rm)",Energy_LL[i],Energy_UL[i]));
+        h2_p[i]->SetTitle(Form("Deposit Energy [%.2fGeV, %.2fGeV]; BGO Layer; #sum (dE/dx) / Edep",Energy_LL[i],Energy_UL[i]));
         h2_p[i]->GetYaxis()->SetRangeUser(-5,0.2);
         h2_p[i]->SetBarWidth(0.4);
         h2_p[i]->SetBarOffset(-0.25);
@@ -260,8 +264,5 @@ void Rm2()
         axis_top->Draw();
         legend5->Draw();
         c6->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Rm_PowerE/CDF/Rm_BGOLayer_CANDLE_DP_%.2f_%.2f.pdf",Energy_LL[i],Energy_UL[i]));
-
     }
-    
-    
 }

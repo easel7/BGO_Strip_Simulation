@@ -25,7 +25,7 @@ void Lateral_RMS_L3()
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     {
         proton_tree->GetEntry(entry);
-        if ((*EnergyVec)[0] > 0.23 && (*EnergyVec)[1] > 0.23 && (*EnergyVec)[2] > 0.23 && (*EnergyVec)[0] > 0.046 && Total_E > 1E3 && Total_E<1580) //
+        if ((*EnergyVec)[0] > 0.2 && (*EnergyVec)[1] > 0.2 && (*EnergyVec)[2] > 0.2 && (*EnergyVec)[0] > 0.04 && Total_E > 1E3 && Total_E<1580) //
         {
             h1_p->Fill((*RMSVec)[0],Weight);
             h2_p->Fill((*RMSVec)[4],Weight);
@@ -33,10 +33,10 @@ void Lateral_RMS_L3()
             h4_p->Fill((*RMSVec)[13],Weight);
         }
     }   
-    h1_p->Sumw2();
-    h2_p->Sumw2();
-    h3_p->Sumw2();
-    h4_p->Sumw2();
+    h1_p->Sumw2();     h1_p->SetLineColor(kRed);
+    h2_p->Sumw2();     h2_p->SetLineColor(kRed);
+    h3_p->Sumw2();     h3_p->SetLineColor(kRed);
+    h4_p->Sumw2();     h4_p->SetLineColor(kRed);
     h1_p->Scale(1/h1_p->Integral());
     h1_p->SetLineWidth(2);
     h2_p->Scale(1/h2_p->Integral());
@@ -51,14 +51,10 @@ void Lateral_RMS_L3()
     c1->cd(1);
     // gPad->SetLogy();
     h1_p->Draw("hist");
-
     c1->cd(2);
     h2_p->Draw("hist");
-    
     c1->cd(3);
     h3_p->Draw("hist");
-
-    
     c1->cd(4);
     h4_p->Draw("hist");
   

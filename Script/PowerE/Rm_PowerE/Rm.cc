@@ -21,7 +21,7 @@ void Rm()
     deuteron_tree->SetBranchAddress("LayerEnergyVector",&d_EnergyVec);
     deuteron_tree->SetBranchAddress("Efrac"            ,&d_Efrac);
     deuteron_tree->SetBranchAddress("First_Had_Layer"  ,&d_First_Had_Layer);
-    deuteron_tree_tree->SetBranchAddress("Total_E"     ,&d_Total_E);
+    deuteron_tree->SetBranchAddress("Total_E"     ,&d_Total_E);
 
     auto electron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Electron_PowerLaw.root");
     auto electron_tree = (TTree*)electron_file->Get("B4");
@@ -55,22 +55,22 @@ void Rm()
     carbon_tree->SetBranchAddress("First_Had_Layer"  ,&c_First_Had_Layer);
     carbon_tree->SetBranchAddress("Total_E"          ,&c_Total_E);
     
-    double Proton_Ratio[14]={0};     double Deuteron_Ratio[14]={0};    double Electron_Ratio[14]={0};    double Helium4_Ratio[14]={0};     double Helium3_Ratio[14]={0};     double Carbon_Ratio[14]={0};        double Energy[13]={0};
-    double Proton_Ratio_LL[14]={0};  double Deuteron_Ratio_LL[14]={0}; double Electron_Ratio_LL[14]={0}; double Helium4_Ratio_LL[14]={0};  double Helium3_Ratio_LL[14]={0};  double Carbon_Ratio_LL[14]={0};     double Energy_LL[13]={0};      
-    double Proton_Ratio_UL[14]={0};  double Deuteron_Ratio_UL[14]={0}; double Electron_Ratio_UL[14]={0}; double Helium4_Ratio_UL[14]={0};  double Helium3_Ratio_UL[14]={0};  double Carbon_Ratio_UL[14]={0};     double Energy_UL[13]={0};
+    double Proton_Ratio[14]={0};     double Deuteron_Ratio[14]={0};    double Electron_Ratio[14]={0};    double Helium4_Ratio[14]={0};     double Helium3_Ratio[14]={0};     double Carbon_Ratio[14]={0};        double Energy[15]={0};
+    double Proton_Ratio_LL[14]={0};  double Deuteron_Ratio_LL[14]={0}; double Electron_Ratio_LL[14]={0}; double Helium4_Ratio_LL[14]={0};  double Helium3_Ratio_LL[14]={0};  double Carbon_Ratio_LL[14]={0};     double Energy_LL[15]={0};      
+    double Proton_Ratio_UL[14]={0};  double Deuteron_Ratio_UL[14]={0}; double Electron_Ratio_UL[14]={0}; double Helium4_Ratio_UL[14]={0};  double Helium3_Ratio_UL[14]={0};  double Carbon_Ratio_UL[14]={0};     double Energy_UL[15]={0};
 
     double Layer[14]={0};
     double Layer_Err[14]={0};
 
     // Depsit and Layer
-    TH1D *h1_p[13][14];
-    TH1D *h1_d[13][14];
-    TH1D *h1_e[13][14];
-    TH1D *h1_h[13][14];
-    TH1D *h1_H[13][14];
-    TH1D *h1_c[13][14];
+    TH1D *h1_p[15][14];
+    TH1D *h1_d[15][14];
+    TH1D *h1_e[15][14];
+    TH1D *h1_h[15][14];
+    TH1D *h1_H[15][14];
+    TH1D *h1_c[15][14];
 
-    for (int i = 0; i < 13; i++) // Deposit Energy Bin
+    for (int i = 0; i < 15; i++) // Deposit Energy Bin
     {
         Energy[i]    =  0.2*i+1.1;
         Energy_LL[i] =  0.2*i+1.0;
@@ -95,12 +95,12 @@ void Rm()
 
             for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
             {
-                proton_tree->GetEntry(entry);   if ( log10(p_Total_E) > 1+0.2*k && log10(p_Total_E) <= 1.2+0.2*k ) h1_p[i][j]->Fill(log10((*p_Efrac)[j]));
-                deuteron_tree->GetEntry(entry); if ( log10(d_Total_E) > 1+0.2*k && log10(d_Total_E) <= 1.2+0.2*k ) h1_d[i][j]->Fill(log10((*d_Efrac)[j]));
-                electron_tree->GetEntry(entry); if ( log10(e_Total_E) > 1+0.2*k && log10(e_Total_E) <= 1.2+0.2*k ) h1_e[i][j]->Fill(log10((*e_Efrac)[j]));
-                helium4_tree->GetEntry(entry);  if ( log10(h_Total_E) > 1+0.2*k && log10(h_Total_E) <= 1.2+0.2*k ) h1_h[i][j]->Fill(log10((*h_Efrac)[j]));
-                helium3_tree->GetEntry(entry);  if ( log10(H_Total_E) > 1+0.2*k && log10(H_Total_E) <= 1.2+0.2*k ) h1_H[i][j]->Fill(log10((*H_Efrac)[j]));
-                carbon_tree->GetEntry(entry);   if ( log10(c_Total_E) > 1+0.2*k && log10(c_Total_E) <= 1.2+0.2*k ) h1_c[i][j]->Fill(log10((*c_Efrac)[j]));
+                proton_tree->GetEntry(entry);   if ( log10(p_Total_E) > 1+0.2*i && log10(p_Total_E) <= 1.2+0.2*i ) h1_p[i][j]->Fill(log10((*p_Efrac)[j]));
+                deuteron_tree->GetEntry(entry); if ( log10(d_Total_E) > 1+0.2*i && log10(d_Total_E) <= 1.2+0.2*i ) h1_d[i][j]->Fill(log10((*d_Efrac)[j]));
+                electron_tree->GetEntry(entry); if ( log10(e_Total_E) > 1+0.2*i && log10(e_Total_E) <= 1.2+0.2*i ) h1_e[i][j]->Fill(log10((*e_Efrac)[j]));
+                helium4_tree->GetEntry(entry);  if ( log10(h_Total_E) > 1+0.2*i && log10(h_Total_E) <= 1.2+0.2*i ) h1_h[i][j]->Fill(log10((*h_Efrac)[j]));
+                helium3_tree->GetEntry(entry);  if ( log10(H_Total_E) > 1+0.2*i && log10(H_Total_E) <= 1.2+0.2*i ) h1_H[i][j]->Fill(log10((*H_Efrac)[j]));
+                carbon_tree->GetEntry(entry);   if ( log10(c_Total_E) > 1+0.2*i && log10(c_Total_E) <= 1.2+0.2*i ) h1_c[i][j]->Fill(log10((*c_Efrac)[j]));
             }
 
             h1_p[i][j]->Sumw2(); /*h1_p[i][j]->Scale(1.0/h1_p[i][j]->Integral()); */h1_p[i][j]->SetLineColor(kRed);     h1_p[i][j]->SetMarkerColor(kRed);     h1_p[i][j]->SetLineWidth(2);
@@ -110,7 +110,8 @@ void Rm()
             h1_H[i][j]->Sumw2(); /*h1_H[i][j]->Scale(1.0/h1_H[i][j]->Integral()); */h1_H[i][j]->SetLineColor(kGreen-3); h1_H[i][j]->SetMarkerColor(kGreen-3); h1_H[i][j]->SetLineWidth(2);
             h1_c[i][j]->Sumw2(); /*h1_c[i][j]->Scale(1.0/h1_c[i][j]->Integral()); */h1_c[i][j]->SetLineColor(kMagenta); h1_c[i][j]->SetMarkerColor(kMagenta); h1_c[i][j]->SetLineWidth(2);
 
-            h1_e[i][j]->GetYaxis()->SetRangeUser(0,0.25);h1_e[j]->SetTitle(Form("10^%.f - %.f GeV Deposit EdepRatio Distrubution in L%d;log_{10}(Rm) = log_{10}(Max Energy Deposit bar in L%d/ Total Deposit);Count", 1+0.2*k ,1.2+0.2*k ,j ));
+            h1_e[i][j]->GetYaxis()->SetRangeUser(0,0.25);
+            h1_e[i][j]->SetTitle(Form("10^%.f - %.f GeV Deposit EdepRatio Distrubution in L%d;log_{10}(Rm) = log_{10}(Max Energy Deposit bar in L%d/ Total Deposit);Count", 1+0.2*i ,1.2+0.2*i ,j,j));
             h1_e[i][j]->Draw();
             h1_H[i][j]->Draw("same");
             h1_c[i][j]->Draw("same");
@@ -125,8 +126,6 @@ void Rm()
             double h_values[3];  h1_h[i][j]->GetQuantiles(3, h_values, quantiles); Helium4_Ratio[j] = h_values[1];    Helium4_Ratio_LL[j] = h_values[1] - h_values[0];   Helium4_Ratio_UL[j]= h_values[2] - h_values[1];
             double H_values[3];  h1_H[i][j]->GetQuantiles(3, H_values, quantiles); Helium3_Ratio[j] = H_values[1];    Helium3_Ratio_LL[j] = H_values[1] - H_values[0];   Helium3_Ratio_UL[j]= H_values[2] - H_values[1];
             double c_values[3];  h1_c[i][j]->GetQuantiles(3, c_values, quantiles); Carbon_Ratio[j] = c_values[1];     Carbon_Ratio_LL[j] = c_values[1] - c_values[0];    Carbon_Ratio_UL[j]= c_values[2] - c_values[1];
-
-
 
             Layer[j] = 0.5 + j;
             Layer_Err[j] = 0.5;

@@ -55,20 +55,20 @@ void Longti_Efrac()
     carbon_tree->SetBranchAddress("First_Had_Layer"  ,&c_First_Had_Layer);
     carbon_tree->SetBranchAddress("Total_E"          ,&c_Total_E);
     
-    double Proton_Ratio[14]={0};     double Deuteron_Ratio[14]={0};    double Electron_Ratio[14]={0};    double Helium4_Ratio[14]={0};     double Helium3_Ratio[14]={0};     double Carbon_Ratio[14]={0};        double Energy[13]={0};
-    double Proton_Ratio_LL[14]={0};  double Deuteron_Ratio_LL[14]={0}; double Electron_Ratio_LL[14]={0}; double Helium4_Ratio_LL[14]={0};  double Helium3_Ratio_LL[14]={0};  double Carbon_Ratio_LL[14]={0};     double Energy_LL[13]={0};      
-    double Proton_Ratio_UL[14]={0};  double Deuteron_Ratio_UL[14]={0}; double Electron_Ratio_UL[14]={0}; double Helium4_Ratio_UL[14]={0};  double Helium3_Ratio_UL[14]={0};  double Carbon_Ratio_UL[14]={0};     double Energy_UL[13]={0};
+    double Proton_Ratio[14]={0};     double Deuteron_Ratio[14]={0};    double Electron_Ratio[14]={0};    double Helium4_Ratio[14]={0};     double Helium3_Ratio[14]={0};     double Carbon_Ratio[14]={0};        double Energy[15]={0};
+    double Proton_Ratio_LL[14]={0};  double Deuteron_Ratio_LL[14]={0}; double Electron_Ratio_LL[14]={0}; double Helium4_Ratio_LL[14]={0};  double Helium3_Ratio_LL[14]={0};  double Carbon_Ratio_LL[14]={0};     double Energy_LL[15]={0};      
+    double Proton_Ratio_UL[14]={0};  double Deuteron_Ratio_UL[14]={0}; double Electron_Ratio_UL[14]={0}; double Helium4_Ratio_UL[14]={0};  double Helium3_Ratio_UL[14]={0};  double Carbon_Ratio_UL[14]={0};     double Energy_UL[15]={0};
 
     double Layer[14]={0};
     double Layer_Err[14]={0};
 
     // Depsit and Layer
-    TH1D *h1_p[13][14];
-    TH1D *h1_d[13][14];
-    TH1D *h1_e[13][14];
-    TH1D *h1_h[13][14];
-    TH1D *h1_H[13][14];
-    TH1D *h1_c[13][14];
+    TH1D *h1_p[15][14];
+    TH1D *h1_d[15][14];
+    TH1D *h1_e[15][14];
+    TH1D *h1_h[15][14];
+    TH1D *h1_H[15][14];
+    TH1D *h1_c[15][14];
 
     for (int i = 0; i < 13; i++) // Deposit Energy Bin
     {

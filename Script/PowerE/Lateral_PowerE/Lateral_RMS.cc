@@ -70,7 +70,7 @@ void Lateral_RMS()
     TH1D *h1_H[13][14];
     TH1D *h1_c[13][14];
 
-    for (int i = 0; i < 13; i++) // Deposit Energy Bin
+    for (int i = 0; i < 1; i++) // Deposit Energy Bin
     {
         Energy[i]    =  0.2*i+1.1;
         Energy_LL[i] =  0.2*i+1.0;

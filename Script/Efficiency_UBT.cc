@@ -134,7 +134,7 @@ void Efficiency_UBT()
             if ( (*p_EnergyVec)[0] > 0.23   && (*p_EnergyVec)[1]  > 0.23   && (*p_EnergyVec)[2]  > 0.23     &&  (*p_EnergyVec)[3] > 0.046) h2_p[i]->Fill(p_Total_E/p_Energy); 
             if (((*p_EnergyVec)[2] > 0.0092 && (*p_EnergyVec)[10] > 0.0092 && (*p_EnergyVec)[12] > 0.0092 ) || ((*p_EnergyVec)[3] > 0.0092 && (*p_EnergyVec)[11] > 0.0092 && (*p_EnergyVec)[13] > 0.0092 )) h4_p[i]->Fill(p_Total_E/p_Energy);
             // if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 ) h5_p[i]->Fill(p_Total_E/p_Energy);
-            if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[0]<40 && (*p_RMSVec)[1]<40) h5_p[i]->Fill(p_Total_E/p_Energy);
+            if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45) h5_p[i]->Fill(p_Total_E/p_Energy);
 
 
             
@@ -144,7 +144,7 @@ void Efficiency_UBT()
             if ( (*d_EnergyVec)[0] > 0.23   && (*d_EnergyVec)[1] > 0.23 && (*d_EnergyVec)[2] > 0.23 && (*d_EnergyVec)[3] > 0.046) h2_d[i]->Fill(d_Total_E/d_Energy); 
             if (((*d_EnergyVec)[2] > 0.0092 && (*d_EnergyVec)[10] > 0.0092 && (*d_EnergyVec)[12] > 0.0092 ) || ((*d_EnergyVec)[3] > 0.0092 && (*d_EnergyVec)[11] > 0.0092 && (*d_EnergyVec)[13] > 0.0092 )) h4_d[i]->Fill(d_Total_E/d_Energy);
             // if ((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 ) h5_d[i]->Fill(d_Total_E/d_Energy);
-            if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[0]<40 && (*d_RMSVec)[1]<40) h5_d[i]->Fill(d_Total_E/d_Energy);
+            if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[2]<45 && (*d_RMSVec)[3]<45) h5_d[i]->Fill(d_Total_E/d_Energy);
 
             
             electron_tree->GetEntry(entry); 
@@ -153,7 +153,7 @@ void Efficiency_UBT()
             if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_EnergyVec)[2] > 0.23 && (*e_EnergyVec)[3] > 0.046) h2_e[i]->Fill(e_Total_E/e_Energy); 
             if (((*e_EnergyVec)[2] > 0.0092 && (*e_EnergyVec)[10] > 0.0092 && (*e_EnergyVec)[12] > 0.0092 ) || ((*e_EnergyVec)[3] > 0.0092 && (*e_EnergyVec)[11] > 0.0092 && (*e_EnergyVec)[13] > 0.0092 )) h4_e[i]->Fill(e_Total_E/e_Energy);
             // if ((*e_RMSVec)[0]>15 && (*e_RMSVec)[1]>15) h5_e[i]->Fill(e_Total_E/e_Energy);
-            if((*e_RMSVec)[0]>15 && (*e_RMSVec)[1]>15 && (*e_RMSVec)[0]<40 && (*e_RMSVec)[1]<40) h5_e[i]->Fill(e_Total_E/e_Energy);
+            if((*e_RMSVec)[0]>15 && (*e_RMSVec)[1]>15 && (*e_RMSVec)[2]<45 && (*e_RMSVec)[3]<45) h5_e[i]->Fill(e_Total_E/e_Energy);
 
             
             helium4_tree->GetEntry(entry);  
@@ -162,7 +162,7 @@ void Efficiency_UBT()
             if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_EnergyVec)[2] > 0.23 && (*h_EnergyVec)[3] > 0.046) h2_h[i]->Fill(h_Total_E/h_Energy); 
             if (((*h_EnergyVec)[2] > 0.0092 && (*h_EnergyVec)[10] > 0.0092 && (*h_EnergyVec)[12] > 0.0092 ) || ((*h_EnergyVec)[3] > 0.0092 && (*h_EnergyVec)[11] > 0.0092 && (*h_EnergyVec)[13] > 0.0092 )) h4_h[i]->Fill(h_Total_E/h_Energy);
             // if ((*h_RMSVec)[0]>15 && (*h_RMSVec)[1]>15) h5_h[i]->Fill(h_Total_E/h_Energy);
-            if((*h_RMSVec)[0]>15 && (*h_RMSVec)[1]>15 && (*h_RMSVec)[0]<40 && (*h_RMSVec)[1]<40) h5_h[i]->Fill(h_Total_E/h_Energy);
+            if((*h_RMSVec)[0]>15 && (*h_RMSVec)[1]>15 && (*h_RMSVec)[2]<45 && (*h_RMSVec)[3]<45) h5_h[i]->Fill(h_Total_E/h_Energy);
             
             helium3_tree->GetEntry(entry);  
             h1_H[i]->Fill(H_Total_E/H_Energy); 
@@ -170,7 +170,7 @@ void Efficiency_UBT()
             if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_EnergyVec)[2] > 0.23 && (*H_EnergyVec)[3] > 0.046) h2_H[i]->Fill(H_Total_E/H_Energy); 
             if (((*H_EnergyVec)[2] > 0.0092 && (*H_EnergyVec)[10] > 0.0092 && (*H_EnergyVec)[12] > 0.0092 ) || ((*H_EnergyVec)[3] > 0.0092 && (*H_EnergyVec)[11] > 0.0092 && (*H_EnergyVec)[13] > 0.0092 )) h4_H[i]->Fill(H_Total_E/H_Energy);
             // if ((*H_RMSVec)[0]>15 && (*H_RMSVec)[1]>15) h5_H[i]->Fill(H_Total_E/H_Energy);
-            if((*H_RMSVec)[0]>15 && (*H_RMSVec)[1]>15 && (*H_RMSVec)[0]<40 && (*H_RMSVec)[1]<40) h5_H[i]->Fill(H_Total_E/H_Energy);
+            if((*H_RMSVec)[0]>15 && (*H_RMSVec)[1]>15 && (*H_RMSVec)[2]<45 && (*H_RMSVec)[3]<45) h5_H[i]->Fill(H_Total_E/H_Energy);
 
             
             carbon_tree->GetEntry(entry);   
@@ -179,7 +179,7 @@ void Efficiency_UBT()
             if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_EnergyVec)[2] > 0.23 && (*c_EnergyVec)[3] > 0.046) h2_c[i]->Fill(c_Total_E/c_Energy); 
             if (((*c_EnergyVec)[2] > 0.0092 && (*c_EnergyVec)[10] > 0.0092 && (*c_EnergyVec)[12] > 0.0092 ) || ((*c_EnergyVec)[3] > 0.0092 && (*c_EnergyVec)[11] > 0.0092 && (*c_EnergyVec)[13] > 0.0092 )) h4_c[i]->Fill(c_Total_E/c_Energy);
             // if ((*c_RMSVec)[0]>15 && (*c_RMSVec)[1]>15) h5_c[i]->Fill(c_Total_E/c_Energy);
-            if((*c_RMSVec)[0]>15 && (*c_RMSVec)[1]>15 && (*c_RMSVec)[0]<40 && (*c_RMSVec)[1]<40) h5_c[i]->Fill(c_Total_E/c_Energy);
+            if((*c_RMSVec)[0]>15 && (*c_RMSVec)[1]>15 && (*c_RMSVec)[2]<45 && (*c_RMSVec)[3]<45) h5_c[i]->Fill(c_Total_E/c_Energy);
 
         }
 
@@ -219,33 +219,33 @@ void Efficiency_UBT()
     auto gre_p_HET = CreateGraphWithProperties(19, Energy, Proton_Eff_HET, Energy_Err, Uncertainty, 20, kRed, kRed, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_p_UBT = CreateGraphWithProperties(19, Energy, Proton_Eff_UBT, Energy_Err, Uncertainty, 20, kRed, kRed, "Unbiased Trigger;Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_p_MIT = CreateGraphWithProperties(19, Energy, Proton_Eff_MIT, Energy_Err, Uncertainty, 20, kRed, kRed, "MIP Trigger;Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_p_RMS = CreateGraphWithProperties(19, Energy, Proton_Eff_RMS, Energy_Err, Uncertainty, 20, kRed, kRed, "RMS_{0}>15 && RMS_{1}>15;Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_p_RMS = CreateGraphWithProperties(19, Energy, Proton_Eff_RMS, Energy_Err, Uncertainty, 20, kRed, kRed, "RMS_{0}>15 && RMS_{1}>15 && RMS_{2}<45 && RMS_{3} < 45;Kinetic Energy (GeV); Trigger Efficiency");
 
 
     auto gre_d_HET = CreateGraphWithProperties(19, Energy, Deuteron_Eff_HET, Energy_Err, Uncertainty, 21, kBlue, kBlue, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_d_UBT = CreateGraphWithProperties(19, Energy, Deuteron_Eff_UBT, Energy_Err, Uncertainty, 21, kBlue, kBlue, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_d_MIT = CreateGraphWithProperties(19, Energy, Deuteron_Eff_MIT, Energy_Err, Uncertainty, 21, kBlue, kBlue, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_d_RMS = CreateGraphWithProperties(19, Energy, Deuteron_Eff_RMS, Energy_Err, Uncertainty, 21, kBlue, kBlue,  "RMS_{0}>15 && RMS_{1}>15;Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_d_RMS = CreateGraphWithProperties(19, Energy, Deuteron_Eff_RMS, Energy_Err, Uncertainty, 21, kBlue, kBlue,  "RMS_{0}>15 && RMS_{1}>15 && RMS_{2}<45 && RMS_{3} < 45;Kinetic Energy (GeV); Trigger Efficiency");
 
     auto gre_e_HET = CreateGraphWithProperties(19, Energy, Electron_Eff_HET, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_e_UBT = CreateGraphWithProperties(19, Energy, Electron_Eff_UBT, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_e_MIT = CreateGraphWithProperties(19, Energy, Electron_Eff_MIT, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_e_RMS = CreateGraphWithProperties(19, Energy, Electron_Eff_RMS, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3,  "RMS_{0}>15 && RMS_{1}>15;Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_e_RMS = CreateGraphWithProperties(19, Energy, Electron_Eff_RMS, Energy_Err, Uncertainty, 22, kOrange-3, kOrange-3,  "RMS_{0}>15 && RMS_{1}>15 && RMS_{2}<45 && RMS_{3} < 45;Kinetic Energy (GeV); Trigger Efficiency");
 
     auto gre_h_HET = CreateGraphWithProperties(19, Energy, Helium4_Eff_HET, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_h_UBT = CreateGraphWithProperties(19, Energy, Helium4_Eff_UBT, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_h_MIT = CreateGraphWithProperties(19, Energy, Helium4_Eff_MIT, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_h_RMS = CreateGraphWithProperties(19, Energy, Helium4_Eff_RMS, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "RMS_{0}>15 && RMS_{1}>15;Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_h_RMS = CreateGraphWithProperties(19, Energy, Helium4_Eff_RMS, Energy_Err, Uncertainty, 23, kGreen-3, kGreen-3, "RMS_{0}>15 && RMS_{1}>15 && RMS_{2}<45 && RMS_{3} < 45;Kinetic Energy (GeV); Trigger Efficiency");
 
     auto gre_H_HET = CreateGraphWithProperties(19, Energy, Helium3_Eff_HET, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_H_UBT = CreateGraphWithProperties(19, Energy, Helium3_Eff_UBT, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_H_MIT = CreateGraphWithProperties(19, Energy, Helium3_Eff_MIT, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_H_RMS = CreateGraphWithProperties(19, Energy, Helium3_Eff_RMS, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "RMS_{0}>15 && RMS_{1}>15;Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_H_RMS = CreateGraphWithProperties(19, Energy, Helium3_Eff_RMS, Energy_Err, Uncertainty, 32, kGreen-3, kGreen-3, "RMS_{0}>15 && RMS_{1}>15 && RMS_{2}<45 && RMS_{3} < 45;Kinetic Energy (GeV); Trigger Efficiency");
 
     auto gre_c_HET = CreateGraphWithProperties(19, Energy, Carbon_Eff_HET, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_c_UBT = CreateGraphWithProperties(19, Energy, Carbon_Eff_UBT, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "Unbiased Trigger; Kinetic Energy (GeV); Trigger Efficiency");
     auto gre_c_MIT = CreateGraphWithProperties(19, Energy, Carbon_Eff_MIT, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "MIP Trigger; Kinetic Energy (GeV); Trigger Efficiency");
-    auto gre_c_RMS = CreateGraphWithProperties(19, Energy, Carbon_Eff_RMS, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "RMS_{0}>15 && RMS_{1}>15;Kinetic Energy (GeV); Trigger Efficiency");
+    auto gre_c_RMS = CreateGraphWithProperties(19, Energy, Carbon_Eff_RMS, Energy_Err, Uncertainty, 23, kMagenta, kMagenta, "RMS_{0}>15 && RMS_{1}>15 && RMS_{2}<45 && RMS_{3} < 45;Kinetic Energy (GeV); Trigger Efficiency");
 
     auto c0 = new TCanvas("c0","c0",1200,1200);
     c0->Clear();
@@ -331,12 +331,12 @@ void Efficiency_UBT()
 
     auto legend3 = new TLegend(0.62, 0.58, 0.88, 0.78);
     legend3->SetNColumns(2);
-    legend3->AddEntry(gre_p_MIT, "RMS_{0}>15 && RMS_{1}>15 Proton", "ep");
-    legend3->AddEntry(gre_d_MIT, "RMS_{0}>15 && RMS_{1}>15 Deuteron", "ep");
-    legend3->AddEntry(gre_e_MIT, "RMS_{0}>15 && RMS_{1}>15 Electron", "ep");
-    legend3->AddEntry(gre_h_MIT, "RMS_{0}>15 && RMS_{1}>15 Helium4", "ep");
-    legend3->AddEntry(gre_H_MIT, "RMS_{0}>15 && RMS_{1}>15 Helium3", "ep");
-    legend3->AddEntry(gre_c_MIT, "RMS_{0}>15 && RMS_{1}>15 Carbon", "ep");
+    legend3->AddEntry(gre_p_MIT, "Proton", "ep");
+    legend3->AddEntry(gre_d_MIT, "Deuteron", "ep");
+    legend3->AddEntry(gre_e_MIT, "Electron", "ep");
+    legend3->AddEntry(gre_h_MIT, "Helium4", "ep");
+    legend3->AddEntry(gre_H_MIT, "Helium3", "ep");
+    legend3->AddEntry(gre_c_MIT, "Carbon", "ep");
     legend3->Draw();
 
 }
