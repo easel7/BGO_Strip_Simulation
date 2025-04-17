@@ -63,7 +63,8 @@ void Jm2()
         double p_maxVal[14]={0};
         int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
         if(p_energy_index < 0 || p_energy_index > 14) continue;
-        if( (*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45 )  // 
+        // if( (*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45 )  // 
+        if( (*p_L_EnergyVec)[0]>0.23 && (*p_L_EnergyVec)[1]>0.23 && (*p_RMSVec)[2]<40 && (*p_RMSVec)[3]<40 )  // 
         {
             for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
             {
@@ -94,7 +95,8 @@ void Jm2()
         if(d_energy_index < 0 || d_energy_index > 14) continue;
         // cout << d_Total_E << "," <<  d_energy_index << endl;
         // cout << d_EnergyVec->size() << endl;
-        if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[2]<45 && (*d_RMSVec)[3]<45) // 
+        // if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[2]<45 && (*d_RMSVec)[3]<45) // 
+        if((*d_L_EnergyVec)[0]>0.23 && (*d_L_EnergyVec)[1]>0.23 && (*d_RMSVec)[2]<40 && (*d_RMSVec)[3]<40) // 
         {
             for (size_t k = 0; k < d_EnergyVec->size(); k += 22)
             {
@@ -114,7 +116,7 @@ void Jm2()
         // cout << "Next " << endl;
     }
 
-    for(int i = 0 ; i<15 ; i++) // Energy
+    for(int i = 10 ; i<11 ; i++) // Energy
     {
         auto c1 = new TCanvas("c1","c1",2500,1500);
         c1->Clear();
@@ -139,9 +141,9 @@ void Jm2()
             h1_p[i][j]->Scale(1.0/h1_p[i][j]->Integral()); 
             h1_d[i][j]->Scale(1.0/h1_d[i][j]->Integral()); 
 
-            h1_p[i][j]->GetYaxis()->SetRangeUser(0,0.14);
+            h1_p[i][j]->GetYaxis()->SetRangeUser(0,h1_p[i][j]->GetMaximum()*1.2);
             h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] in L%d;log10(Jm) = log10(Max Energy Deposit bar/ Total Deposit);Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j));
-            h1_p[i][j]->Draw();
+
             h1_p[i][j]->Draw("hist");
             h1_d[i][j]->Draw("histsame");
 
@@ -156,6 +158,7 @@ void Jm2()
             hC_p[i][j]->Scale(1.0/hC_p[i][j]->Integral());
             hC_d[i][j]->Scale(1.0/hC_d[i][j]->Integral());
             hC_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] in L%d;#sum_{0}^{%d} (dE/dx) / Edep",pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j,j));
+            hC_p[i][j]->GetYaxis()->SetRangeUser(0,hC_p[i][j]->GetMaximum()*1.2);
             hC_p[i][j]->Draw("hist");
             hC_d[i][j]->Draw("histsame");
         }

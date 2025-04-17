@@ -47,7 +47,7 @@ void Sum_Rm_L1()
         proton_tree->GetEntry(entry);    
         double sum_p = 0;
         double p_maxVal[14] = {0};
-        if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45  ) //  
+        if((*p_L_EnergyVec)[0]>0.23 && (*p_L_EnergyVec)[1]>0.23 && (*p_RMSVec)[2]<40 && (*p_RMSVec)[3]<40  ) //  
         {
             for (size_t j = 0; j < p_EnergyVec->size(); j += 22)
             {

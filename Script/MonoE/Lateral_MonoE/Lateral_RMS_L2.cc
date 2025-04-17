@@ -1,11 +1,11 @@
 void Lateral_RMS_L2()
 {
-    int p_First_Had_Layer;   int p_First_Had_Type; double p_E_total;    std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr;
-    int d_First_Had_Layer;   int d_First_Had_Type; double d_E_total;    std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr;
-    int e_First_Had_Layer;   int e_First_Had_Type; double e_E_total;    std::vector<double>* e_RMSVec = nullptr;    std::vector<double>* e_EnergyVec = nullptr;    std::vector<double>* e_Efrac = nullptr;
-    int h_First_Had_Layer;   int h_First_Had_Type; double h_E_total;    std::vector<double>* h_RMSVec = nullptr;    std::vector<double>* h_EnergyVec = nullptr;    std::vector<double>* h_Efrac = nullptr;
-    int H_First_Had_Layer;   int H_First_Had_Type; double H_E_total;    std::vector<double>* H_RMSVec = nullptr;    std::vector<double>* H_EnergyVec = nullptr;    std::vector<double>* H_Efrac = nullptr;
-    int c_First_Had_Layer;   int c_First_Had_Type; double c_E_total;    std::vector<double>* c_RMSVec = nullptr;    std::vector<double>* c_EnergyVec = nullptr;    std::vector<double>* c_Efrac = nullptr;
+    int p_First_Had_Layer;   int p_First_Had_Type; double p_E_total;    std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;  std::vector<double>* p_L_EnergyVec = nullptr; std::vector<double>* p_Efrac = nullptr;
+    int d_First_Had_Layer;   int d_First_Had_Type; double d_E_total;    std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;  std::vector<double>* d_L_EnergyVec = nullptr; std::vector<double>* d_Efrac = nullptr;
+    int e_First_Had_Layer;   int e_First_Had_Type; double e_E_total;    std::vector<double>* e_RMSVec = nullptr;    std::vector<double>* e_EnergyVec = nullptr;  std::vector<double>* e_L_EnergyVec = nullptr; std::vector<double>* e_Efrac = nullptr;
+    int h_First_Had_Layer;   int h_First_Had_Type; double h_E_total;    std::vector<double>* h_RMSVec = nullptr;    std::vector<double>* h_EnergyVec = nullptr;  std::vector<double>* h_L_EnergyVec = nullptr; std::vector<double>* h_Efrac = nullptr;
+    int H_First_Had_Layer;   int H_First_Had_Type; double H_E_total;    std::vector<double>* H_RMSVec = nullptr;    std::vector<double>* H_EnergyVec = nullptr;  std::vector<double>* H_L_EnergyVec = nullptr; std::vector<double>* H_Efrac = nullptr;
+    int c_First_Had_Layer;   int c_First_Had_Type; double c_E_total;    std::vector<double>* c_RMSVec = nullptr;    std::vector<double>* c_EnergyVec = nullptr;  std::vector<double>* c_L_EnergyVec = nullptr; std::vector<double>* c_Efrac = nullptr;
 
     // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
     auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
@@ -14,6 +14,7 @@ void Lateral_RMS_L2()
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
     proton_tree->SetBranchAddress("BarEnergyVector"  ,&p_EnergyVec);
+    proton_tree->SetBranchAddress("LayerEnergyVector",&p_L_EnergyVec);
     proton_tree->SetBranchAddress("Efrac"            ,&p_Efrac);
     proton_tree->SetBranchAddress("First_Had_Layer"  ,&p_First_Had_Layer);
     proton_tree->SetBranchAddress("First_Had_Type"   ,&p_First_Had_Type);
@@ -42,7 +43,8 @@ void Lateral_RMS_L2()
     {
         
         proton_tree->GetEntry(entry);    
-        if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45)
+        // if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]<40 && (*p_RMSVec)[3]<40)
+        // if((*p_L_EnergyVec)[0]>0.23 && (*p_L_EnergyVec)[1]>0.23 && (*p_RMSVec)[2]<40 && (*p_RMSVec)[3]<40)
         {
             for (size_t i = 22*k; i < 22*(k+1); i += 22)
             {

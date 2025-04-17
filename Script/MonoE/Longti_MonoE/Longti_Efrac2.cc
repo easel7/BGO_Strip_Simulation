@@ -70,7 +70,7 @@ void Longti_Efrac2()
 
             for (size_t k = 0; k < 14; k += 1)
             {
-                if ((*p_RMSVec)[0] > 15 && (*p_RMSVec)[1] > 15) 
+                if ((*p_EnergyVec)[0]>0.23 && (*p_EnergyVec)[1]>0.23 && (*p_RMSVec)[2]<40 && (*p_RMSVec)[3]<40  ) 
                 {
                     h1_p[k]->Fill(log10((*p_Efrac)[k]));
                     sum_p += (*p_Efrac)[k];
@@ -79,7 +79,7 @@ void Longti_Efrac2()
                     h2_p->Fill(k,log10(sum_p));
 
                 }
-                if ((*d_RMSVec)[0] > 15 && (*d_RMSVec)[1] > 15) 
+                if ((*d_EnergyVec)[0]>0.23 && (*d_EnergyVec)[1]>0.23 && (*d_RMSVec)[2]<40 && (*d_RMSVec)[3]<40  ) 
                 {
                     h1_d[k]->Fill(log10((*d_Efrac)[k]));
                     sum_d += (*d_Efrac)[k];
@@ -128,11 +128,11 @@ void Longti_Efrac2()
         legend1->AddEntry(h1_p[0], "Proton", "l");
         legend1->AddEntry(h1_d[0], "Deuteron", "l");  
         legend1->Draw();       
-        // c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Longti_MonoE/CDF/Longti_Efrac_%dGeV.pdf",int(Energy[i])));
 
         c2->cd(15);
         tex->Draw();
         legend1->Draw();       
+        c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Longti_MonoE/CDF/Longti_Efrac_%dGeV.pdf",int(Energy[i])));
 
         auto c3 = new TCanvas("c3","c3",2500,1500);
         c3->cd();
@@ -143,6 +143,8 @@ void Longti_Efrac2()
 
         gre_p->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; Deposit Energy Ratio",int(Energy[i])));
         gre_p->SetMarkerStyle(22);
+        gre_p->GetXaxis()->SetLimits(0,14);
+
         gre_p->SetMarkerStyle(20);
         gre_p->SetMarkerColor(kRed);
         gre_p->SetLineColor(kRed);
@@ -166,7 +168,6 @@ void Longti_Efrac2()
         legend3->AddEntry(gre_d, "Deuteron", "ep");
         legend3->Draw();
 
-        // c3->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Longti_MonoE/CDF/Longti_Efrac_BGOLayer_%dGeV.pdf",int(Energy[i])));
         auto c4 = new TCanvas("c4","c4",1500,1000);
         gPad->SetLogy(1);
 
@@ -192,12 +193,14 @@ void Longti_Efrac2()
         legend4->AddEntry(SUM_gre_p, "Proton", "ep");
         legend4->AddEntry(SUM_gre_d, "Deuteron", "ep");
         legend4->Draw();
+        // c4->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Longti_MonoE/CDF/Longti_Efrac_BGOLayer_%dGeV.pdf",int(Energy[i])));
+
 
         auto c5 = new TCanvas("c5", "c5", 1500, 1000);
         gPad->SetLogy(1);
         gr_proton->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; Distrubution of #sum EdepRatio",int(Energy[i])));
         gr_proton->GetYaxis()->SetRangeUser(1e-5,1);
-
+        gr_proton->GetXaxis()->SetLimits(0,14);
         gr_proton->SetMarkerStyle(20);  // proton: circle
         gr_proton->SetMarkerColorAlpha(kRed, 0.1);  // 0.0 = fully transparent, 1.0 = fully opaque
         gr_proton->SetMarkerSize(0.8);
@@ -217,6 +220,8 @@ void Longti_Efrac2()
         auto c6 = new TCanvas("c6", "c6", 1500, 1000);
         h2_p->SetTitle(Form("Incident Energy %d GeV ; BGO Layer; Distrubution of #sum EdepRatio",int(Energy[i])));
         h2_p->GetYaxis()->SetRangeUser(-5,0.2);
+        h2_p->GetXaxis()->SetLimits(0,14);
+
         h2_p->SetBarWidth(0.4);
         h2_p->SetBarOffset(-0.25);
         h2_p->SetFillColorAlpha(kRed,0.5);

@@ -77,7 +77,7 @@ void Jm2()
             double sum_p = 0;
             double sum_p_total = 0;
             double p_maxVal[14]={0};
-            if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[0]<45 && (*p_RMSVec)[1]<45) 
+            if ((*p_L_EnergyVec)[0]>0.23 && (*p_L_EnergyVec)[1]>0.23 && (*p_RMSVec)[2]<40 && (*p_RMSVec)[3]<40  ) 
             // if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15) 
             {
                 // for (size_t k = 0; k < p_EnergyVec->size(); k ++) {sum_d += (*p_EnergyVec)[k];}
@@ -111,7 +111,8 @@ void Jm2()
             double sum_d = 0;
             double sum_d_total = 0;
             double d_maxVal[14]={0};
-            if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[0]<45 && (*d_RMSVec)[1]<45) 
+            if ((*d_L_EnergyVec)[0]>0.23 && (*d_L_EnergyVec)[1]>0.23 && (*d_RMSVec)[2]<40 && (*d_RMSVec)[3]<40  ) 
+
             // if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15) 
             {
                 for (size_t k = 0; k < d_EnergyVec->size(); k += 22)

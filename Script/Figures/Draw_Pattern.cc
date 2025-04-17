@@ -3,8 +3,8 @@ void Draw_Pattern()
     std::vector<double>* energyVec = nullptr;
     std::vector<double>* p_RMSVec = nullptr;
     // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
-    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
+    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
 
     auto proton_tree = (TTree*)proton_file->Get("B4");
 
@@ -18,7 +18,7 @@ void Draw_Pattern()
     auto hYZ   = new TH2D("hYZ","BGO Y-Z Plane",22,-11,11,14,0,14);
     auto h3box = new TH3D("h3box","3D View Proton Cascade",22,-11,11,22,-11,11,14,0,14);
 
-    int entry  = 308;   
+    int entry  = 379;   
     // for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
     // for (Long64_t entry = 0; entry < 10; entry++)
     {

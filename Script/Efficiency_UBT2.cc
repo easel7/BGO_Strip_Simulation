@@ -101,7 +101,7 @@ void Efficiency_UBT2()
         if ( (*p_EnergyVec)[0] > 0.23   && (*p_EnergyVec)[1]  > 0.23   && (*p_EnergyVec)[2]  > 0.23     &&  (*p_EnergyVec)[3] > 0.046) h2_p[p_energy_index]->Fill(p_Total_E/p_Energy); 
         if (((*p_EnergyVec)[2] > 0.0092 && (*p_EnergyVec)[10] > 0.0092 && (*p_EnergyVec)[12] > 0.0092 ) || ((*p_EnergyVec)[3] > 0.0092 && (*p_EnergyVec)[11] > 0.0092 && (*p_EnergyVec)[13] > 0.0092 )) h4_p[p_energy_index]->Fill(p_Total_E/p_Energy);
         // if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 )                                       h5_p[p_energy_index]->Fill(p_Total_E/p_Energy);
-        if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45) h5_p[p_energy_index]->Fill(p_Total_E/p_Energy);
+        if((*p_EnergyVec)[0] > 0.23   && (*p_EnergyVec)[1]  > 0.23 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45) h5_p[p_energy_index]->Fill(p_Total_E/p_Energy);
     }
            
     for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
@@ -114,7 +114,7 @@ void Efficiency_UBT2()
             if ( (*d_EnergyVec)[0] > 0.23   && (*d_EnergyVec)[1] > 0.23 && (*d_EnergyVec)[2] > 0.23 && (*d_EnergyVec)[3] > 0.046) h2_d[d_energy_index]->Fill(d_Total_E/d_Energy); 
             if (((*d_EnergyVec)[2] > 0.0092 && (*d_EnergyVec)[10] > 0.0092 && (*d_EnergyVec)[12] > 0.0092 ) || ((*d_EnergyVec)[3] > 0.0092 && (*d_EnergyVec)[11] > 0.0092 && (*d_EnergyVec)[13] > 0.0092 )) h4_d[d_energy_index]->Fill(d_Total_E/d_Energy);
             // if ((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 ) h5_d[d_energy_index]->Fill(d_Total_E/d_Energy);
-            if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[2]<45 && (*d_RMSVec)[3]<45) h5_d[d_energy_index]->Fill(d_Total_E/d_Energy);
+            if((*d_EnergyVec)[0] > 0.23   && (*d_EnergyVec)[1] > 0.23 && (*d_RMSVec)[2]<45 && (*d_RMSVec)[3]<45) h5_d[d_energy_index]->Fill(d_Total_E/d_Energy);
     }
 
 
@@ -147,7 +147,7 @@ void Efficiency_UBT2()
     H1_p->SetLineColor(kRed); H1_p->SetLineWidth(2);  H1_p->SetTitle("High-Energy Trigger; BGO Deposit Energy (GeV); Trigger Efficiency");
     H2_p->SetLineColor(kRed); H2_p->SetLineWidth(2);  H2_p->SetTitle("Unbiased Trigger;BGO Deposit Energy (GeV); Trigger Efficiency");
     H3_p->SetLineColor(kRed); H3_p->SetLineWidth(2);  H3_p->SetTitle("MIP Trigger;BGO Deposit Energy (GeV); Trigger Efficiency");
-    H4_p->SetLineColor(kRed); H4_p->SetLineWidth(2);  H4_p->SetTitle("RMS_{0}>15 && RMS_{1}>15 && RMS_{2}<45 && RMS_{3} < 45;BGO Deposit Energy (GeV); Trigger Efficiency");
+    H4_p->SetLineColor(kRed); H4_p->SetLineWidth(2);  H4_p->SetTitle("E_{0}>10 MIP && E_{1}>10 MIP && RMS_{2}<45 && RMS_{3} < 45;BGO Deposit Energy (GeV); Trigger Efficiency");
 
     H1_d->SetLineColor(kBlue); H1_d->SetLineWidth(2); 
     H2_d->SetLineColor(kBlue); H2_d->SetLineWidth(2); 

@@ -79,12 +79,12 @@ void Longti_EnergyVec()
 
             for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
             {
-                proton_tree->GetEntry(entry);   /*if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_EnergyVec)[2] > 0.23 && (*p_EnergyVec)[0] > 0.046)*/ h1_p[j]->Fill(log10((*p_EnergyVec)[j]));
-                deuteron_tree->GetEntry(entry); /*if ((*d_EnergyVec)[0] > 0.23 && (*d_EnergyVec)[1] > 0.23 && (*d_EnergyVec)[2] > 0.23 && (*d_EnergyVec)[0] > 0.046)*/ h1_d[j]->Fill(log10((*d_EnergyVec)[j]));
-                electron_tree->GetEntry(entry); /*if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_EnergyVec)[2] > 0.23 && (*e_EnergyVec)[0] > 0.046)*/ h1_e[j]->Fill(log10((*e_EnergyVec)[j]));
-                helium4_tree->GetEntry(entry);  /*if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_EnergyVec)[2] > 0.23 && (*h_EnergyVec)[0] > 0.046)*/ h1_h[j]->Fill(log10((*h_EnergyVec)[j]));
-                helium3_tree->GetEntry(entry);  /*if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_EnergyVec)[2] > 0.23 && (*H_EnergyVec)[0] > 0.046)*/ h1_H[j]->Fill(log10((*H_EnergyVec)[j]));
-                carbon_tree->GetEntry(entry);   /*if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_EnergyVec)[2] > 0.23 && (*c_EnergyVec)[0] > 0.046)*/ h1_c[j]->Fill(log10((*c_EnergyVec)[j]));
+                proton_tree->GetEntry(entry);   if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_RMSVec)[2] < 40 && (*p_RMSVec)[3] <40 ) h1_p[j]->Fill(log10((*p_EnergyVec)[j]));
+                deuteron_tree->GetEntry(entry); if ((*d_EnergyVec)[0] > 0.23 && (*d_EnergyVec)[1] > 0.23 && (*d_RMSVec)[2] < 40 && (*d_RMSVec)[3] <40 ) h1_d[j]->Fill(log10((*d_EnergyVec)[j]));
+                electron_tree->GetEntry(entry); if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_RMSVec)[2] < 40 && (*e_RMSVec)[3] <40 ) h1_e[j]->Fill(log10((*e_EnergyVec)[j]));
+                helium4_tree->GetEntry(entry);  if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_RMSVec)[2] < 40 && (*h_RMSVec)[3] <40 ) h1_h[j]->Fill(log10((*h_EnergyVec)[j]));
+                helium3_tree->GetEntry(entry);  if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_RMSVec)[2] < 40 && (*H_RMSVec)[3] <40 ) h1_H[j]->Fill(log10((*H_EnergyVec)[j]));
+                carbon_tree->GetEntry(entry);   if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_RMSVec)[2] < 40 && (*c_RMSVec)[3] <40 ) h1_c[j]->Fill(log10((*c_EnergyVec)[j]));
             }
 
             h1_p[j]->Sumw2(); h1_p[j]->Scale(1.0/h1_p[j]->Integral());h1_p[j]->SetLineColor(kRed);     h1_p[j]->SetMarkerColor(kRed);     h1_p[j]->SetLineWidth(2);
@@ -99,8 +99,8 @@ void Longti_EnergyVec()
             h1_H[j]->Draw("same");
             h1_c[j]->Draw("same");
             h1_h[j]->Draw("same");
-            h1_p[j]->Draw("same");
-            h1_d[j]->Draw("same");
+            h1_p[j]->Draw("histsame");
+            h1_d[j]->Draw("histsame");
 
             double quantiles[3] = {0.16, 0.50, 0.84};  // Percentiles
             double p_values[3];  h1_p[j]->GetQuantiles(3, p_values, quantiles);
@@ -130,7 +130,7 @@ void Longti_EnergyVec()
         legend1->AddEntry(h1_H[0], "Helium3", "l");         
         legend1->AddEntry(h1_c[0], "Carbon", "l");         
         legend1->Draw();       
-        c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Longti_MonoE/Longti_EnergyVec_%dGeV.pdf",int(Energy[i])));
+        c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Longti_MonoE/PDF/Longti_EnergyVec_%dGeV.pdf",int(Energy[i])));
 
 
         auto c2 = new TCanvas("c2","c2",1000,1000);
@@ -169,7 +169,7 @@ void Longti_EnergyVec()
         legend2->AddEntry(gre_c, "HET Carbon", "ep");
         legend2->Draw();
 
-        c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/Longti_MonoE/Longti_EnergyVec_BGOLayer_%dGeV.pdf",int(Energy[i])));
+        c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Longti_MonoE/PDF/Longti_EnergyVec_BGOLayer_%dGeV.pdf",int(Energy[i])));
     }
     
 }

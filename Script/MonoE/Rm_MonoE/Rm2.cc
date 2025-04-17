@@ -7,8 +7,8 @@ void Rm2()
         else if(i>=9 && i < 19)   {Energy[i] =  i*100-800;}
         else   {Energy[i] = i*1000 - 18000;}
 
-        int p_First_Had_Layer; double p_E_total;   std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr;
-        int d_First_Had_Layer; double d_E_total;   std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr;
+        int p_First_Had_Layer; double p_E_total;   std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr;     std::vector<double>* p_L_EnergyVec = nullptr;
+        int d_First_Had_Layer; double d_E_total;   std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr;     std::vector<double>* d_L_EnergyVec = nullptr;
 
         TH1D *h1_p[14];  TH1D *hC_p[14];  TF1  *fitFunc_p[14];         double Layer[14]={0};
         TH1D *h1_d[14];  TH1D *hC_d[14];  TF1  *fitFunc_d[14];          double Layer_Err[14]={0};
@@ -32,6 +32,7 @@ void Rm2()
         auto proton_tree = (TTree*)proton_file->Get("B4");
         proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
         proton_tree->SetBranchAddress("BarEnergyVector",  &p_EnergyVec);
+        proton_tree->SetBranchAddress("LayerEnergyVector",&p_L_EnergyVec);
         proton_tree->SetBranchAddress("Efrac"            ,&p_Efrac);
         proton_tree->SetBranchAddress("First_Had_Layer"  ,&p_First_Had_Layer);
         proton_tree->SetBranchAddress("Total_E"          ,&p_E_total);
@@ -40,6 +41,7 @@ void Rm2()
         auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
         deuteron_tree->SetBranchAddress("RMS"              ,&d_RMSVec);
         deuteron_tree->SetBranchAddress("BarEnergyVector"  ,&d_EnergyVec);
+        deuteron_tree->SetBranchAddress("LayerEnergyVector",&d_L_EnergyVec);
         deuteron_tree->SetBranchAddress("Efrac"            ,&d_Efrac);
         deuteron_tree->SetBranchAddress("First_Had_Layer"  ,&d_First_Had_Layer);
         deuteron_tree->SetBranchAddress("Total_E"          ,&d_E_total);
@@ -68,7 +70,7 @@ void Rm2()
             proton_tree->GetEntry(entry);   
             double sum_p = 0;
             double p_maxVal[14]={0}; 
-            if((*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45  ) // && (*p_RMSVec)[0]<40 && (*p_RMSVec)[1]<40
+            if((*p_L_EnergyVec)[0]>0.23 && (*p_L_EnergyVec)[1]>0.23 && (*p_RMSVec)[2]<40 && (*p_RMSVec)[3]<40  ) // && (*p_RMSVec)[0]<40 && (*p_RMSVec)[1]<40
             {
                 // for (size_t k = 0; k < p_EnergyVec->size(); k ++) {sum_d += (*p_EnergyVec)[k];}
                 for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
@@ -98,7 +100,7 @@ void Rm2()
             deuteron_tree->GetEntry(entry); 
             double sum_d = 0;
             double d_maxVal[14]={0};
-            if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[2]<45 && (*d_RMSVec)[3]<45  ) //  && (*d_RMSVec)[0]<40 && (*d_RMSVec)[1]<40
+            if((*d_L_EnergyVec)[0]>0.23 && (*d_L_EnergyVec)[1]>0.23 && (*d_RMSVec)[2]<40 && (*d_RMSVec)[3]<40  ) //  && (*d_RMSVec)[0]<40 && (*d_RMSVec)[1]<40
             {
                 for (size_t k = 0; k < d_EnergyVec->size(); k += 22)
                 {
@@ -156,6 +158,7 @@ void Rm2()
         legend1->AddEntry(hC_p[0], "Proton", "l");
         legend1->AddEntry(hC_d[0], "Deuteron", "l");
         legend1->Draw();       
+        c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/PDF/Rm_DP_%dGeV.pdf",int(Energy[i])));
 
         c2->cd(15);
         tex->Draw();
@@ -188,7 +191,7 @@ void Rm2()
         legend3->AddEntry(gre_p, "Proton", "ep");
         legend3->AddEntry(gre_d, "Deuteron", "ep");
         legend3->Draw();
-        c3->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/CDF/Rm_BGOLayer_DP_%dGeV.pdf",int(Energy[i])));
+        c3->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Rm_MonoE/PDF/Rm_BGOLayer_DP_%dGeV.pdf",int(Energy[i])));
 
 
         auto c4 = new TCanvas("c4","c4",1500,1000);

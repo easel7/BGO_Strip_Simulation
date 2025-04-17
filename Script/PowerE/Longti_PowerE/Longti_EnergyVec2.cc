@@ -18,7 +18,7 @@ void Longti_EnergyVec2()
     deuteron_tree->SetBranchAddress("LayerEnergyVector",&d_EnergyVec);
     deuteron_tree->SetBranchAddress("Efrac"            ,&d_Efrac);
     deuteron_tree->SetBranchAddress("First_Had_Layer"  ,&d_First_Had_Layer);
-    deuteron_tree->SetBranchAddress("Total_E"     ,&d_Total_E);
+    deuteron_tree->SetBranchAddress("Total_E"          ,&d_Total_E);
     deuteron_tree->SetBranchAddress("weight"           ,&d_weight);
     
     double Energy[15]={0};
@@ -51,7 +51,8 @@ void Longti_EnergyVec2()
         proton_tree->GetEntry(entry);   
         int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
         if(p_energy_index < 0 || p_energy_index > 14) continue;
-        if( (*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45 )  // 
+        // if( (*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45 )  // 
+        if( (*p_EnergyVec)[0]>0.23 && (*p_EnergyVec)[1]>0.23 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45 )  // 
         // if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_EnergyVec)[2] > 0.23 && (*p_EnergyVec)[0] > 0.046)
         {
             for (int k = 0; k < p_EnergyVec->size(); k ++)
@@ -69,7 +70,8 @@ void Longti_EnergyVec2()
         if(d_energy_index < 0 || d_energy_index > 14) continue;
         // cout << d_Total_E << "," <<  d_energy_index << endl;
         // cout << d_EnergyVec->size() << endl;
-        if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[2]<45 && (*d_RMSVec)[3]<45) // 
+        // if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[2]<45 && (*d_RMSVec)[3]<45) // 
+        if((*d_EnergyVec)[0]>0.23 && (*d_EnergyVec)[1]>0.23 && (*d_RMSVec)[2]<45 && (*d_RMSVec)[3]<45) // 
         // if ((*d_EnergyVec)[0] > 0.23 && (*d_EnergyVec)[1] > 0.23 && (*d_EnergyVec)[2] > 0.23 && (*d_EnergyVec)[0] > 0.046)
         {
             for (int k = 0; k < d_EnergyVec->size(); k ++)
@@ -82,7 +84,7 @@ void Longti_EnergyVec2()
         }
     }
 
-    for (int i = 0; i < 15; i++) // Deposit Energy Bin
+    for (int i = 10; i < 11; i++) // Deposit Energy Bin
     {
         auto c1 = new TCanvas("c1","c1",2500,1500);
         c1->Clear();
@@ -101,7 +103,8 @@ void Longti_EnergyVec2()
 
             h1_p[i][j]->Scale(1.0/h1_p[i][j]->Integral());
             h1_d[i][j]->Scale(1.0/h1_d[i][j]->Integral());
-            h1_p[i][j]->GetYaxis()->SetRangeUser(0,0.25);
+            h1_p[i][j]->GetYaxis()->SetRangeUser(0,h1_p[i][j]->GetMaximum()*1.2);
+
             h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] EdepRatio Distrubution in L%d;log_{10}(Energy Deposit in Layer/GeV);Normalized Count", pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j ));
             h1_p[i][j]->Draw("hist");
             h1_d[i][j]->Draw("histsame");

@@ -43,10 +43,10 @@ void Y2()
         h2_d[i] = new TH2D(Form("h2_d[%d]",i),Form("h2_d[%d]",i),14,0,14,100,-2,0);
         for( int j= 0; j<14 ;j++)
         {
-            h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j),100,0,1); 
-            h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j),100,0,1); 
-            hC_p[i][j] = new TH1D(Form("hC_p[%d][%d]",i,j), Form("hC_p[%d][%d]",i,j),100,0,1);  
-            hC_d[i][j] = new TH1D(Form("hC_d[%d][%d]",i,j), Form("hC_d[%d][%d]",i,j),100,0,1);  
+            h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j),50,0,1); 
+            h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j),50,0,1); 
+            hC_p[i][j] = new TH1D(Form("hC_p[%d][%d]",i,j), Form("hC_p[%d][%d]",i,j),50,0,1);  
+            hC_d[i][j] = new TH1D(Form("hC_d[%d][%d]",i,j), Form("hC_d[%d][%d]",i,j),50,0,1);  
             Layer[j] = 0.5 + j;
             Layer_Err[j] = 0.5;
             
@@ -61,7 +61,8 @@ void Y2()
         double p_maxVal=0;
         int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
         if(p_energy_index < 0 || p_energy_index > 14) continue;
-        if( (*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45 )  // 
+        // if( (*p_RMSVec)[0]>15 && (*p_RMSVec)[1]>15 && (*p_RMSVec)[2]<45 && (*p_RMSVec)[3]<45 )  // 
+        if( (*p_L_EnergyVec)[0]>0.23 && (*p_L_EnergyVec)[1]>0.23 && (*p_RMSVec)[2]<40 && (*p_RMSVec)[3]<40 )  // 
         {
             auto p_start = p_Efrac->begin();  auto p_end = p_Efrac->end();  
             p_maxVal = *std::max_element(p_start, p_end); 
@@ -82,7 +83,8 @@ void Y2()
         if(d_energy_index < 0 || d_energy_index > 14) continue;
         // cout << d_Total_E << "," <<  d_energy_index << endl;
         // cout << d_EnergyVec->size() << endl;
-        if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[2]<45 && (*d_RMSVec)[3]<45) // 
+        // if((*d_RMSVec)[0]>15 && (*d_RMSVec)[1]>15 && (*d_RMSVec)[2]<45 && (*d_RMSVec)[3]<45) // 
+        if((*d_L_EnergyVec)[0]>0.23 && (*d_L_EnergyVec)[1]>0.23 && (*d_RMSVec)[2]<40 && (*d_RMSVec)[3]<40) // 
         {
             auto d_start = d_Efrac->begin();  auto d_end = d_Efrac->end();  
             d_maxVal = *std::max_element(d_start, d_end); 
@@ -94,7 +96,7 @@ void Y2()
         // cout << "Next " << endl;
     }
 
-    for(int i = 0 ; i<15 ; i++) // Energy
+    for(int i = 10 ; i<11 ; i++) // Energy
     {
         auto c1 = new TCanvas("c1","c1",2500,1500);
         c1->Clear();
@@ -119,8 +121,8 @@ void Y2()
             h1_p[i][j]->Scale(1.0/h1_p[i][j]->Integral()); 
             h1_d[i][j]->Scale(1.0/h1_d[i][j]->Integral()); 
 
-            h1_p[i][j]->GetYaxis()->SetRangeUser(0,0.14);
-            h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] in L%d;log10(Jm) = log10(Max Energy Deposit bar/ Total Deposit);Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j));
+            h1_p[i][j]->GetYaxis()->SetRangeUser(0,h1_p[i][j]->GetMaximum()*1.2);
+            h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] in L%d;Y_{i} = E_{dep,i} / max(E_{dep,i}) ;Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j));
             h1_p[i][j]->Draw();
             h1_p[i][j]->Draw("hist");
             h1_d[i][j]->Draw("histsame");
