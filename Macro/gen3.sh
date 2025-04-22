@@ -50,16 +50,17 @@ do
 EOL
 done
 
-for energy in $(seq 2 1 10)
+
+for energy in $(seq 2000 1000 10000)
 do
   # Generate the corresponding macro file for the current energy value
-  cat <<EOL > "${Tag}_${energy}TeV.mac"
+  cat <<EOL > "${Tag}_${energy}GeV.mac"
 /run/initialize
 /analysis/setFileName ../Root/${Tag}_${energy}TeV
 /gps/particle ${particle}
 /gps/ion 6 12 6
 /gps/ene/type Mono
-/gps/ene/mono ${energy} TeV
+/gps/ene/mono ${energy} GeV
 
 /gps/pos/type Plane
 /gps/pos/shape Square
