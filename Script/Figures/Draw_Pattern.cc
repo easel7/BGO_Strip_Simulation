@@ -20,9 +20,9 @@ void Draw_Pattern()
     proton_tree->SetBranchAddress("First_Had_Type" , &p_FH_Type);
 
     // cout  << proton_tree->GetEntries() << endl;
-    // Long64_t entry  = 5;   
+    // Long64_t entry  = 484;   
     // for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
-    for (Long64_t entry = 0; entry < 10; entry++)
+    for (Long64_t entry = 0; entry < 1000; entry++)
     {
         auto c1    = new TCanvas("c1","c1",1800,600);
         auto hXZ   = new TH2D("hXZ","BGO X-Z Plane",22,-11,11,14,0,14);
@@ -70,9 +70,9 @@ void Draw_Pattern()
                     double max_val = *max_iter;
                     int max_index = distance(p_EnergyVec->begin(), max_iter);
                     // cout << "Max value in [" << layer * 22 << "," << (layer+1) * 22 << ") = " << max_val  << " at index " << max_index << " Depth " << p_FH_Dep << " layer " <<  p_FH_Lay << " Type =" << p_FH_Type << endl;
-                    // cout << "Core point at bar = " << max_index % 22 << ", depth = " << 14. - p_FH_Dep / 25. << endl;
+                    // cout << "Core point at bar = " << max_index % 22 << ", depth = " << 14. - p_FH_Dep / 25.5 << endl;
                     bar_info[0] = max_index % 22;
-                    g_core1->SetPoint(0, bar_info[0] - 10.5, 14. - p_FH_Dep / 25.);
+                    g_core1->SetPoint(0, bar_info[0] - 10.5, 14. - p_FH_Dep / 25.5);
                     box1->SetX1(bar_info[0] - 9);
                     box1->SetY1(0);
                     box1->SetX2(bar_info[0] - 12);
@@ -87,7 +87,7 @@ void Draw_Pattern()
                     // cout << "Max value in [" << layer * 22 << "," << (layer+1) * 22 << ") = " << max_val  << " at index " << max_index << " Depth " << endl;
                     // cout << "Core point at bar = " << max_index % 22 << endl;
                     bar_info[1] = max_index % 22;
-                    g_core2->SetPoint(0, bar_info[1] - 10.5, 14. - p_FH_Dep / 25.);
+                    g_core2->SetPoint(0, bar_info[1] - 10.5, 14. - p_FH_Dep / 25.5);
                     box2->SetX1(bar_info[1] - 9);
                     box2->SetY1(0);
                     box2->SetX2(bar_info[1] - 12);
