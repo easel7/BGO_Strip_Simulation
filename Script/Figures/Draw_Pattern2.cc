@@ -6,6 +6,8 @@ int FindMaxMiddleIndex(std::vector<double>* p_EnergyVec, int layer);
 
 void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int& out_len, int& out_start_index);
 
+void FindMaxValueInPositiveSegment(const double array[], int start_index, int length, double& out_max_value, int& out_max_index);
+
 double MaxMinRatio(const double array[], int size);
 
 void PrepareFitData(
@@ -28,7 +30,8 @@ void Draw_Pattern2()
     int p_Nhits;
 
     const char* string1;
-    const char* string2 = "Deuteron_1000GeV";
+    const char* string2 = "Proton_1000GeV";
+    // const char* string2 = "Deuteron_1000GeV";
 
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
@@ -78,23 +81,25 @@ void Draw_Pattern2()
     int point_counter_e = 0;           int pc_e = 0;
     int point_counter_p = 0;           int pc_p = 0;
 
-
+    auto h2         = new TH2D("h2","h2",60,-1,5,16,-2,14);
     // cout  << proton_tree->GetEntries() << endl;
-    Long64_t entry  = 5;   
+    // Long64_t entry  = 99;   
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
     // for (Long64_t entry = 0; entry < 100; entry++)
     {        
         double bar_info[2] = {0};
         double bar_Energy_info[14] = {0};
-        double bar_Change_info[13] = {0};
+        double bar_Change_info[14] = {0};
         double rate_max_min  = 0;
         double rate_sum      = 0;
         int    rate_len      = 0;
         int    rate_poi      = 0;
+        double max_rate      = 0;
+        int max_rate_index   = 0;
 
         proton_tree->GetEntry(entry);
         if (p_Nhits < 10 ) continue;
-        cout << entry << endl;
+        // cout << entry << endl;
         // cout << " Depth " << p_FH_Dep << " layer " <<  p_FH_Lay << " Type =" << p_FH_Type << endl;
         
         int layer_start = 4;
@@ -155,42 +160,34 @@ void Draw_Pattern2()
 
         for(int layer = 0 ; layer<14 ; layer++)
         {   
-            if (layer %2 == 0)
+            int center_bar = (layer % 2 == 0) ? bar_info[0] : bar_info[1];  // select center bar
+            for (int k = center_bar - 1; k <= center_bar + 1; k++)
             {
-                for (int k = bar_info[0] - 1 ; k <= bar_info[0] + 1 ; k++) 
-                {
-                    bar_Energy_info[layer] += (*p_EnergyVec)[layer * 22 + k];
-                    // cout << "Layer " << layer << " , bar " << k << " , Energy " << (*p_EnergyVec)[layer * 22 + k] << endl;
-                }
-                if(layer>0) 
-                {
-                    if( bar_Energy_info[layer-1] == 0) { bar_Change_info[layer-1] = 1e-5 ; cout << "entry = " << entry << endl;}
-                    else {bar_Change_info[layer-1] = log10(bar_Energy_info[layer]/bar_Energy_info[layer-1]); }
-                }
+                bar_Energy_info[layer] += (*p_EnergyVec)[layer * 22 + k];
             }
-            else
+            if(layer==0)
             {
-                for (int k = bar_info[1] - 1 ; k <= bar_info[1] + 1 ; k++) 
-                {
-                    bar_Energy_info[layer] += (*p_EnergyVec)[layer * 22 + k];
-                    // cout << "Layer " << layer << " , bar " << k << " , Energy " << (*p_EnergyVec)[layer * 22 + k] << endl;
-                }
-                if( bar_Energy_info[layer-1] == 0) { bar_Change_info[layer-1] = 1e-5 ; cout << "entry = " << entry << endl;}
-                else {bar_Change_info[layer-1] = log10(bar_Energy_info[layer]/bar_Energy_info[layer-1]); }
-            } 
+                bar_Change_info[0] = log10(bar_Energy_info[0] / 0.02);
+            }
+            else // (layer>0) 
+            {
+                if( bar_Energy_info[layer-1] == 0) { bar_Change_info[layer-1] = -5 ;  }//  cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
+                else if( bar_Energy_info[layer] == 0) { bar_Change_info[layer-1] = -4 ; }//  cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
+                else {bar_Change_info[layer] = log10(bar_Energy_info[layer]/bar_Energy_info[layer-1]); }// cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
+            }
         }
 
-        FindMaxPositiveSegment(bar_Change_info,13,rate_sum,rate_len,rate_poi);
+        FindMaxPositiveSegment(bar_Change_info,14,rate_sum,rate_len,rate_poi);
+        FindMaxValueInPositiveSegment(bar_Change_info,rate_poi,rate_len,max_rate,max_rate_index);
         // cout << " begin to increase bin = " << rate_poi << endl;
-        
-        rate_max_min = MaxMinRatio(bar_Energy_info,14);
-        g_sum_len0->SetPoint(point_counter++,rate_sum,rate_len);
-        h_poi_had0->Fill(rate_poi,p_FH_Lay);
-        h_change_0->Fill(rate_sum); 
-        h_contin_0->Fill(rate_len);
-        if(p_FH_Type == 1)       {  string1 = "Inelastic"; h_max_min1->Fill(log10(rate_max_min)); h_change_1->Fill(rate_sum); h_contin_1->Fill(rate_len); g_sum_len1->SetPoint(point_counter_i++,rate_sum,rate_len+0.1); h_poi_had1->Fill(rate_poi,p_FH_Lay);} 
-        else if (p_FH_Type == 2) {  string1 = "Elastic";   h_max_min2->Fill(log10(rate_max_min)); h_change_2->Fill(rate_sum); h_contin_2->Fill(rate_len); g_sum_len2->SetPoint(point_counter_e++,rate_sum,rate_len)    ; h_poi_had2->Fill(rate_poi,p_FH_Lay);}
-        else                     {  string1 = "Pass";      h_max_min3->Fill(log10(rate_max_min)); h_change_3->Fill(rate_sum); h_contin_3->Fill(rate_len); g_sum_len3->SetPoint(point_counter_p++,rate_sum,rate_len-0.1); h_poi_had3->Fill(rate_poi,p_FH_Lay);}
+        // cout << "Max Positive Bin Length = " << rate_len << endl;
+        // cout << "Max Increase Rate = " <<  max_rate << endl;
+        // cout << "Max Increase Rate Bin = " << max_rate_index << endl;
+        rate_max_min = MaxMinRatio(bar_Energy_info,14);    h_max_min0->Fill(log10(rate_max_min)); h_change_0->Fill(rate_sum); h_contin_0->Fill(rate_len); g_sum_len0->SetPoint(point_counter++,rate_sum,rate_len)      ; h_poi_had0->Fill(max_rate_index,p_FH_Lay);
+        if (rate_max_min <1e2 && p_FH_Type == 1) { cout << entry << endl; }
+        if(p_FH_Type == 1)       {  string1 = "Inelastic"; h_max_min1->Fill(log10(rate_max_min)); h_change_1->Fill(rate_sum); h_contin_1->Fill(rate_len); g_sum_len1->SetPoint(point_counter_i++,rate_sum,rate_len+0.1); h_poi_had1->Fill(max_rate_index,p_FH_Lay); h2->Fill(log10(rate_max_min),max_rate_index);} 
+        else if (p_FH_Type == 2) {  string1 = "Elastic";   h_max_min2->Fill(log10(rate_max_min)); h_change_2->Fill(rate_sum); h_contin_2->Fill(rate_len); g_sum_len2->SetPoint(point_counter_e++,rate_sum,rate_len)    ; h_poi_had2->Fill(max_rate_index,p_FH_Lay);}
+        else                     {  string1 = "Pass";      h_max_min3->Fill(log10(rate_max_min)); h_change_3->Fill(rate_sum); h_contin_3->Fill(rate_len); g_sum_len3->SetPoint(point_counter_p++,rate_sum,rate_len-0.1); h_poi_had3->Fill(max_rate_index,p_FH_Lay);}
         
     }
     auto c2    = new TCanvas("c2","c2",2100,2100);
@@ -217,6 +214,7 @@ void Draw_Pattern2()
     c2->cd(2);
     gStyle->SetOptStat(0);
     gPad->SetLogx(1);
+    gPad->SetLogy(1);
     h_change_1->GetXaxis()->SetLimits(1e-2, 1e2);        // X 轴范围
     h_change_1->SetTitle(";#sum log10(Change Rate);Counts");
     h_change_1->SetLineColor(kRed);
@@ -241,7 +239,14 @@ void Draw_Pattern2()
 
     legend1->Draw();
 
+
     c2->cd(4);
+    gStyle->SetOptStat(0);
+    h2->SetTitle("Inelastic;log10(Emax/Emin);Bin of Maximum Change Ratio");
+    h2->Draw("colz");
+
+
+    c2->cd(5);
     gPad->SetLogx();
     g_sum_len0->SetTitle(";#sum log10(Change Rate);# Continues Positive Bins");
     g_sum_len0->GetXaxis()->SetLimits(1e-2, 100);        // X 轴范围
@@ -275,38 +280,22 @@ void Draw_Pattern2()
     
     c2->cd(7);
     gPad->SetLogz();
-    h_poi_had1->SetTitle(";Bin where continuous growth starts; First Hadronic Layer");
+    h_poi_had1->SetTitle("Inelastic;Bin of Maximum Change Ratio; First Hadronic Layer");
     h_poi_had1->Draw("colz");
 
     c2->cd(8);
     gPad->SetLogz();
-    h_poi_had2->SetTitle(";Bin where continuous growth starts; First Hadronic Layer");
+    h_poi_had2->SetMinimum(h_poi_had2->GetMinimum(1e-10)); // 取非零最小值
+    h_poi_had2->SetMaximum(h_poi_had2->GetMaximum());
+    h_poi_had2->SetTitle("Elastic;Bin of Maximum Change Ratio; First Hadronic Layer");
     h_poi_had2->Draw("colz");
-
 
     c2->cd(9);
     gPad->SetLogz();
-    h_poi_had3->SetTitle(";Bin where continuous growth starts; First Hadronic Layer");
+    h_poi_had3->SetMinimum(h_poi_had3->GetMinimum(1e-10)); // 取非零最小值
+    h_poi_had3->SetMaximum(h_poi_had3->GetMaximum());
+    h_poi_had3->SetTitle("Pass through;Bin of Maximum Change Ratio; First Hadronic Layer");
     h_poi_had3->Draw("colz");
-
-    // g_poi_had1->SetMarkerStyle(20);  
-    // g_poi_had1->SetMarkerColorAlpha(kRed, 0.1);  // 0.0 = fully transparent, 1.0 = fully opaque
-    // g_poi_had1->SetMarkerSize(0.8);
-
-    // g_poi_had2->SetMarkerStyle(21);  
-    // g_poi_had2->SetMarkerColorAlpha(kBlue, 0.1);
-    // g_poi_had2->SetMarkerSize(0.8);
-
-    // g_poi_had3->SetMarkerStyle(22);  
-    // g_poi_had3->SetMarkerColorAlpha(kOrange-3, 1);
-    // g_poi_had3->SetMarkerSize(0.8);
-
-    // g_poi_had0->Draw("AP"); 
-    // g_poi_had1->Draw("PSAME");
-    // g_poi_had2->Draw("PSAME");
-    // g_poi_had3->Draw("PSAME");
-
-    // legend2->Draw();
 
     c2->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/%s_FIG.pdf",string2));
     std::cout << "Number of valid points: " << g_sum_len0->GetN() << std::endl;
@@ -330,7 +319,7 @@ void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int
         if (content > 0) 
         {
             if (curr_len == 0)
-                curr_start_index = i + 1;  // 新的一段开始
+                curr_start_index = i ;  // 新的一段开始
 
             curr_sum += content;
             curr_len++;
@@ -355,6 +344,23 @@ void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int
     out_start_index = max_start_index;
 }
 
+
+void FindMaxValueInPositiveSegment(const double array[], int start_index, int length, double& out_max_value, int& out_max_index)
+{
+    out_max_value = -1e9;  // 初始值很小
+    out_max_index = -1;
+
+    for (int i = start_index; i < start_index + length; ++i) 
+    {
+        double content = array[i];
+        if (content > out_max_value) 
+        {
+        out_max_value = content;
+        out_max_index = i;
+        }
+    }
+}
+
 double MaxMinRatio(const double array[], int size) 
 {
     if (size <= 0) throw std::invalid_argument("数组不能为空");
@@ -365,7 +371,7 @@ double MaxMinRatio(const double array[], int size)
     for (int i = 0; i < size; ++i) 
     {
         if (array[i] > max_val) max_val = array[i];
-        if (array[i] < min_val) min_val = array[i];
+        if (array[i] < min_val && array[i] > 0) min_val = array[i];
         // cout << array[i] <<  " , min =  " << min_val <<  " ,  max " << max_val <<  endl;
     }
 

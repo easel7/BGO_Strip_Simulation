@@ -213,7 +213,7 @@ void Efficiency_UBT()
         Carbon_Eff_MIT[i]   = h4_c[i]->Integral()/h1_c[i]->Integral();
         Carbon_Eff_RMS[i]   = h5_c[i]->Integral()/h1_c[i]->Integral();
 
-        cout << "Energy = " << int(Energy[i]) << " GeV !  ele Total eff : " << h1_e[i]->Integral() << " ele HET eff : " <<  h2_e[i]->Integral() <<" ele UBT eff : " << h3_e[i]->Integral() <<" ele MIP eff : " << h4_e[i]->Integral() <<endl;
+        cout << "Energy = " << int(Energy[i]) << " GeV !  ele Total eff : " << h1_e[i]->Integral() << " ele HET eff : " <<  h2_e[i]->Integral() <<" ele UBT eff : " << h3_e[i]->Integral() <<" ele MIP eff : " << h4_e[i]->Integral() << "HET D/p Eff"<< h2_d[i]->Integral()/h2_p[i]->Integral() <<endl;
     }
 
     auto gre_p_HET = CreateGraphWithProperties(19, Energy, Proton_Eff_HET, Energy_Err, Uncertainty, 20, kRed, kRed, "High-Energy Trigger; Kinetic Energy (GeV); Trigger Efficiency");

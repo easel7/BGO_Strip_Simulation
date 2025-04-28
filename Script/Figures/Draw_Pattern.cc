@@ -4,6 +4,8 @@ double g_fit_total_energy = 0;
 
 void FindMaxPositiveBinSegment(TH1D* hist, double& out_sum, int& out_len, int& out_start_bin);
 
+void FindMaxValueInPositiveSegment(TH1D* hist, int start_bin, int len, double& out_max_value, int& out_max_bin);
+
 void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_t flag);
 
 void PrepareFitData(
@@ -16,6 +18,8 @@ void PrepareFitData(
 
 int FindMaxMiddleIndex(std::vector<double>* p_EnergyVec, int layer);
 
+double MaxMinRatio(TH1D* hist);
+
 void Draw_Pattern()
 {
     vector<double>* p_EnergyVec = nullptr;
@@ -26,6 +30,7 @@ void Draw_Pattern()
     int p_Nhits;
 
     const char* string1;
+    // const char* string2 = "Proton_1000GeV";
     const char* string2 = "Deuteron_1000GeV";
 
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
@@ -48,34 +53,39 @@ void Draw_Pattern()
     auto g_sum_len2 = new TGraph();
     auto g_sum_len3 = new TGraph();
 
+    auto h2         = new TH2D("h2","h2",)
+
     int point_counter   = 0;
     int point_counter_i = 0;
     int point_counter_e = 0;
     int point_counter_p = 0;
 
-
     // cout  << proton_tree->GetEntries() << endl;
-    Long64_t entry  = 5061;   
+    Long64_t entry  = 596;   
     // for (Long64_t entry = 0; entry < 100; entry++)
     {
         auto c1    = new TCanvas("c1","c1",1400,1400);
         auto hXZ   = new TH2D("hXZ","BGO X-Z Plane",22,-11,11,14,0,14);
         auto hYZ   = new TH2D("hYZ","BGO Y-Z Plane",22,-11,11,14,0,14);
         auto hBGO1 = new TH1D("hBGO1","BGO Core Axis Energy Deposit",14,0,14); 
-        auto hBGO2 = new TH1D("hBGO2","Deposit Energy Change Ratio",13,1,14); 
+        auto hBGO2 = new TH1D("hBGO2","Deposit Energy Change Ratio",14,0,14); 
         
-        auto *g_core0 = new TGraph();
-        auto *g_core1 = new TGraph();
+        auto *g_core0 = new TGraph();          auto *g_ch_0 = new TGraph();
+        auto *g_core1 = new TGraph();          auto *g_ch_1 = new TGraph();
+        auto *g_core2 = new TGraph();          auto *g_ch_2 = new TGraph();
+        auto *g_core3 = new TGraph();          auto *g_ch_3 = new TGraph();
+
         auto    *box0 = new TBox();
         auto    *box1 = new TBox();
         
         double bar_info[2] = {0};
         double bar_Energy_info[14] = {0};
-        double bar_Change_info[13] = {0};
+        double bar_Change_info[14] = {0};
         double rate_sum      = 0;
         int    rate_len      = 0;
         int    rate_poi      = 0;
-
+        double max_rate      = 0;
+        int max_rate_index   = 0;
 
         proton_tree->GetEntry(entry);
         // if (p_Nhits < 10 ) continue;
@@ -157,12 +167,12 @@ void Draw_Pattern()
             bar_info[1] = std::round(bar_even);
         }
 
-        g_core0->SetPoint(0, bar_info[0] - 10.5, 14 - layer_start );
+
         box0->SetX1(bar_info[0] - 9);
         box0->SetY1(0);
         box0->SetX2(bar_info[0] - 12);
         box0->SetY2(14 - layer_start );
-        g_core1->SetPoint(0, bar_info[1] - 10.5, 14 - layer_start );
+
         box1->SetX1(bar_info[1] - 9);
         box1->SetY1(0);
         box1->SetX2(bar_info[1] - 12);
@@ -170,51 +180,60 @@ void Draw_Pattern()
 
         for(int layer = 0 ; layer<14 ; layer++)
         {   
-            if (layer %2 == 0)
+            int center_bar = (layer % 2 == 0) ? bar_info[0] : bar_info[1];  // select center bar
+            for (int k = center_bar - 1; k <= center_bar + 1; k++)
             {
-                for (int k = bar_info[0] - 1 ; k <= bar_info[0] + 1 ; k++) 
-                {
-                    bar_Energy_info[layer] += (*p_EnergyVec)[layer * 22 + k];
-                    // cout << "Layer " << layer << " , bar " << k << " , Energy " << (*p_EnergyVec)[layer * 22 + k] << endl;
-                }
-                if(layer>0) 
-                {
-                    if( bar_Energy_info[layer-1] == 0) { bar_Change_info[layer-1] = 1e-5 ;  } // cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
-                    else {bar_Change_info[layer-1] = bar_Energy_info[layer]/bar_Energy_info[layer-1];  } // cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
-                }
+                bar_Energy_info[layer] += (*p_EnergyVec)[layer * 22 + k];
             }
-            else
-            {
-                for (int k = bar_info[1] - 1 ; k <= bar_info[1] + 1 ; k++) 
-                {
-                    bar_Energy_info[layer] += (*p_EnergyVec)[layer * 22 + k];
-                    // cout << "Layer " << layer << " , bar " << k << " , Energy " << (*p_EnergyVec)[layer * 22 + k] << endl;
-                }
-                if( bar_Energy_info[layer-1] == 0) { bar_Change_info[layer-1] = 1e-5  ; } // cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
-                else {bar_Change_info[layer-1] = bar_Energy_info[layer]/bar_Energy_info[layer-1]; } // cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
-            } 
-            hBGO1->SetBinContent(layer+1, bar_Energy_info[layer]);
-            // cout << layer << " , " << bar_Energy_info[layer] << endl;
-            if(layer>0) 
-            {
-                hBGO2->SetBinContent(layer, log10(bar_Change_info[layer-1]));
-            }
-        }
-        auto   *line1 = new TLine(-11,14 - p_FH_Lay,11,14 - p_FH_Lay);
 
+            if(layer==0)
+            {
+                bar_Change_info[0] = log10(bar_Energy_info[0] / 0.02);
+            }
+            else // (layer>0) 
+            {
+                if( bar_Energy_info[layer-1] == 0) { bar_Change_info[layer-1] = -5 ;   cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
+                else if( bar_Energy_info[layer] == 0) { bar_Change_info[layer-1] = -4 ;   cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
+                else {bar_Change_info[layer] = log10(bar_Energy_info[layer]/bar_Energy_info[layer-1]);  cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
+            }
+            hBGO1->SetBinContent(layer+1, bar_Energy_info[layer]);
+            hBGO2->SetBinContent(layer+1, bar_Change_info[layer]);
+        }
         FindMaxPositiveBinSegment(hBGO2,rate_sum,rate_len,rate_poi);
-        cout << " begin to increase bin = " << rate_poi << endl;
-        h_max_min0->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));        
+        FindMaxValueInPositiveSegment(hBGO2,rate_poi,rate_len,max_rate,max_rate_index);
+
+        cout << "Begin to increase bin = " << rate_poi << endl;
+        cout << "Max Positive Bin Length = " << rate_len << endl;
+        cout << "Max Increase Rate = " <<  max_rate << endl;
+        cout << "Max Increase Rate Bin = " << max_rate_index << endl;
+
+
+        auto *line1 = new TLine(-11,14 - p_FH_Lay,11,14 - p_FH_Lay);
+        auto *line2 = new TLine(p_FH_Lay,hBGO1->GetMinimum(),p_FH_Lay,hBGO1->GetMaximum());
+        auto *line3 = new TLine(p_FH_Lay,hBGO2->GetMinimum(),p_FH_Lay,hBGO2->GetMaximum());
+        auto *line4 = new TLine(0,0,14,0);
+        g_core0->SetPoint(0, bar_info[0] - 10.5, 15 - rate_poi );                       g_ch_0->SetPoint(0, bar_info[0] - 10.5, 15 - max_rate_index );              
+        g_core1->SetPoint(0, bar_info[1] - 10.5, 15 - rate_poi );                       g_ch_1->SetPoint(0, bar_info[1] - 10.5, 15 - max_rate_index );              
+        g_core2->SetPoint(0, rate_poi - 0.5, hBGO1->GetBinContent(rate_poi) );          g_ch_2->SetPoint(0, max_rate_index - 0.5, hBGO1->GetBinContent(max_rate_index) );
+        g_core3->SetPoint(0, rate_poi - 0.5, hBGO2->GetBinContent(rate_poi) );          g_ch_3->SetPoint(0, max_rate_index - 0.5, hBGO2->GetBinContent(max_rate_index) );
+        line4->SetLineColor(kBlack);
+        line4->SetLineWidth(2);
+        line4->SetLineStyle(9);
+        h_max_min0->Fill(log10(MaxMinRatio(hBGO1)));
         g_sum_len0->SetPoint(point_counter++,rate_sum,rate_len);
-        if(p_FH_Type == 1)       {  string1 = "Inelastic";  g_core0->SetMarkerColor(kRed);     g_core1->SetMarkerColor(kRed);     box0->SetLineColor(kRed);     box1->SetLineColor(kRed);       line1->SetLineColor(kRed);      h_max_min1->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));        g_sum_len1->SetPoint(point_counter_i++,rate_sum,rate_len+0.1);}
-        else if (p_FH_Type == 2) {  string1 = "Elastic";    g_core0->SetMarkerColor(kMagenta); g_core1->SetMarkerColor(kMagenta); box0->SetLineColor(kMagenta); box1->SetLineColor(kMagenta);   line1->SetLineColor(kMagenta);  h_max_min2->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));        g_sum_len2->SetPoint(point_counter_e++,rate_sum,rate_len);}
-        else                     {  string1 = "Pass";       g_core0->SetMarkerColor(kGray);    g_core1->SetMarkerColor(kGray);    box0->SetLineColor(kGray);    box1->SetLineColor(kGray);      line1->SetLineColor(kGray);     h_max_min3->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));        g_sum_len3->SetPoint(point_counter_p++,rate_sum,rate_len-0.1);}
+        if(p_FH_Type == 1)       {  string1 = "Inelastic";  g_core0->SetMarkerColor(kRed);    g_core1->SetMarkerColor(kRed);    g_core2->SetMarkerColor(kRed);    g_core3->SetMarkerColor(kRed);      g_ch_0->SetMarkerColor(kRed);      g_ch_1->SetMarkerColor(kRed);      g_ch_2->SetMarkerColor(kRed);      g_ch_3->SetMarkerColor(kRed);  box0->SetLineColor(kRed);     box1->SetLineColor(kRed);       line1->SetLineColor(kRed);     line2->SetLineColor(kRed);     line3->SetLineColor(kRed);     h_max_min1->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len1->SetPoint(point_counter_i++,rate_sum,rate_len+0.1);}
+        else if (p_FH_Type == 2) {  string1 = "Elastic";    g_core0->SetMarkerColor(kMagenta);g_core1->SetMarkerColor(kMagenta);g_core2->SetMarkerColor(kMagenta);g_core3->SetMarkerColor(kMagenta);  g_ch_0->SetMarkerColor(kMagenta);  g_ch_1->SetMarkerColor(kMagenta);  g_ch_2->SetMarkerColor(kMagenta);  g_ch_3->SetMarkerColor(kRed);  box0->SetLineColor(kMagenta); box1->SetLineColor(kMagenta);   line1->SetLineColor(kMagenta); line2->SetLineColor(kMagenta); line3->SetLineColor(kMagenta); h_max_min2->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len2->SetPoint(point_counter_e++,rate_sum,rate_len);    }
+        else                     {  string1 = "Pass";       g_core0->SetMarkerColor(kGray);   g_core1->SetMarkerColor(kGray);   g_core2->SetMarkerColor(kGray);   g_core3->SetMarkerColor(kGray);     g_ch_0->SetMarkerColor(kGray);     g_ch_1->SetMarkerColor(kGray);     g_ch_2->SetMarkerColor(kGray);     g_ch_3->SetMarkerColor(kRed);  box0->SetLineColor(kGray);    box1->SetLineColor(kGray);      line1->SetLineColor(kGray);    line2->SetLineColor(kGray);    line3->SetLineColor(kGray);    h_max_min3->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len3->SetPoint(point_counter_p++,rate_sum,rate_len-0.1);}
         
-        g_core0->SetMarkerStyle(29);   box0->SetFillStyle(0);    
-        g_core0->SetMarkerSize(2);     box0->SetLineWidth(2);
-        g_core1->SetMarkerStyle(29);   box1->SetFillStyle(0);    
-        g_core1->SetMarkerSize(2);     box1->SetLineWidth(2);
-        line1->SetLineWidth(2);
+        box0->SetFillStyle(0);        box0->SetLineWidth(2);
+        box1->SetFillStyle(0);        box1->SetLineWidth(2);
+        g_core0->SetMarkerStyle(29);  g_core0->SetMarkerSize(2);    g_ch_0->SetMarkerStyle(22);   g_ch_0->SetMarkerSize(2);
+        g_core1->SetMarkerStyle(29);  g_core1->SetMarkerSize(2);    g_ch_1->SetMarkerStyle(22);   g_ch_1->SetMarkerSize(2);
+        g_core2->SetMarkerStyle(29);  g_core2->SetMarkerSize(2);    g_ch_2->SetMarkerStyle(22);   g_ch_2->SetMarkerSize(2);
+        g_core3->SetMarkerStyle(29);  g_core3->SetMarkerSize(2);    g_ch_3->SetMarkerStyle(22);   g_ch_3->SetMarkerSize(2);
+        line1->SetLineWidth(2);       line4->SetLineColor(kBlack);
+        line2->SetLineWidth(2);       line4->SetLineWidth(2);
+        line3->SetLineWidth(2);       line4->SetLineStyle(9);
 
         for (int layer = 0; layer < 14; layer++) {
             hXZ->SetBinContent(1, 14-layer, -5);
@@ -240,6 +259,8 @@ void Draw_Pattern()
         hXZ->Draw("colz");
         line1->Draw("same");
         g_core0->Draw("psame"); 
+        g_ch_0->Draw("psame"); 
+
         box0->Draw("psame");
 
         
@@ -259,6 +280,8 @@ void Draw_Pattern()
         hYZ->Draw("colz");
         line1->Draw("same");
         g_core1->Draw("psame"); 
+        g_ch_1->Draw("psame"); 
+
         box1->Draw("psame");
 
         gPad->Update();
@@ -282,9 +305,9 @@ void Draw_Pattern()
         hBGO1->GetYaxis()->SetTitleOffset(0.97);
         hBGO1->GetXaxis()->CenterTitle();
         hBGO1->Draw("hist");
-        auto *line2 = new TLine(p_FH_Lay,hBGO1->GetMinimum(),p_FH_Lay,hBGO1->GetMaximum());
-        line2->SetLineColor(kRed);
-        line2->SetLineWidth(2);
+        g_core2->Draw("psame");
+        g_ch_2->Draw("psame"); 
+
         if(p_FH_Lay%2 != -1 ) {line2->Draw("");}
 
         c1->cd(4);
@@ -292,19 +315,14 @@ void Draw_Pattern()
         hBGO2->SetLineWidth(2);
         hBGO2->SetTitle("BGO Core Axis Energy Deposit Change Rate;BGO Layer; log10(^{}E^{}_{i}/^{}E^{}_{i-1})");
         hBGO2->GetYaxis()->CenterTitle();
-        hBGO2->GetYaxis()->SetRangeUser(-1.5,1.5);
+        hBGO2->GetYaxis()->SetRangeUser(-0.5,2.5);
         hBGO2->GetYaxis()->SetTitleOffset(1.05);
         hBGO2->GetXaxis()->CenterTitle();
         hBGO2->Draw("hist");
-        auto *line3 = new TLine(p_FH_Lay,hBGO2->GetMinimum(),p_FH_Lay,hBGO2->GetMaximum());
-        auto *line4 = new TLine(1,0,14,0);
-
-        line3->SetLineColor(kRed);
-        line3->SetLineWidth(2);
-        line4->SetLineColor(kBlack);
-        line4->SetLineWidth(2);
-        line4->SetLineStyle(9);
         line4->Draw();
+        g_core3->Draw("psame");
+        g_ch_3->Draw("psame"); 
+
         if(p_FH_Lay%2 != -1 ) {line3->Draw("");}
         if (entry < 100) { c1->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/%s/%s/%lld.pdf",string1,string2,entry)); }
     }
@@ -321,8 +339,6 @@ void Draw_Pattern()
     h_max_min2->Draw("histsame");
     h_max_min3->Draw("histsame");
 
-
-    
     c2->cd(2);
     gPad->SetLogx();
     g_sum_len0->SetTitle("; #sum log10(Change Rate);# Continues Positive Bins");
@@ -393,6 +409,44 @@ void FindMaxPositiveBinSegment(TH1D* hist, double& out_sum, int& out_len, int& o
     out_sum = max_sum;
     out_len = max_len;
     out_start_bin = max_start_bin;
+}
+
+
+void FindMaxValueInPositiveSegment(TH1D* hist, int start_bin, int len, double& out_max_value, int& out_max_bin)
+{
+    out_max_value = -1e9;  // 默认很小
+    out_max_bin = -1;
+
+    for (int i = start_bin; i < start_bin + len; ++i) 
+    {
+        double content = hist->GetBinContent(i);
+        if (content > out_max_value) 
+        {
+        out_max_value = content;
+        out_max_bin = i;
+        }
+    }
+}
+
+
+double MaxMinRatio(TH1D* hist) 
+{
+    int nbins = hist->GetNbinsX();
+
+    double max_val = 0;
+    double min_val = 1e4;
+
+    for (int i = 1; i <= nbins; ++i) 
+    {
+        double content = hist->GetBinContent(i);
+        if (content > max_val) max_val = content;
+        if (content < min_val && content > 0) min_val = content;
+        // cout << content <<  " , min =  " << min_val <<  " ,  max " << max_val <<  endl;
+    }
+
+    if (min_val == 0) throw std::runtime_error("最小值为 0，无法计算比值");
+
+    return max_val / min_val;
 }
 
 int FindMaxMiddleIndex(std::vector<double>* p_EnergyVec, int layer) 

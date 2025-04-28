@@ -1,7 +1,7 @@
 void Longti_EnergyVec()
 {
     double Energy[19]={0};
-    for (int i = 0; i < 19; i++) // Energy
+    for (int i = 18; i < 19; i++) // Energy
     {
         if(i<9)  {Energy[i] =  (i+1)*10;}
         else   {Energy[i] =  i*100-800;}
@@ -79,12 +79,12 @@ void Longti_EnergyVec()
 
             for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
             {
-                proton_tree->GetEntry(entry);   if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_RMSVec)[2] < 40 && (*p_RMSVec)[3] <40 ) h1_p[j]->Fill(log10((*p_EnergyVec)[j]));
-                deuteron_tree->GetEntry(entry); if ((*d_EnergyVec)[0] > 0.23 && (*d_EnergyVec)[1] > 0.23 && (*d_RMSVec)[2] < 40 && (*d_RMSVec)[3] <40 ) h1_d[j]->Fill(log10((*d_EnergyVec)[j]));
-                electron_tree->GetEntry(entry); if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_RMSVec)[2] < 40 && (*e_RMSVec)[3] <40 ) h1_e[j]->Fill(log10((*e_EnergyVec)[j]));
-                helium4_tree->GetEntry(entry);  if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_RMSVec)[2] < 40 && (*h_RMSVec)[3] <40 ) h1_h[j]->Fill(log10((*h_EnergyVec)[j]));
-                helium3_tree->GetEntry(entry);  if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_RMSVec)[2] < 40 && (*H_RMSVec)[3] <40 ) h1_H[j]->Fill(log10((*H_EnergyVec)[j]));
-                carbon_tree->GetEntry(entry);   if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_RMSVec)[2] < 40 && (*c_RMSVec)[3] <40 ) h1_c[j]->Fill(log10((*c_EnergyVec)[j]));
+                proton_tree->GetEntry(entry);   /*if ((*p_EnergyVec)[0] > 0.23 && (*p_EnergyVec)[1] > 0.23 && (*p_RMSVec)[2] < 40 && (*p_RMSVec)[3] <40 ) */ h1_p[j]->Fill(log10((*p_EnergyVec)[j]));
+                deuteron_tree->GetEntry(entry); /*if ((*d_EnergyVec)[0] > 0.23 && (*d_EnergyVec)[1] > 0.23 && (*d_RMSVec)[2] < 40 && (*d_RMSVec)[3] <40 ) */ h1_d[j]->Fill(log10((*d_EnergyVec)[j]));
+                electron_tree->GetEntry(entry); /*if ((*e_EnergyVec)[0] > 0.23 && (*e_EnergyVec)[1] > 0.23 && (*e_RMSVec)[2] < 40 && (*e_RMSVec)[3] <40 ) */ h1_e[j]->Fill(log10((*e_EnergyVec)[j]));
+                helium4_tree->GetEntry(entry);  /*if ((*h_EnergyVec)[0] > 0.23 && (*h_EnergyVec)[1] > 0.23 && (*h_RMSVec)[2] < 40 && (*h_RMSVec)[3] <40 ) */ h1_h[j]->Fill(log10((*h_EnergyVec)[j]));
+                helium3_tree->GetEntry(entry);  /*if ((*H_EnergyVec)[0] > 0.23 && (*H_EnergyVec)[1] > 0.23 && (*H_RMSVec)[2] < 40 && (*H_RMSVec)[3] <40 ) */ h1_H[j]->Fill(log10((*H_EnergyVec)[j]));
+                carbon_tree->GetEntry(entry);   /*if ((*c_EnergyVec)[0] > 0.23 && (*c_EnergyVec)[1] > 0.23 && (*c_RMSVec)[2] < 40 && (*c_RMSVec)[3] <40 ) */ h1_c[j]->Fill(log10((*c_EnergyVec)[j]));
             }
 
             h1_p[j]->Sumw2(); h1_p[j]->Scale(1.0/h1_p[j]->Integral());h1_p[j]->SetLineColor(kRed);     h1_p[j]->SetMarkerColor(kRed);     h1_p[j]->SetLineWidth(2);
