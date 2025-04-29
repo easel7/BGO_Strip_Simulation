@@ -30,8 +30,8 @@ void Draw_Pattern()
     int p_Nhits;
 
     const char* string1;
-    // const char* string2 = "Proton_1000GeV";
-    const char* string2 = "Deuteron_1000GeV";
+    const char* string2 = "Proton_1000GeV";
+    // const char* string2 = "Deuteron_1000GeV";
 
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
@@ -53,15 +53,13 @@ void Draw_Pattern()
     auto g_sum_len2 = new TGraph();
     auto g_sum_len3 = new TGraph();
 
-    auto h2         = new TH2D("h2","h2",)
-
     int point_counter   = 0;
     int point_counter_i = 0;
     int point_counter_e = 0;
     int point_counter_p = 0;
 
     // cout  << proton_tree->GetEntries() << endl;
-    Long64_t entry  = 596;   
+    Long64_t entry  = 5668;   
     // for (Long64_t entry = 0; entry < 100; entry++)
     {
         auto c1    = new TCanvas("c1","c1",1400,1400);

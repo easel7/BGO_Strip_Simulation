@@ -30,8 +30,8 @@ void Draw_Pattern2()
     int p_Nhits;
 
     const char* string1;
-    const char* string2 = "Proton_1000GeV";
-    // const char* string2 = "Deuteron_1000GeV";
+    // const char* string2 = "Proton_1000GeV";
+    const char* string2 = "Deuteron_1000GeV";
 
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
@@ -82,6 +82,8 @@ void Draw_Pattern2()
     int point_counter_p = 0;           int pc_p = 0;
 
     auto h2         = new TH2D("h2","h2",60,-1,5,16,-2,14);
+    auto h3         = new TH2D("h3","h3",60,-1,5,nbins, bin_edges.data());
+
     // cout  << proton_tree->GetEntries() << endl;
     // Long64_t entry  = 99;   
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
@@ -184,8 +186,8 @@ void Draw_Pattern2()
         // cout << "Max Increase Rate = " <<  max_rate << endl;
         // cout << "Max Increase Rate Bin = " << max_rate_index << endl;
         rate_max_min = MaxMinRatio(bar_Energy_info,14);    h_max_min0->Fill(log10(rate_max_min)); h_change_0->Fill(rate_sum); h_contin_0->Fill(rate_len); g_sum_len0->SetPoint(point_counter++,rate_sum,rate_len)      ; h_poi_had0->Fill(max_rate_index,p_FH_Lay);
-        if (rate_max_min <1e2 && p_FH_Type == 1) { cout << entry << endl; }
-        if(p_FH_Type == 1)       {  string1 = "Inelastic"; h_max_min1->Fill(log10(rate_max_min)); h_change_1->Fill(rate_sum); h_contin_1->Fill(rate_len); g_sum_len1->SetPoint(point_counter_i++,rate_sum,rate_len+0.1); h_poi_had1->Fill(max_rate_index,p_FH_Lay); h2->Fill(log10(rate_max_min),max_rate_index);} 
+        if (rate_sum <2e-1 && p_FH_Type == 1) { cout << entry << endl; }
+        if(p_FH_Type == 1)       {  string1 = "Inelastic"; h_max_min1->Fill(log10(rate_max_min)); h_change_1->Fill(rate_sum); h_contin_1->Fill(rate_len); g_sum_len1->SetPoint(point_counter_i++,rate_sum,rate_len+0.1); h_poi_had1->Fill(max_rate_index,p_FH_Lay); h2->Fill(log10(rate_max_min),max_rate_index); h3->Fill(log10(rate_max_min),rate_sum);} 
         else if (p_FH_Type == 2) {  string1 = "Elastic";   h_max_min2->Fill(log10(rate_max_min)); h_change_2->Fill(rate_sum); h_contin_2->Fill(rate_len); g_sum_len2->SetPoint(point_counter_e++,rate_sum,rate_len)    ; h_poi_had2->Fill(max_rate_index,p_FH_Lay);}
         else                     {  string1 = "Pass";      h_max_min3->Fill(log10(rate_max_min)); h_change_3->Fill(rate_sum); h_contin_3->Fill(rate_len); g_sum_len3->SetPoint(point_counter_p++,rate_sum,rate_len-0.1); h_poi_had3->Fill(max_rate_index,p_FH_Lay);}
         
@@ -215,7 +217,7 @@ void Draw_Pattern2()
     gStyle->SetOptStat(0);
     gPad->SetLogx(1);
     gPad->SetLogy(1);
-    h_change_1->GetXaxis()->SetLimits(1e-2, 1e2);        // X 轴范围
+    h_change_1->GetXaxis()->SetLimits(1e-2, 1e2);
     h_change_1->SetTitle(";#sum log10(Change Rate);Counts");
     h_change_1->SetLineColor(kRed);
     h_change_2->SetLineColor(kBlue);
@@ -228,7 +230,8 @@ void Draw_Pattern2()
 
     c2->cd(3);
     gStyle->SetOptStat(0);
-    // h_contin_1->GetXaxis()->SetLimits(-1, 5);        // X 轴范围
+    gPad->SetLogy();
+    h_contin_1->GetYaxis()->SetRangeUser(1e-1, 3e3); 
     h_contin_1->SetTitle(";# Continues Positive Bins;Counts");
     h_contin_1->SetLineColor(kRed);
     h_contin_2->SetLineColor(kBlue);
@@ -277,6 +280,13 @@ void Draw_Pattern2()
     legend2->AddEntry(g_sum_len2, "FH Elastic","p");
     legend2->AddEntry(g_sum_len3, "Pass through","p");
     legend2->Draw();
+
+
+    c2->cd(6);
+    gPad->SetLogy();
+    gStyle->SetOptStat(0);
+    h3->SetTitle("Inelastic;log10(Emax/Emin);#sum log10(Change Rate)");
+    h3->Draw("colz");
     
     c2->cd(7);
     gPad->SetLogz();
