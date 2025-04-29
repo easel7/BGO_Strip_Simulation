@@ -21,7 +21,7 @@ void CrossSection_Dual()
     for(int ii = 1 ; ii <= 35 ; ii++)
     {
         hC1->SetBinContent(ii, (1e4 -h1->Integral(0,ii) )*(0.5) );
-        hC2->SetBinContent(ii, ( 1e4 -h2->Integral(0,ii) )*(0.5*1.25) );
+        hC2->SetBinContent(ii, ( 1e4 -h2->Integral(0,ii) )*(0.5) );
     }
 
     TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-x/[1])", 0, 40); fitFunc1->SetParameters(100, 10); fitFunc1->SetLineColor(kRed);

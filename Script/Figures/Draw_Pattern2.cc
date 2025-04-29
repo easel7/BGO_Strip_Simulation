@@ -30,8 +30,10 @@ void Draw_Pattern2()
     int p_Nhits;
 
     const char* string1;
-    // const char* string2 = "Proton_1000GeV";
-    const char* string2 = "Deuteron_1000GeV";
+    const char* string2 = "Proton_1000GeV";
+    // const char* string2 = "Proton_10000GeV";
+    // const char* string2 = "Deuteron_1000GeV";
+    // const char* string2 = "Deuteron_10000GeV";
 
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
@@ -44,9 +46,9 @@ void Draw_Pattern2()
     proton_tree->SetBranchAddress("First_Had_Type" , &p_FH_Type);
     proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
 
-    int nbins = 40;
+    int nbins = 30;
     double xmin = 1e-2;
-    double xmax = 1e2;
+    double xmax = 1e1;
 
     double logxmin = log10(xmin);
     double logxmax = log10(xmax);
@@ -81,7 +83,9 @@ void Draw_Pattern2()
     int point_counter_e = 0;           int pc_e = 0;
     int point_counter_p = 0;           int pc_p = 0;
 
-    auto h2         = new TH2D("h2","h2",60,-1,5,16,-2,14);
+    auto h1         = new TH2D("h1","h1",60,-1,5,16,-2,14);
+    auto h2         = new TH1D("h2","h2",14,0,14);
+    auto hC2        = new TH1D("hC2","hC2",14,0,14);
     auto h3         = new TH2D("h3","h3",60,-1,5,nbins, bin_edges.data());
 
     // cout  << proton_tree->GetEntries() << endl;
@@ -117,11 +121,11 @@ void Draw_Pattern2()
                 int max_index2 = FindMaxMiddleIndex(p_EnergyVec, k+1);
                 int bar2 = max_index2 % 22;
                 if (k % 2 == 0) {
-                    bar_info[0] = bar1; // 奇数层
-                    bar_info[1] = bar2; // 偶数层
+                    bar_info[0] = bar1; // odd
+                    bar_info[1] = bar2; // even
                 } else {
-                    bar_info[0] = bar2; // 奇数层
-                    bar_info[1] = bar1; // 偶数层
+                    bar_info[0] = bar2; // odd
+                    bar_info[1] = bar1; // even
                 }
                 // 输出确定的 bar_info
                 // cout << "Directly determined bar_info: " 
@@ -186,15 +190,25 @@ void Draw_Pattern2()
         // cout << "Max Increase Rate = " <<  max_rate << endl;
         // cout << "Max Increase Rate Bin = " << max_rate_index << endl;
         rate_max_min = MaxMinRatio(bar_Energy_info,14);    h_max_min0->Fill(log10(rate_max_min)); h_change_0->Fill(rate_sum); h_contin_0->Fill(rate_len); g_sum_len0->SetPoint(point_counter++,rate_sum,rate_len)      ; h_poi_had0->Fill(max_rate_index,p_FH_Lay);
-        if (rate_sum <2e-1 && p_FH_Type == 1) { cout << entry << endl; }
-        if(p_FH_Type == 1)       {  string1 = "Inelastic"; h_max_min1->Fill(log10(rate_max_min)); h_change_1->Fill(rate_sum); h_contin_1->Fill(rate_len); g_sum_len1->SetPoint(point_counter_i++,rate_sum,rate_len+0.1); h_poi_had1->Fill(max_rate_index,p_FH_Lay); h2->Fill(log10(rate_max_min),max_rate_index); h3->Fill(log10(rate_max_min),rate_sum);} 
-        else if (p_FH_Type == 2) {  string1 = "Elastic";   h_max_min2->Fill(log10(rate_max_min)); h_change_2->Fill(rate_sum); h_contin_2->Fill(rate_len); g_sum_len2->SetPoint(point_counter_e++,rate_sum,rate_len)    ; h_poi_had2->Fill(max_rate_index,p_FH_Lay);}
+        if (rate_max_min >  1e2 && rate_len > 5 ) 
+        {h2->Fill(max_rate_index); }
+        if (rate_max_min < 100 && rate_max_min>60  && p_FH_Type == 1 && p_FH_Lay>11) { cout << entry << " , " <<  rate_max_min <<  endl; }
+        
+        if (rate_max_min >  1e2 )
+        {h_poi_had2->Fill(max_rate_index,p_FH_Lay);}
+        
+        
+        if(p_FH_Type == 1)       {  string1 = "Inelastic"; h_max_min1->Fill(log10(rate_max_min)); h_change_1->Fill(rate_sum); h_contin_1->Fill(rate_len); g_sum_len1->SetPoint(point_counter_i++,rate_sum,rate_len+0.1); h_poi_had1->Fill(max_rate_index,p_FH_Lay); 
+            h1->Fill(log10(rate_max_min),p_FH_Lay); h3->Fill(log10(rate_max_min),rate_sum);
+        } 
+        else if (p_FH_Type == 2) {  string1 = "Elastic";   h_max_min2->Fill(log10(rate_max_min)); h_change_2->Fill(rate_sum); h_contin_2->Fill(rate_len); g_sum_len2->SetPoint(point_counter_e++,rate_sum,rate_len)    ; }
         else                     {  string1 = "Pass";      h_max_min3->Fill(log10(rate_max_min)); h_change_3->Fill(rate_sum); h_contin_3->Fill(rate_len); g_sum_len3->SetPoint(point_counter_p++,rate_sum,rate_len-0.1); h_poi_had3->Fill(max_rate_index,p_FH_Lay);}
         
     }
     auto c2    = new TCanvas("c2","c2",2100,2100);
     c2->Divide(3,3);
     c2->cd(1);
+    gPad->SetLogy(1);
     gStyle->SetOptStat(0);
     h_max_min1->GetXaxis()->SetLimits(-1, 5);        // X 轴范围
     h_max_min1->SetTitle(";log10(Emax/Emin);Counts");
@@ -231,7 +245,7 @@ void Draw_Pattern2()
     c2->cd(3);
     gStyle->SetOptStat(0);
     gPad->SetLogy();
-    h_contin_1->GetYaxis()->SetRangeUser(1e-1, 3e3); 
+    h_contin_1->GetYaxis()->SetRangeUser(1e0, 3e3); 
     h_contin_1->SetTitle(";# Continues Positive Bins;Counts");
     h_contin_1->SetLineColor(kRed);
     h_contin_2->SetLineColor(kBlue);
@@ -245,8 +259,9 @@ void Draw_Pattern2()
 
     c2->cd(4);
     gStyle->SetOptStat(0);
-    h2->SetTitle("Inelastic;log10(Emax/Emin);Bin of Maximum Change Ratio");
-    h2->Draw("colz");
+    // h1->SetTitle("Inelastic;log10(Emax/Emin);Bin of Maximum Change Ratio");
+    h1->SetTitle("Inelastic;log10(Emax/Emin);First Hadronic Layer");
+    h1->Draw("colz");
 
 
     c2->cd(5);
@@ -292,6 +307,11 @@ void Draw_Pattern2()
     gPad->SetLogz();
     h_poi_had1->SetTitle("Inelastic;Bin of Maximum Change Ratio; First Hadronic Layer");
     h_poi_had1->Draw("colz");
+    double cov1 = h_poi_had1->GetCorrelationFactor();
+    cout << " cov1 = " << cov1 << endl;
+
+    double cov2 = h_poi_had2->GetCorrelationFactor();
+    cout << " cov2 = " << cov2 << endl;
 
     c2->cd(8);
     gPad->SetLogz();
@@ -309,6 +329,39 @@ void Draw_Pattern2()
 
     c2->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/%s_FIG.pdf",string2));
     std::cout << "Number of valid points: " << g_sum_len0->GetN() << std::endl;
+
+    for(int ii = 1 ; ii <= 14 ; ii++)
+    {
+        hC2->SetBinContent(ii, ( 1e4 - h2->Integral(0,ii) ) );
+    }
+
+    TLatex latex;
+    latex.SetTextSize(0.04);
+    latex.SetTextFont(72);
+    latex.SetTextAlign(13);  //align at top
+    TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-x/[1])", 0, 6); fitFunc2->SetParameters(100, 10); fitFunc2->SetLineColor(kBlue);
+
+    auto c1 = new TCanvas("c1","c1",1200,600);
+    c1->Divide(2,1);
+    c1->cd(1);
+    h2->SetTitle(";Layer;N_{interact}");
+    h2->Draw("");
+    c1->cd(2);
+    gPad->SetLogy();
+    // gStyle->SetOptFit(0);
+    gStyle->SetOptStat(0);
+    hC2->GetYaxis()->SetRangeUser(1e2,2e4);
+    hC2->SetTitle(";Layer;N_{survive}");
+    hC2->Draw("");
+    hC2->Fit(fitFunc2, "R"); // 进行拟合
+    double constant2   = fitFunc2->GetParameter(0);
+    double lambda2     = fitFunc2->GetParameter(1);
+    double lambda2_err = fitFunc2->GetParError(1);
+    double n_BGO = TMath::Na()*7.13/ (1245.8344/19.); // cm-3
+    double hi_section = 1 / (lambda2*25) / n_BGO * 1e25; // barn, mm = 1e-1 cm, 1e24 barn = 1 cm^2
+    double hi_section_err = hi_section * lambda2_err/lambda2; // barn
+    latex.DrawLatex(0,pow(10,3.3),"Fitting Function: N_{leave} =N_{total} *exp(-x/#lambda)");
+    latex.DrawLatex(0,pow(10,3.0),Form("Deuteron Fitting #lambda: %.2f mm",lambda2*25));
 }
 
 void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int& out_len, int& out_start_index) 
@@ -334,7 +387,9 @@ void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int
             curr_sum += content;
             curr_len++;
 
+            // if (curr_len > max_len || (curr_sum > max_sum && curr_len == max_len)) 
             if (curr_sum > max_sum || (curr_sum == max_sum && curr_len > max_len)) 
+
             {
                 max_sum = curr_sum;
                 max_len = curr_len;

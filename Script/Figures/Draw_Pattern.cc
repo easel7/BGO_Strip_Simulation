@@ -31,7 +31,10 @@ void Draw_Pattern()
 
     const char* string1;
     const char* string2 = "Proton_1000GeV";
+    // const char* string2 = "Proton_10000GeV";
     // const char* string2 = "Deuteron_1000GeV";
+    // const char* string2 = "Deuteron_10000GeV";
+
 
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
@@ -59,7 +62,7 @@ void Draw_Pattern()
     int point_counter_p = 0;
 
     // cout  << proton_tree->GetEntries() << endl;
-    Long64_t entry  = 5668;   
+    Long64_t entry  = 251;   
     // for (Long64_t entry = 0; entry < 100; entry++)
     {
         auto c1    = new TCanvas("c1","c1",1400,1400);
@@ -111,11 +114,11 @@ void Draw_Pattern()
         }
 
         int layer_start = 4;
-        const double RMS_threshold = 15.0;  // 自定义阈值，越小越“直”，你可以调整
-        bool bar_info_assigned = false;  // 标志变量，判断是否已赋值
+        const double RMS_threshold = 15.0;  
+        bool bar_info_assigned = false;  
         // cout << " Layer " << layer_start << " , RMS = " <<  (*p_RMSVec)[layer_start] << " , Next Layer RMS = " << (*p_RMSVec)[layer_start+1] << endl;
-        for (int k = layer_start; k <= 12; k ++) 
-        {  // 每次两层作为一个窗口
+        for (int k = layer_start; k <= 12; k ++) // two layer as a search window
+        {  
             if((*p_RMSVec)[k]<=RMS_threshold && (*p_RMSVec)[k+1]<=RMS_threshold)
             {
                 int max_index1 = FindMaxMiddleIndex(p_EnergyVec, k);
@@ -123,19 +126,17 @@ void Draw_Pattern()
                 int max_index2 = FindMaxMiddleIndex(p_EnergyVec, k+1);
                 int bar2 = max_index2 % 22;
                 if (k % 2 == 0) {
-                    bar_info[0] = bar1; // 奇数层
-                    bar_info[1] = bar2; // 偶数层
+                    bar_info[0] = bar1; // odd
+                    bar_info[1] = bar2; // even
                 } else {
-                    bar_info[0] = bar2; // 奇数层
-                    bar_info[1] = bar1; // 偶数层
+                    bar_info[0] = bar2; // odd
+                    bar_info[1] = bar1; // even
                 }
-                // 输出确定的 bar_info
                 // cout << "Directly determined bar_info: " 
                 // << "bar1 = " << bar_info[0] << ", bar2 = " << bar_info[1] << endl;
 
-                // 设置标志为 true，表示已经赋值
                 bar_info_assigned = true;
-                break;  // 一旦赋值，跳出循环
+                break;  
             }
         }
         
@@ -219,9 +220,13 @@ void Draw_Pattern()
         line4->SetLineStyle(9);
         h_max_min0->Fill(log10(MaxMinRatio(hBGO1)));
         g_sum_len0->SetPoint(point_counter++,rate_sum,rate_len);
-        if(p_FH_Type == 1)       {  string1 = "Inelastic";  g_core0->SetMarkerColor(kRed);    g_core1->SetMarkerColor(kRed);    g_core2->SetMarkerColor(kRed);    g_core3->SetMarkerColor(kRed);      g_ch_0->SetMarkerColor(kRed);      g_ch_1->SetMarkerColor(kRed);      g_ch_2->SetMarkerColor(kRed);      g_ch_3->SetMarkerColor(kRed);  box0->SetLineColor(kRed);     box1->SetLineColor(kRed);       line1->SetLineColor(kRed);     line2->SetLineColor(kRed);     line3->SetLineColor(kRed);     h_max_min1->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len1->SetPoint(point_counter_i++,rate_sum,rate_len+0.1);}
-        else if (p_FH_Type == 2) {  string1 = "Elastic";    g_core0->SetMarkerColor(kMagenta);g_core1->SetMarkerColor(kMagenta);g_core2->SetMarkerColor(kMagenta);g_core3->SetMarkerColor(kMagenta);  g_ch_0->SetMarkerColor(kMagenta);  g_ch_1->SetMarkerColor(kMagenta);  g_ch_2->SetMarkerColor(kMagenta);  g_ch_3->SetMarkerColor(kRed);  box0->SetLineColor(kMagenta); box1->SetLineColor(kMagenta);   line1->SetLineColor(kMagenta); line2->SetLineColor(kMagenta); line3->SetLineColor(kMagenta); h_max_min2->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len2->SetPoint(point_counter_e++,rate_sum,rate_len);    }
-        else                     {  string1 = "Pass";       g_core0->SetMarkerColor(kGray);   g_core1->SetMarkerColor(kGray);   g_core2->SetMarkerColor(kGray);   g_core3->SetMarkerColor(kGray);     g_ch_0->SetMarkerColor(kGray);     g_ch_1->SetMarkerColor(kGray);     g_ch_2->SetMarkerColor(kGray);     g_ch_3->SetMarkerColor(kRed);  box0->SetLineColor(kGray);    box1->SetLineColor(kGray);      line1->SetLineColor(kGray);    line2->SetLineColor(kGray);    line3->SetLineColor(kGray);    h_max_min3->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len3->SetPoint(point_counter_p++,rate_sum,rate_len-0.1);}
+        if(p_FH_Type == 1)       {  h_max_min1->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len1->SetPoint(point_counter_i++,rate_sum,rate_len+0.1);}
+        else if (p_FH_Type == 2) {  h_max_min2->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len2->SetPoint(point_counter_e++,rate_sum,rate_len);    }
+        else                     {  h_max_min3->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len3->SetPoint(point_counter_p++,rate_sum,rate_len-0.1);}
+
+        if(p_FH_Type == 1)       {  string1 = "Inelastic";  g_core0->SetMarkerColor(kRed);    g_core1->SetMarkerColor(kRed);    g_core2->SetMarkerColor(kRed);    g_core3->SetMarkerColor(kRed);      g_ch_0->SetMarkerColor(kRed);      g_ch_1->SetMarkerColor(kRed);      g_ch_2->SetMarkerColor(kRed);      g_ch_3->SetMarkerColor(kRed);     box0->SetLineColor(kRed);     box1->SetLineColor(kRed);       line1->SetLineColor(kRed);     line2->SetLineColor(kRed);     line3->SetLineColor(kRed);     }
+        else if (p_FH_Type == 2) {  string1 = "Elastic";    g_core0->SetMarkerColor(kMagenta);g_core1->SetMarkerColor(kMagenta);g_core2->SetMarkerColor(kMagenta);g_core3->SetMarkerColor(kMagenta);  g_ch_0->SetMarkerColor(kMagenta);  g_ch_1->SetMarkerColor(kMagenta);  g_ch_2->SetMarkerColor(kMagenta);  g_ch_3->SetMarkerColor(kMagenta); box0->SetLineColor(kMagenta); box1->SetLineColor(kMagenta);   line1->SetLineColor(kMagenta); line2->SetLineColor(kMagenta); line3->SetLineColor(kMagenta); }
+        else                     {  string1 = "Pass";       g_core0->SetMarkerColor(kGray);   g_core1->SetMarkerColor(kGray);   g_core2->SetMarkerColor(kGray);   g_core3->SetMarkerColor(kGray);     g_ch_0->SetMarkerColor(kGray);     g_ch_1->SetMarkerColor(kGray);     g_ch_2->SetMarkerColor(kGray);     g_ch_3->SetMarkerColor(kGray);    box0->SetLineColor(kGray);    box1->SetLineColor(kGray);      line1->SetLineColor(kGray);    line2->SetLineColor(kGray);    line3->SetLineColor(kGray);    }
         
         box0->SetFillStyle(0);        box0->SetLineWidth(2);
         box1->SetFillStyle(0);        box1->SetLineWidth(2);
@@ -324,45 +329,47 @@ void Draw_Pattern()
         if(p_FH_Lay%2 != -1 ) {line3->Draw("");}
         if (entry < 100) { c1->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/%s/%s/%lld.pdf",string1,string2,entry)); }
     }
-    auto c2    = new TCanvas("c2","c2",1400,700);
-    c2->Divide(2,1);
-    c2->cd(1);
-    h_max_min1->SetTitle(";log10(Emax/Emin);Counts");
 
-    h_max_min1->SetLineColor(kRed);
-    h_max_min2->SetLineColor(kBlue);
-    h_max_min3->SetLineColor(kOrange-3);
+    /*  Check the Macro Parameter Do not Delete*/
+    // auto c2    = new TCanvas("c2","c2",1400,700);
+    // c2->Divide(2,1);
+    // c2->cd(1);
+    // h_max_min1->SetTitle(";log10(Emax/Emin);Counts");
 
-    h_max_min1->Draw("hist");
-    h_max_min2->Draw("histsame");
-    h_max_min3->Draw("histsame");
+    // h_max_min1->SetLineColor(kRed);
+    // h_max_min2->SetLineColor(kBlue);
+    // h_max_min3->SetLineColor(kOrange-3);
 
-    c2->cd(2);
-    gPad->SetLogx();
-    g_sum_len0->SetTitle("; #sum log10(Change Rate);# Continues Positive Bins");
-    g_sum_len0->GetXaxis()->SetLimits(1e-2, 100);        // X 轴范围
-    g_sum_len0->GetYaxis()->SetRangeUser(0, 14);    // Y 轴范围
-    g_sum_len0->SetMarkerColorAlpha(kBlack, 0);  // 0.0 = fully transparent, 1.0 = fully opaque
-    g_sum_len0->SetMarkerSize(0);
+    // h_max_min1->Draw("hist");
+    // h_max_min2->Draw("histsame");
+    // h_max_min3->Draw("histsame");
 
-    g_sum_len1->SetMarkerStyle(20);  
-    g_sum_len1->SetMarkerColorAlpha(kRed, 0.1);  // 0.0 = fully transparent, 1.0 = fully opaque
-    g_sum_len1->SetMarkerSize(0.8);
+    // c2->cd(2);
+    // gPad->SetLogx();
+    // g_sum_len0->SetTitle("; #sum log10(Change Rate);# Continues Positive Bins");
+    // g_sum_len0->GetXaxis()->SetLimits(1e-2, 100);        // X 轴范围
+    // g_sum_len0->GetYaxis()->SetRangeUser(0, 14);    // Y 轴范围
+    // g_sum_len0->SetMarkerColorAlpha(kBlack, 0);  // 0.0 = fully transparent, 1.0 = fully opaque
+    // g_sum_len0->SetMarkerSize(0);
 
-    g_sum_len2->SetMarkerStyle(21);  
-    g_sum_len2->SetMarkerColorAlpha(kBlue, 0.1);
-    g_sum_len2->SetMarkerSize(0.8);
+    // g_sum_len1->SetMarkerStyle(20);  
+    // g_sum_len1->SetMarkerColorAlpha(kRed, 0.1);  // 0.0 = fully transparent, 1.0 = fully opaque
+    // g_sum_len1->SetMarkerSize(0.8);
 
-    g_sum_len3->SetMarkerStyle(22);  
-    g_sum_len3->SetMarkerColorAlpha(kOrange-3, 0.1);
-    g_sum_len3->SetMarkerSize(0.8);
+    // g_sum_len2->SetMarkerStyle(21);  
+    // g_sum_len2->SetMarkerColorAlpha(kBlue, 0.1);
+    // g_sum_len2->SetMarkerSize(0.8);
 
-    g_sum_len0->Draw("AP"); 
-    g_sum_len1->Draw("PSAME");  
-    g_sum_len2->Draw("PSAME");
-    g_sum_len3->Draw("PSAME");
+    // g_sum_len3->SetMarkerStyle(22);  
+    // g_sum_len3->SetMarkerColorAlpha(kOrange-3, 0.1);
+    // g_sum_len3->SetMarkerSize(0.8);
 
-    std::cout << "Number of valid points: " << g_sum_len0->GetN() << std::endl;
+    // g_sum_len0->Draw("AP"); 
+    // g_sum_len1->Draw("PSAME");  
+    // g_sum_len2->Draw("PSAME");
+    // g_sum_len3->Draw("PSAME");
+
+    // std::cout << "Number of valid points: " << g_sum_len0->GetN() << std::endl;
 }
 
 void FindMaxPositiveBinSegment(TH1D* hist, double& out_sum, int& out_len, int& out_start_bin) 
@@ -389,6 +396,7 @@ void FindMaxPositiveBinSegment(TH1D* hist, double& out_sum, int& out_len, int& o
             curr_sum += content;
             curr_len++;
 
+            // if (curr_len > max_len || (curr_sum > max_sum && curr_len == max_len)) 
             if (curr_sum > max_sum || (curr_sum == max_sum && curr_len > max_len)) 
             {
                 max_sum = curr_sum;
