@@ -68,25 +68,27 @@ void Draw_Pattern2()
     auto h_contin_2 = new TH1D("h_contin_2","h_contin_2",14,0,14); // Elastic
     auto h_contin_3 = new TH1D("h_contin_3","h_contin_3",14,0,14); // Pass
 
-    auto h_change_0 = new TH1D("h_change_0","h_change_0",nbins, bin_edges.data()); 
-    auto h_change_1 = new TH1D("h_change_1","h_change_1",nbins, bin_edges.data()); // Inelastic
-    auto h_change_2 = new TH1D("h_change_2","h_change_2",nbins, bin_edges.data()); // Elastic
-    auto h_change_3 = new TH1D("h_change_3","h_change_3",nbins, bin_edges.data()); // Pass
+    auto h_change_0 = new TH1D("h_change_0","h_change_0",60,-1,5); 
+    auto h_change_1 = new TH1D("h_change_1","h_change_1",60,-1,5); // Inelastic
+    auto h_change_2 = new TH1D("h_change_2","h_change_2",60,-1,5); // Elastic
+    auto h_change_3 = new TH1D("h_change_3","h_change_3",60,-1,5); // Pass
+
 
     auto g_sum_len0 = new TGraph();      auto h_poi_had0 = new TH2I("h_poi_had0","h_poi_had0",14,0,14,16,-2,14);
     auto g_sum_len1 = new TGraph();      auto h_poi_had1 = new TH2I("h_poi_had1","h_poi_had1",14,0,14,16,-2,14);
     auto g_sum_len2 = new TGraph();      auto h_poi_had2 = new TH2I("h_poi_had2","h_poi_had2",14,0,14,16,-2,14);
     auto g_sum_len3 = new TGraph();      auto h_poi_had3 = new TH2I("h_poi_had3","h_poi_had3",14,0,14,16,-2,14);
 
-    int point_counter   = 0;           int pc   = 0;
-    int point_counter_i = 0;           int pc_i = 0;
-    int point_counter_e = 0;           int pc_e = 0;
-    int point_counter_p = 0;           int pc_p = 0;
+    int point_counter   = 0; int pc   = 0;
+    int point_counter_i = 0; int pc_i = 0;
+    int point_counter_e = 0; int pc_e = 0;
+    int point_counter_p = 0; int pc_p = 0;
 
     auto h1         = new TH2D("h1","h1",60,-1,5,16,-2,14);
     auto h2         = new TH1D("h2","h2",14,0,14);
     auto hC2        = new TH1D("hC2","hC2",14,0,14);
-    auto h3         = new TH2D("h3","h3",60,-1,5,nbins, bin_edges.data());
+    auto h3         = new TH2D("h3","h3",60,-1,5,60,-1,5);
+    auto h4         = new TH1D("h4","h4",40,0,2);
 
     // cout  << proton_tree->GetEntries() << endl;
     // Long64_t entry  = 99;   
@@ -127,11 +129,8 @@ void Draw_Pattern2()
                     bar_info[0] = bar2; // odd
                     bar_info[1] = bar1; // even
                 }
-                // 输出确定的 bar_info
                 // cout << "Directly determined bar_info: " 
                 // << "bar1 = " << bar_info[0] << ", bar2 = " << bar_info[1] << endl;
-
-                // 设置标志为 true，表示已经赋值
                 bar_info_assigned = true;
                 break;  // 一旦赋值，跳出循环
             }
@@ -162,7 +161,6 @@ void Draw_Pattern2()
             // cout << " bar_even = " << bar_even << endl;
             bar_info[1] = std::round(bar_even);
         }
-       
 
         for(int layer = 0 ; layer<14 ; layer++)
         {   
@@ -189,20 +187,46 @@ void Draw_Pattern2()
         // cout << "Max Positive Bin Length = " << rate_len << endl;
         // cout << "Max Increase Rate = " <<  max_rate << endl;
         // cout << "Max Increase Rate Bin = " << max_rate_index << endl;
-        rate_max_min = MaxMinRatio(bar_Energy_info,14);    h_max_min0->Fill(log10(rate_max_min)); h_change_0->Fill(rate_sum); h_contin_0->Fill(rate_len); g_sum_len0->SetPoint(point_counter++,rate_sum,rate_len)      ; h_poi_had0->Fill(max_rate_index,p_FH_Lay);
+        rate_max_min = MaxMinRatio(bar_Energy_info,14);    
+        h_max_min0->Fill(log10(rate_max_min)); 
+        h_change_0->Fill(log10(rate_sum)); 
+        h_contin_0->Fill(rate_len); 
+        g_sum_len0->SetPoint(point_counter++,rate_sum,rate_len); 
+        h_poi_had0->Fill(max_rate_index,p_FH_Lay);
+        
+        
         if (rate_max_min >  1e2 && rate_len > 5 ) 
         {h2->Fill(max_rate_index); }
-        if (rate_max_min < 100 && rate_max_min>60  && p_FH_Type == 1 && p_FH_Lay>11) { cout << entry << " , " <<  rate_max_min <<  endl; }
-        
+        // if (rate_max_min < 100 && rate_max_min>60  && p_FH_Type == 1 && p_FH_Lay>11) { cout << entry << " , " <<  rate_max_min <<  endl; }
         if (rate_max_min >  1e2 )
-        {h_poi_had2->Fill(max_rate_index,p_FH_Lay);}
+        {}
         
         
-        if(p_FH_Type == 1)       {  string1 = "Inelastic"; h_max_min1->Fill(log10(rate_max_min)); h_change_1->Fill(rate_sum); h_contin_1->Fill(rate_len); g_sum_len1->SetPoint(point_counter_i++,rate_sum,rate_len+0.1); h_poi_had1->Fill(max_rate_index,p_FH_Lay); 
-            h1->Fill(log10(rate_max_min),p_FH_Lay); h3->Fill(log10(rate_max_min),rate_sum);
+        if(p_FH_Type == 1)       {  string1 = "Inelastic"; 
+            h_max_min1->Fill(log10(rate_max_min)); 
+            h_change_1->Fill(log10(rate_sum)); 
+            h_contin_1->Fill(rate_len); 
+            g_sum_len1->SetPoint(point_counter_i++,rate_sum,rate_len+0.1); 
+            h_poi_had1->Fill(max_rate_index,p_FH_Lay); 
+            h4->Fill(max_rate);
+            h3->Fill(log10(rate_max_min),rate_sum);
         } 
-        else if (p_FH_Type == 2) {  string1 = "Elastic";   h_max_min2->Fill(log10(rate_max_min)); h_change_2->Fill(rate_sum); h_contin_2->Fill(rate_len); g_sum_len2->SetPoint(point_counter_e++,rate_sum,rate_len)    ; }
-        else                     {  string1 = "Pass";      h_max_min3->Fill(log10(rate_max_min)); h_change_3->Fill(rate_sum); h_contin_3->Fill(rate_len); g_sum_len3->SetPoint(point_counter_p++,rate_sum,rate_len-0.1); h_poi_had3->Fill(max_rate_index,p_FH_Lay);}
+        else if (p_FH_Type == 2) {  string1 = "Elastic";   
+            h_max_min2->Fill(log10(rate_max_min)); 
+            h_change_2->Fill(log10(rate_sum)); 
+            h_contin_2->Fill(rate_len); 
+            g_sum_len2->SetPoint(point_counter_e++,rate_sum,rate_len); 
+            h_poi_had2->Fill(max_rate_index,p_FH_Lay);
+        }
+        else                     {  string1 = "Pass";      
+            h_max_min3->Fill(log10(rate_max_min)); 
+            h_change_3->Fill(log10(rate_sum)); 
+            h_contin_3->Fill(rate_len); 
+            g_sum_len3->SetPoint(point_counter_p++,rate_sum,rate_len-0.1);
+            h_poi_had3->Fill(max_rate_index,p_FH_Lay);
+
+            h1->Fill(log10(rate_max_min),p_FH_Lay);
+        }
         
     }
     auto c2    = new TCanvas("c2","c2",2100,2100);
@@ -229,16 +253,16 @@ void Draw_Pattern2()
 
     c2->cd(2);
     gStyle->SetOptStat(0);
-    gPad->SetLogx(1);
+    // gPad->SetLogx(1);
     gPad->SetLogy(1);
     h_change_1->GetXaxis()->SetLimits(1e-2, 1e2);
     h_change_1->SetTitle(";#sum log10(Change Rate);Counts");
     h_change_1->SetLineColor(kRed);
     h_change_2->SetLineColor(kBlue);
     h_change_3->SetLineColor(kOrange-3);
-    h_change_1->Draw("hist");
-    h_change_2->Draw("histsame");
-    h_change_3->Draw("histsame");
+    // h_change_1->Draw("hist");
+    // h_change_2->Draw("histsame");
+    // h_change_3->Draw("histsame");
 
     legend1->Draw();
 
@@ -260,7 +284,7 @@ void Draw_Pattern2()
     c2->cd(4);
     gStyle->SetOptStat(0);
     // h1->SetTitle("Inelastic;log10(Emax/Emin);Bin of Maximum Change Ratio");
-    h1->SetTitle("Inelastic;log10(Emax/Emin);First Hadronic Layer");
+    h1->SetTitle("Pass throught;log10(Emax/Emin);First Hadronic Layer");
     h1->Draw("colz");
 
 
@@ -298,9 +322,9 @@ void Draw_Pattern2()
 
 
     c2->cd(6);
-    gPad->SetLogy();
+    // gPad->SetLogy();
     gStyle->SetOptStat(0);
-    h3->SetTitle("Inelastic;log10(Emax/Emin);#sum log10(Change Rate)");
+    h3->SetTitle("Elastic;log10(Emax/Emin);#sum log10(Change Rate)");
     h3->Draw("colz");
     
     c2->cd(7);
@@ -310,15 +334,14 @@ void Draw_Pattern2()
     double cov1 = h_poi_had1->GetCorrelationFactor();
     cout << " cov1 = " << cov1 << endl;
 
-    double cov2 = h_poi_had2->GetCorrelationFactor();
-    cout << " cov2 = " << cov2 << endl;
-
     c2->cd(8);
     gPad->SetLogz();
     h_poi_had2->SetMinimum(h_poi_had2->GetMinimum(1e-10)); // 取非零最小值
     h_poi_had2->SetMaximum(h_poi_had2->GetMaximum());
     h_poi_had2->SetTitle("Elastic;Bin of Maximum Change Ratio; First Hadronic Layer");
     h_poi_had2->Draw("colz");
+    double cov2 = h_poi_had2->GetCorrelationFactor();
+    cout << " cov2 = " << cov2 << endl;
 
     c2->cd(9);
     gPad->SetLogz();
@@ -362,6 +385,9 @@ void Draw_Pattern2()
     double hi_section_err = hi_section * lambda2_err/lambda2; // barn
     latex.DrawLatex(0,pow(10,3.3),"Fitting Function: N_{leave} =N_{total} *exp(-x/#lambda)");
     latex.DrawLatex(0,pow(10,3.0),Form("Deuteron Fitting #lambda: %.2f mm",lambda2*25));
+
+    auto c3 = new TCanvas("c3","c3",600,600);
+    h4->Draw();
 }
 
 void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int& out_len, int& out_start_index) 
