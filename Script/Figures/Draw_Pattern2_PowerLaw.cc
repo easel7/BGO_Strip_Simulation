@@ -18,11 +18,11 @@ void PrepareFitData(
     std::vector<double>& energies,
     double& total_energy);
 
-double AccumIncreaseToPeak(const double array[], int start_idx, int end_idx);
-
 void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_t flag);
 
-void Draw_Pattern2()
+double AccumIncreaseToPeak(const double array[], int start_idx, int end_idx);
+
+void Draw_Pattern2_PowerLaw()
 {
     vector<double>* p_EnergyVec = nullptr;
     vector<double>* p_RMSVec = nullptr;
@@ -31,19 +31,22 @@ void Draw_Pattern2()
     int p_FH_Type;
     int p_FH_Lay;
     int p_Nhits;
+    int p_FH_Second;
+
 
     const char* string1;
-    const char* string2 = "Proton_1000GeV";
-    // const char* string2 = "Proton_10000GeV";
-    // const char* string2 = "Deuteron_1000GeV";
-    // const char* string2 = "Deuteron_10000GeV";
-    auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
+    // const char* string2 = "Proton_PowerLaw";
+    const char* string2 = "Deuteron_PowerLaw";
+
+    auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Weight/%s.root",string2));
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("BarEnergyVector", &p_EnergyVec);
     proton_tree->SetBranchAddress("RMS"            , &p_RMSVec);
     proton_tree->SetBranchAddress("First_Had_Depth", &p_FH_Dep);
     proton_tree->SetBranchAddress("First_Had_Layer", &p_FH_Lay);
     proton_tree->SetBranchAddress("First_Had_Type" , &p_FH_Type);
+    proton_tree->SetBranchAddress("First_Had_Second", &p_FH_Second);
+
     proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
     proton_tree->SetBranchAddress("Total_E"        , &p_Total_E);
 
@@ -64,13 +67,25 @@ void Draw_Pattern2()
     auto h_max_min2 = new TH1D("h_max_min2","h_max_min2",60,-1,5); // Elastic
     auto h_max_min3 = new TH1D("h_max_min3","h_max_min3",60,-1,5); // Pass
 
-    auto h_change_1 = new TH1D("h_change_1","h_change_1",nbins, bin_edges.data()); // Inelastic
-    auto h_change_2 = new TH1D("h_change_2","h_change_2",nbins, bin_edges.data()); // Elastic
-    auto h_change_3 = new TH1D("h_change_3","h_change_3",nbins, bin_edges.data()); // Pass
+    auto h_change_1 = new TH1D("h_change_1","h_change_1",60,-1,5); // Inelastic
+    auto h_change_2 = new TH1D("h_change_2","h_change_2",60,-1,5); // Elastic
+    auto h_change_3 = new TH1D("h_change_3","h_change_3",60,-1,5); // Pass
 
     auto h_contin_1 = new TH1D("h_contin_1","h_contin_1",14,0,14); // Inelastic
     auto h_contin_2 = new TH1D("h_contin_2","h_contin_2",14,0,14); // Elastic
     auto h_contin_3 = new TH1D("h_contin_3","h_contin_3",14,0,14); // Pass
+
+    auto h_layer_1 = new TH1D("h_layer_1","h_layer_1",14,0,14); // Inelastic
+    auto h_layer_2 = new TH1D("h_layer_2","h_layer_2",14,0,14); // Elastic
+    auto h_layer_3 = new TH1D("h_layer_3","h_layer_3",14,0,14); // Pass
+
+    auto h_sec_1 = new TH1D("h_sec_1","h_sec_1",20,0,200); // Inelastic
+    auto h_sec_2 = new TH1D("h_sec_2","h_sec_2",20,0,200); // Elastic
+    auto h_sec_3 = new TH1D("h_sec_3","h_sec_3",20,0,200); // Pass
+
+    auto h_RMS_1 = new TH1D("h_RMS_1","h_RMS_1",20,0,200); // Inelastic
+    auto h_RMS_2 = new TH1D("h_RMS_2","h_RMS_2",20,0,200); // Elastic
+    auto h_RMS_3 = new TH1D("h_RMS_3","h_RMS_3",20,0,200); // Pass
 
     auto g_sum_len0 = new TGraph();  int point_counter   = 0; int pc   = 0;
     auto g_sum_len1 = new TGraph();  int point_counter_i = 0; int pc_i = 0;
@@ -115,15 +130,17 @@ void Draw_Pattern2()
     auto h_int      = new TH1D("h_int","h_int",14,0,14);
     auto h_sur        = new TH1D("h_sur","h_sur",14,0,14);
 
+    int through =0; 
+    int el = 0;
+
     // cout  << proton_tree->GetEntries() << endl;
-    Long64_t entry  = 99;   
+    // Long64_t entry  = 99;   
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
     // for (Long64_t entry = 0; entry < 100; entry++)
     {        
         double bar_info[2] = {0};
         double bar_Energy_info[14] = {0};
         double bar_Change_info[14] = {0};
-        
         double rate_max_min      = 0;
         double seg_sum           = 0;   // 总增长和
         int    seg_len           = 0;   // 连续正增长长度
@@ -132,10 +149,10 @@ void Draw_Pattern2()
         int    seg_peak_idx      = 0;   // 正段增长最大值的索引
         double seg_sum_to_peak   = 0;   // 从起点到增长最大值的增长和
         int    seg_len_to_peak   = 0;   // 从起点到增长最大值的索引
-        
 
         proton_tree->GetEntry(entry);
         if (p_Nhits < 10 ) continue;
+        if (log10(p_Total_E) < 2.8 || log10(p_Total_E)> 3.0 ) continue;
         // cout << entry << endl;
         // cout << " Depth " << p_FH_Dep << " layer " <<  p_FH_Lay << " Type =" << p_FH_Type << endl;
         
@@ -183,7 +200,7 @@ void Draw_Pattern2()
             TMinuit minuit1(1);
             minuit1.SetFCN(FitAxisFunction);
             minuit1.SetPrintLevel(-1);
-            minuit1.DefineParameter(0, "bar_even", g_fit_bars[1], 0.04, 2, 19);
+            minuit1.DefineParameter(0, "bar_even", g_fit_bars[1], 0.01, 2, 19);
             minuit1.Migrad();
             double bar_even, bar_even_err;
             minuit1.GetParameter(0, bar_even, bar_even_err);
@@ -200,7 +217,7 @@ void Draw_Pattern2()
             }
             if(layer==0)
             {
-                bar_Change_info[0] = log10(bar_Energy_info[0] / 0.02);
+                bar_Change_info[0] = log10(bar_Energy_info[0] / 0.05);
             }
             else // (layer>0) 
             {
@@ -223,10 +240,13 @@ void Draw_Pattern2()
         h_peak_had0->Fill(seg_peak_idx,p_FH_Lay);
         
         if (rate_max_min >  1e2 && seg_len > 5 ) 
-        {h_int->Fill(seg_peak_idx);}
+        {h_int->Fill(seg_peak_idx); }
         // if (rate_max_min < 100 && rate_max_min>60  && p_FH_Type == 1 && p_FH_Lay>11) { cout << entry << " , " <<  rate_max_min <<  endl; }
-        if (rate_max_min >  1e2 )
-        {}
+        
+        if ((*p_RMSVec)[13] < 15 &&  (*p_RMSVec)[12] < 15 )
+        { through ++ ;
+        
+        cout << entry << " , " << p_Total_E << endl;}
         
         
         if(p_FH_Type == 1)       {  string1 = "Inelastic"; 
@@ -242,6 +262,8 @@ void Draw_Pattern2()
             h_sp_rate1->Fill(seg_sum_to_peak);
             h_sp_bin1->Fill(seg_len_to_peak);
             h_peak_val1->Fill(seg_peak_value);
+            h_layer_1->Fill(p_FH_Lay);
+            h_sec_1->Fill(p_FH_Second);
         } 
         else if (p_FH_Type == 2) {  string1 = "Elastic";   
             h_max_min2->Fill(log10(rate_max_min)); 
@@ -258,6 +280,9 @@ void Draw_Pattern2()
             h_sp_rate2->Fill(seg_sum_to_peak);
             h_sp_bin2->Fill(seg_len_to_peak);
             h_peak_val2->Fill(seg_peak_value);
+            el ++ ;
+            h_layer_2->Fill(p_FH_Lay);
+            h_sec_2->Fill(p_FH_Second);
 
         }
         else                     {  string1 = "Pass";      
@@ -275,10 +300,16 @@ void Draw_Pattern2()
             h_sp_rate3->Fill(seg_sum_to_peak);
             h_sp_bin3->Fill(seg_len_to_peak);
             h_peak_val3->Fill(seg_peak_value);
+            h_layer_3->Fill(p_FH_Lay);
+            h_sec_3->Fill(p_FH_Second);
 
         }
         
     }
+
+    cout << "through " << through << endl;
+    cout << "through el " << el << endl;
+
     auto c0    = new TCanvas("c0","c0",1200,1200);
     c0->Divide(2,2);
     c0->cd(1);
@@ -301,7 +332,7 @@ void Draw_Pattern2()
 
     c0->cd(2);
     gStyle->SetOptStat(0);
-    gPad->SetLogx(1);
+    // gPad->SetLogx(1);
     gPad->SetLogy(1);
     // h_change_1->GetXaxis()->SetLimits(1e-2, 3e3);
     h_change_1->SetTitle(";#sum log10(Change Rate);Counts");
@@ -329,9 +360,9 @@ void Draw_Pattern2()
     legend0->Draw();
 
     c0->cd(4);
-    gPad->SetLogx();
+    // gPad->SetLogx();
     g_sum_len0->SetTitle(";#sum log10(Change Rate);# Continues Positive Bins");
-    g_sum_len0->GetXaxis()->SetLimits(1e-2, 100);        // X 轴范围
+    g_sum_len0->GetXaxis()->SetLimits(1, 5);        // X 轴范围
     g_sum_len0->GetYaxis()->SetRangeUser(0, 14);    // Y 轴范围
     g_sum_len0->SetMarkerStyle(20);  
     g_sum_len0->SetMarkerColorAlpha(kBlack, 0);  
@@ -397,20 +428,37 @@ void Draw_Pattern2()
 
     for(int ii = 1 ; ii <= 14 ; ii++)
     {
-        h_sur->SetBinContent(ii, ( 1e4 - h_int->Integral(0,ii) ) );
+        h_sur->SetBinContent(ii, ( point_counter - h_int->Integral(0,ii) ) );
     }
 
     TLatex latex;
     latex.SetTextSize(0.04);
     latex.SetTextFont(72);
     latex.SetTextAlign(13);  //align at top
-    TF1 *fitFunc0 = new TF1("fitFunc0", "[0]*exp(-x/[1])", 0, 3); fitFunc0->SetParameters(100, 10); fitFunc0->SetLineColor(kBlue);
+    TF1 *fitFunc0 = new TF1("fitFunc0", "[0]*exp(-x/[1])", 3, 8); fitFunc0->SetParameters(100, 10); fitFunc0->SetLineColor(kBlue);
 
     auto c2 = new TCanvas("c2","c2",1200,600);
     c2->Divide(2,1);
     c2->cd(1);
-    h_int->SetTitle(";Layer;N_{interact} (Bin of Maximum Change Ratio)");
-    h_int->Draw("");
+    h_layer_1->SetTitle(";Layer;N_{interact}");
+    h_layer_1->SetLineColor(kRed);
+    h_layer_2->SetLineColor(kBlue);
+    h_layer_3->SetLineColor(kOrange-3);
+    h_layer_1->Draw("hist");
+    h_layer_2->Draw("histsame");
+    h_layer_3->Draw("histsame");
+
+    h_int->SetLineColor(kBlack);
+    h_int->SetLineStyle(2);
+    h_int->Draw("histsame");
+
+    auto legend2 = new TLegend(0.4,0.65,0.88,0.88);
+    legend2->AddEntry(h_layer_1, "FH Inelastic","l");
+    legend2->AddEntry(h_layer_2, "FH Elastic","l");
+    legend2->AddEntry(h_layer_3, "Pass through","l");
+    legend2->AddEntry(h_int, "Bin of Maximum Change Ratio","l");
+    legend2->Draw();
+
     c2->cd(2);
     gPad->SetLogy();
     gStyle->SetOptFit(1);
@@ -426,7 +474,7 @@ void Draw_Pattern2()
     double hi_section = 1 / (lambda2*25) / n_BGO * 1e25; // barn, mm = 1e-1 cm, 1e24 barn = 1 cm^2
     double hi_section_err = hi_section * lambda2_err/lambda2; // barn
     latex.DrawLatex(0,pow(10,3.3),"Fitting Function: N_{leave} =N_{total} *exp(-x/#lambda)");
-    latex.DrawLatex(0,pow(10,3.0),Form("Deuteron Fitting #lambda: %.2f mm",lambda2*25));
+    latex.DrawLatex(0,pow(10,3.0),Form("Fitting #lambda: %.2f mm",lambda2*25));
 
     //////////////////////////////////////////////
 
@@ -511,6 +559,7 @@ void Draw_Pattern2()
     auto c7 = new TCanvas("c7","c7",1200,1200);
     c7->Divide(2,2);
     c7->cd(1);
+    gPad->SetLogy();
     h_sp_rate1->SetTitle(";Energy increase from start to peak;Counts");
     h_sp_rate1->SetLineColor(kRed);
     h_sp_rate2->SetLineColor(kBlue);
@@ -521,6 +570,7 @@ void Draw_Pattern2()
     legend0->Draw();
 
     c7->cd(2);
+    gPad->SetLogy();
     h_sp_bin1->SetTitle(";Bin length from start to peak;Counts");
     h_sp_bin1->SetLineColor(kRed);
     h_sp_bin2->SetLineColor(kBlue);
@@ -531,6 +581,7 @@ void Draw_Pattern2()
     legend0->Draw();
 
     c7->cd(3);
+    gPad->SetLogy();
     h_peak_val1->SetTitle(";Maximun Change Ratio;Counts");
     h_peak_val1->SetLineColor(kRed);
     h_peak_val2->SetLineColor(kBlue);
@@ -538,6 +589,20 @@ void Draw_Pattern2()
     h_peak_val1->Draw("hist");
     h_peak_val2->Draw("histsame");
     h_peak_val3->Draw("histsame");
+    legend0->Draw();
+
+
+    auto c8 = new TCanvas("c8","c8",1200,1200);
+    c8->Divide(2,2);
+    c8->cd(1);
+    gPad->SetLogy();
+    h_sec_1->SetTitle(";Second;Counts");
+    h_sec_1->SetLineColor(kRed);
+    h_sec_2->SetLineColor(kBlue);
+    h_sec_3->SetLineColor(kOrange-3);
+    h_sec_1->Draw("hist");
+    h_sec_2->Draw("histsame");
+    h_sec_3->Draw("histsame");
     legend0->Draw();
 }
 

@@ -30,14 +30,15 @@ void Draw_Pattern()
     int p_Nhits;
 
     const char* string1;
-    const char* string2 = "Proton_1000GeV";
+    // const char* string2 = "Proton_1000GeV";
     // const char* string2 = "Proton_10000GeV";
     // const char* string2 = "Deuteron_1000GeV";
     // const char* string2 = "Deuteron_10000GeV";
+    const char* string2 = "Deuteron_PowerLaw";
 
 
-    auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
-    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
+    // auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
+    auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Weight/%s.root",string2));
     // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("BarEnergyVector", &p_EnergyVec);
@@ -62,7 +63,7 @@ void Draw_Pattern()
     int point_counter_p = 0;
 
     // cout  << proton_tree->GetEntries() << endl;
-    Long64_t entry  = 251;   
+    Long64_t entry  = 162;   
     // for (Long64_t entry = 0; entry < 100; entry++)
     {
         auto c1    = new TCanvas("c1","c1",1400,1400);
@@ -179,6 +180,7 @@ void Draw_Pattern()
 
         for(int layer = 0 ; layer<14 ; layer++)
         {   
+            cout << "RMS " << layer << " , " << (*p_RMSVec)[layer] << endl;
             int center_bar = (layer % 2 == 0) ? bar_info[0] : bar_info[1];  // select center bar
             for (int k = center_bar - 1; k <= center_bar + 1; k++)
             {
