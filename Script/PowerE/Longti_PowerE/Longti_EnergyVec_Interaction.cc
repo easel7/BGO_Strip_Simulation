@@ -101,31 +101,5 @@ void Longti_EnergyVec_Interaction()
         legend1->Draw();       
         // c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Longti_PowerE/PDF/Longti_EnergyVec_%.2f_%.2f.pdf",Energy_LL[i],Energy_UL[i]));
 
-
-        auto c2 = new TCanvas("c2","c2",2500,1500);
-        // c2->cd();
-        auto gre_p = new TGraphAsymmErrors(14,Layer,Proton_Ratio  ,Layer_Err,Layer_Err,Proton_Ratio_LL  ,Proton_Ratio_UL);
-        auto gre_d = new TGraphAsymmErrors(14,Layer,Deuteron_Ratio,Layer_Err,Layer_Err,Deuteron_Ratio_LL,Deuteron_Ratio_UL);
-        gre_d->GetYaxis()->SetRangeUser(-2,4);
-        gre_d->GetXaxis()->SetLimits(0,14);
-        gre_d->SetTitle(Form("Deposit Energy [%.2fGeV, %.2fGeV] GeV ; BGO Layer; log10(Deposit Energy/GeV)",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
-        gre_p->SetMarkerStyle(20);
-        gre_p->SetMarkerColor(kRed);
-        gre_p->SetLineColor(kRed);
-        gre_d->SetMarkerStyle(21);
-        gre_d->SetMarkerColor(kBlue);
-        gre_d->SetLineColor(kBlue);
-        gre_p->SetLineWidth(2);
-        gre_d->SetLineWidth(2);
-        gre_d->Draw("AP");
-        gre_p->Draw("PSAME");
-
-        auto legend2 = new TLegend(0.42, 0.12, 0.58, 0.32);
-        legend2->SetNColumns(2);
-        legend2->AddEntry(gre_p, "Proton", "ep");
-        legend2->AddEntry(gre_d, "Deuteron", "ep");
-        legend2->Draw();
-
-        // c2->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Longti_PowerE/PDF/Longti_EnergyVec_BGOLayer_%.2f_%.2f.pdf",Energy_LL[i],Energy_UL[i]));
     }
 }
