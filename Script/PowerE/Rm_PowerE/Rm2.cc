@@ -32,6 +32,9 @@ void Rm2()
     TH1D *h1_p[15][14];  TH1D *hC_p[15][14];       TH2D *h2_p[15];      TGraph *gr_proton[15];          int point_counter_p = 0;
     TH1D *h1_d[15][14];  TH1D *hC_d[15][14];       TH2D *h2_d[15];      TGraph *gr_deuteron[15];        int point_counter_d = 0;
 
+    TH1D *h1_p_inter[15];
+    TH1D *h1_d_inter[15];
+
     for(int i =0 ; i<15 ; i++)
     {
         Energy[i]    = 1.1 + 0.2 * i;
@@ -41,6 +44,10 @@ void Rm2()
         gr_deuteron[i] = new TGraph();
         h2_p[i] = new TH2D(Form("h2_p[%d]",i),Form("h2_p[%d]",i),14,0,14,50,-5,0);
         h2_d[i] = new TH2D(Form("h2_d[%d]",i),Form("h2_d[%d]",i),14,0,14,50,-5,0);
+
+        h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i), 50,-5,0);  
+        h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i), 50,-5,0);  
+
         for( int j= 0; j<14 ;j++)
         {
             h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j),50,-5,0); 
@@ -62,7 +69,7 @@ void Rm2()
 
         int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
         if(p_energy_index < 0 || p_energy_index > 14) continue;
-        if( (*p_L_EnergyVec)[0]>0.23 && (*p_L_EnergyVec)[1]>0.23 && (*p_RMSVec)[2]<40 && (*p_RMSVec)[3]<40 )  // 
+        // if( (*p_L_EnergyVec)[0]>0.23 && (*p_L_EnergyVec)[1]>0.23 && (*p_RMSVec)[2]<40 && (*p_RMSVec)[3]<40 )  // 
         {
             // if (p_energy_index==10) cout << "proton entry = " << entry << endl;
             for (size_t k = 0; k < p_EnergyVec->size(); k += 22)
@@ -91,7 +98,7 @@ void Rm2()
         if(d_energy_index < 0 || d_energy_index > 14) continue;
         // cout << d_Total_E << "," <<  d_energy_index << endl;
         // cout << d_EnergyVec->size() << endl;
-        if((*d_L_EnergyVec)[0]>0.23 && (*d_L_EnergyVec)[1]>0.23 && (*d_RMSVec)[2]<40 && (*d_RMSVec)[3]<40) // 
+        // if((*d_L_EnergyVec)[0]>0.23 && (*d_L_EnergyVec)[1]>0.23 && (*d_RMSVec)[2]<40 && (*d_RMSVec)[3]<40) // 
         {
             // if (d_energy_index==10) cout << "deuteron entry = " << entry << endl;
             for (size_t k = 0; k < d_EnergyVec->size(); k += 22)

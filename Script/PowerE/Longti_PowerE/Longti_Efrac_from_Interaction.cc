@@ -1,4 +1,4 @@
-void Longti_Efrac_Interaction()
+void Longti_Efrac_from_Interaction()
 {
     int p_First_Had_Layer; int p_First_Had_Type; double p_Total_E;  std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr; double p_weight;
     int d_First_Had_Layer; int d_First_Had_Type; double d_Total_E;  std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr; double d_weight;
@@ -65,15 +65,15 @@ void Longti_Efrac_Interaction()
         int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
         if(p_energy_index < 0 || p_energy_index > 14) continue;    
         if(p_First_Had_Type!=1) continue;
-        h1_p[p_energy_index][p_First_Had_Layer]->Fill(log10((*p_Efrac)[p_First_Had_Layer]));
-        h1_p_inter[p_energy_index]->Fill(log10 ((*p_Efrac)[p_First_Had_Layer]) ) ;
-        for(int i=0 ;i<=p_First_Had_Layer; i++)
+        for(int i=p_First_Had_Layer ;i<14-p_First_Had_Layer; i++)
         {
+            int relative_layer = i - p_First_Had_Layer;
+            h1_p[p_energy_index][relative_layer]->Fill(log10((*p_Efrac)[i]));
+            h1_p_inter[p_energy_index]->Fill(log10 ((*p_Efrac)[i]) ) ;
             sum_p += (*p_Efrac)[i];
+            hC_p[p_energy_index][relative_layer]->Fill(log10(sum_p));
+            hC_p_inter[p_energy_index]->Fill(log10 (sum_p) );
         }
-        hC_p[p_energy_index][p_First_Had_Layer]->Fill(log10(sum_p));
-        hC_p_inter[p_energy_index]->Fill(log10 (sum_p) );
-
     }
 
     for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
@@ -83,14 +83,16 @@ void Longti_Efrac_Interaction()
         int d_energy_index = int(floor((log10(d_Total_E) - 1) / 0.2));
         if(d_energy_index < 0 || d_energy_index > 14) continue;
         if(d_First_Had_Type!=1) continue;
-        h1_d[d_energy_index][d_First_Had_Layer]->Fill(log10((*d_Efrac)[d_First_Had_Layer]));
-        h1_d_inter[d_energy_index]->Fill(log10 ((*d_Efrac)[d_First_Had_Layer]) );
-        for(int i=0 ;i<=d_First_Had_Layer; i++)
+
+        for(int i=d_First_Had_Layer ;i<14-d_First_Had_Layer; i++)
         {
+            int relative_layer = i - d_First_Had_Layer;
+            h1_d[d_energy_index][relative_layer]->Fill(log10((*d_Efrac)[i]));
+            h1_d_inter[d_energy_index]->Fill(log10 ((*d_Efrac)[i]) );
             sum_d += (*d_Efrac)[i];
+            hC_d[d_energy_index][relative_layer]->Fill(log10(sum_d));
+            hC_d_inter[d_energy_index]->Fill(log10 (sum_d) );
         }
-        hC_d[d_energy_index][d_First_Had_Layer]->Fill(log10(sum_d));
-        hC_d_inter[d_energy_index]->Fill(log10 (sum_d) );
     }
 
     for (int i = 9; i < 10; i++) // Deposit Energy Bin

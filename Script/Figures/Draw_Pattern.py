@@ -4,8 +4,10 @@ import matplotlib.pyplot as plt
 
 # 载入 ROOT 文件
 filename = "/Users/xiongzheng/software/B4/B4e/ROOT/Proton_1000GeV.root"
-file = ROOT.open(filename)
+file = ROOT.TFile.Open(filename)
 tree = file["B4"]
+
+BarEnergyVector = r.vector('double')()
 
 # 读取分支
 energy_vecs = tree["BarEnergyVector"].arrays(library="np")["BarEnergyVector"]

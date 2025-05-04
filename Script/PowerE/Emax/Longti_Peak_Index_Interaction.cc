@@ -1,0 +1,223 @@
+void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int& out_len, int& out_start_index);
+
+void FindMaxValueInPositiveSegment(const double array[], int start_index, int length, double& out_max_value, int& out_max_index);
+
+void Longti_Peak_Index_Interaction()
+{
+    int p_First_Had_Layer; int p_First_Had_Type; double p_Total_E;  std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr; double p_weight;
+    int d_First_Had_Layer; int d_First_Had_Type; double d_Total_E;  std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr; double d_weight;
+
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
+    auto proton_tree = (TTree*)proton_file->Get("B4");
+    proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
+    proton_tree->SetBranchAddress("LayerEnergyVector",&p_EnergyVec);
+    proton_tree->SetBranchAddress("Efrac"            ,&p_Efrac);
+    proton_tree->SetBranchAddress("First_Had_Layer"  ,&p_First_Had_Layer);
+    proton_tree->SetBranchAddress("First_Had_Type"  ,&p_First_Had_Type);
+    proton_tree->SetBranchAddress("Total_E"          ,&p_Total_E);
+    proton_tree->SetBranchAddress("weight"           ,&p_weight);
+
+    auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
+    auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
+    deuteron_tree->SetBranchAddress("RMS"              ,&d_RMSVec);
+    deuteron_tree->SetBranchAddress("LayerEnergyVector",&d_EnergyVec);
+    deuteron_tree->SetBranchAddress("Efrac"            ,&d_Efrac);
+    deuteron_tree->SetBranchAddress("First_Had_Layer"  ,&d_First_Had_Layer);
+    deuteron_tree->SetBranchAddress("First_Had_Type"   ,&d_First_Had_Type);
+    deuteron_tree->SetBranchAddress("Total_E"          ,&d_Total_E);
+    deuteron_tree->SetBranchAddress("weight"           ,&d_weight);
+    
+    double Energy[15]={0};
+    double Energy_LL[15]={0};      
+    double Energy_UL[15]={0};
+
+    double Layer[14]={0};
+    double Layer_Err[14]={0};
+
+    // Depsit and Layer
+    TH1D *h1_p[15][14];
+    TH1D *h1_d[15][14];
+
+    TH1D *h1_p_inter[15];
+    TH1D *h1_d_inter[15];
+
+
+    for(int i =0 ; i<15 ; i++)  // Deposit Energy Bin
+    {
+        Energy[i]    = 1.1 + 0.2 * i;
+        Energy_LL[i] = 1.0 + 0.2 * i;
+        Energy_UL[i] = 1.2 + 0.2 * i;
+
+        h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i), 14,0,14);  
+        h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i), 14,0,14);  
+
+        for( int j= 0; j<14 ;j++)
+        {
+            h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j),14,0,14);  
+            h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j),14,0,14);    
+            Layer[j] = 0.5 + j;
+            Layer_Err[j] = 0.5;
+        }
+    }
+
+    for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
+    {
+        proton_tree->GetEntry(entry);   
+        double sum_p = 0;
+        double bar_Change_info[14] = {0};
+        double rate_max_min      = 0;
+        double seg_sum           = 0;   // 总增长和
+        int    seg_len           = 0;   // 连续正增长长度
+        int    seg_start_idx     = 0;   // 连续正增长起点索引
+        double seg_peak_value    = 0;   // 正段增长最大值
+        int    seg_peak_idx      = 0;   // 正段增长最大值的索引
+        double seg_sum_to_peak   = 0;   // 从起点到增长最大值的增长和
+        int    seg_len_to_peak   = 0;   // 从起点到增长最大值的索引
+        int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
+        if(p_energy_index < 0 || p_energy_index > 14) continue;    
+        if(p_First_Had_Type < 1 ) continue;
+        bar_Change_info[0] = log10((*p_EnergyVec)[0] / 0.023);
+        for (int layer = 1; layer < 14; ++layer) 
+        {
+            if ((*p_EnergyVec)[layer - 1] == 0 || (*p_EnergyVec)[layer] == 0) bar_Change_info[layer] = -5; 
+            else  bar_Change_info[layer] = log10((*p_EnergyVec)[layer] / (*p_EnergyVec)[layer - 1]);
+            // cout << bar_Change_info[layer] << endl;
+        }
+        FindMaxPositiveSegment(bar_Change_info,14,seg_sum,seg_len,seg_start_idx);
+        FindMaxValueInPositiveSegment(bar_Change_info,seg_start_idx,seg_len,seg_peak_value,seg_peak_idx);
+        // cout << seg_peak_value << endl;
+        h1_p[p_energy_index][p_First_Had_Layer]->Fill(seg_peak_idx);
+        h1_p_inter[p_energy_index]->Fill(seg_peak_idx) ;
+    }
+
+    for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
+    {
+        deuteron_tree->GetEntry(entry);
+        double sum_d = 0;
+        double bar_Change_info[14] = {0};
+        double rate_max_min      = 0;
+        double seg_sum           = 0;   // 总增长和
+        int    seg_len           = 0;   // 连续正增长长度
+        int    seg_start_idx     = 0;   // 连续正增长起点索引
+        double seg_peak_value    = 0;   // 正段增长最大值
+        int    seg_peak_idx      = 0;   // 正段增长最大值的索引
+        double seg_sum_to_peak   = 0;   // 从起点到增长最大值的增长和
+        int    seg_len_to_peak   = 0;   // 从起点到增长最大值的索引
+        int d_energy_index = int(floor((log10(d_Total_E) - 1) / 0.2));
+        if(d_energy_index < 0 || d_energy_index > 14) continue;
+        if(d_First_Had_Type < 1 ) continue;
+        bar_Change_info[0] = log10((*d_EnergyVec)[0] / 0.023);
+        for(int layer = 1 ; layer<14 ; layer++)
+        {   
+            if ((*d_EnergyVec)[layer - 1] == 0 || (*d_EnergyVec)[layer] == 0) bar_Change_info[layer] = -5; 
+            else  bar_Change_info[layer] = log10((*d_EnergyVec)[layer] / (*d_EnergyVec)[layer - 1]);
+        }
+        FindMaxPositiveSegment(bar_Change_info,14,seg_sum,seg_len,seg_start_idx);
+        FindMaxValueInPositiveSegment(bar_Change_info,seg_start_idx,seg_len,seg_peak_value,seg_peak_idx);
+        h1_d[d_energy_index][d_First_Had_Layer]->Fill(seg_peak_idx);
+        h1_d_inter[d_energy_index]->Fill(seg_peak_idx) ;
+    }
+
+    for (int i = 9; i < 10; i++) // Deposit Energy Bin
+    {
+        auto c1 = new TCanvas("c1","c1",2500,1500);
+        c1->Clear();
+        c1->Divide(5,3);
+        gStyle->SetOptStat(0);
+
+        for (int j = 0; j < 14; j++) // layer
+        {
+            h1_p[i][j]->SetLineColor(kRed);   h1_p[i][j]->SetMarkerColor(kRed);  h1_p[i][j]->SetLineWidth(2);   h1_p[i][j]->Sumw2();
+            h1_d[i][j]->SetLineColor(kBlue);  h1_d[i][j]->SetMarkerColor(kBlue); h1_d[i][j]->SetLineWidth(2);   h1_d[i][j]->Sumw2();
+            
+            c1->cd(j + 1);
+
+            h1_p[i][j]->Scale(1.0/h1_p[i][j]->Integral());
+            h1_d[i][j]->Scale(1.0/h1_d[i][j]->Integral());
+            h1_p[i][j]->GetYaxis()->SetRangeUser(0,h1_p[i][j]->GetMaximum()*1.2);
+
+            h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV]Interaction happened in L%d;log10(Peak Change Ratio);Normalized Count", pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j ));
+            h1_p[i][j]->Draw("hist");
+            h1_d[i][j]->Draw("histsame");
+
+        }
+        c1->cd(15);
+        TLatex *tex = new TLatex(0.1,0.9,Form("Deposit Energy[%.2fGeV, %.2fGeV]",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));tex->SetNDC();tex->Draw(); 
+        auto legend1 = new TLegend(0.12, 0.12, 0.88, 0.88);
+        legend1->AddEntry(h1_p[i][0], "Proton", "l");
+        legend1->AddEntry(h1_d[i][0], "Deuteron", "l");     
+        legend1->Draw();       
+
+        auto c2 = new TCanvas("c2","c2",1000,1000);
+        c2->cd();
+        h1_p_inter[i]->SetLineColor(kRed);   h1_p_inter[i]->SetMarkerColor(kRed);  h1_p_inter[i]->SetLineWidth(2);   h1_p_inter[i]->Sumw2();
+        h1_d_inter[i]->SetLineColor(kBlue);  h1_d_inter[i]->SetMarkerColor(kBlue); h1_d_inter[i]->SetLineWidth(2);   h1_d_inter[i]->Sumw2();
+        h1_p_inter[i]->Scale(1.0/h1_p_inter[i]->Integral()); 
+        h1_d_inter[i]->Scale(1.0/h1_d_inter[i]->Integral()); 
+        h1_p_inter[i]->GetYaxis()->SetRangeUser(0,h1_p_inter[i]->GetMaximum()*1.2);
+        h1_p_inter[i]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] Stack Multi Layer;log10(Peak Change Ratio);Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
+        h1_p_inter[i]->Draw("hist");
+        h1_d_inter[i]->Draw("histsame");
+    }
+}
+
+void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int& out_len, int& out_start_index) 
+{
+    double max_sum = 0;
+    int max_len = 0;
+    int max_start_index = -1;
+
+    double curr_sum = 0;
+    int curr_len = 0;
+    int curr_start_index = -1;
+
+    for (int i = 0; i < size; ++i) 
+    {
+        double content = array[i];
+        // std::cout << "bar_Change_info[" << i << "] = " << content << std::endl;
+
+        if (content > 0) 
+        {
+            if (curr_len == 0)
+                curr_start_index = i ;  // 新的一段开始
+
+            curr_sum += content;
+            curr_len++;
+
+            // if (curr_len > max_len || (curr_sum > max_sum && curr_len == max_len)) 
+            if (curr_sum > max_sum || (curr_sum == max_sum && curr_len > max_len)) 
+
+            {
+                max_sum = curr_sum;
+                max_len = curr_len;
+                max_start_index = curr_start_index;  // 记录最大段的起点
+            }
+        } 
+        else 
+        {
+            curr_sum = 0;
+            curr_len = 0;
+            curr_start_index = -1;
+        }
+    }
+
+    out_sum = max_sum;
+    out_len = max_len;
+    out_start_index = max_start_index;
+}
+
+void FindMaxValueInPositiveSegment(const double array[], int start_index, int length, double& out_max_value, int& out_max_index)
+{
+    out_max_value = -1e9;  // 初始值很小
+    out_max_index = -1;
+
+    for (int i = start_index; i < start_index + length; ++i) 
+    {
+        double content = array[i];
+        if (content > out_max_value) 
+        {
+        out_max_value = content;
+        out_max_index = i;
+        }
+    }
+}

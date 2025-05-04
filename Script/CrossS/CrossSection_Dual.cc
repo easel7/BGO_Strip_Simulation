@@ -24,9 +24,9 @@ void CrossSection_Dual()
         hC2->SetBinContent(ii, ( 1e4 -h2->Integral(0,ii) )*(0.5) );
     }
 
-    TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-x/[1])", 0, 40); fitFunc1->SetParameters(100, 10); fitFunc1->SetLineColor(kRed);
-    TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-x/[1])", 0, 40); fitFunc2->SetParameters(100, 10); fitFunc2->SetLineColor(kBlue);
-    TF1 *fitFunc3 = new TF1("fitFunc3", "[0]*exp(-x/[1])", 0, 40); fitFunc3->SetParameters(100, 10); fitFunc3->SetLineColor(kBlack);
+    TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-x/[1])", 0, 60); fitFunc1->SetParameters(100, 10); fitFunc1->SetLineColor(kRed);
+    TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-x/[1])", 0, 60); fitFunc2->SetParameters(100, 10); fitFunc2->SetLineColor(kBlue);
+    TF1 *fitFunc3 = new TF1("fitFunc3", "[0]*exp(-x/[1])", 0, 60); fitFunc3->SetParameters(100, 10); fitFunc3->SetLineColor(kBlack);
 
 
     TLatex latex;
