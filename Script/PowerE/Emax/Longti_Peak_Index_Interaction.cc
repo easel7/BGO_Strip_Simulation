@@ -48,13 +48,13 @@ void Longti_Peak_Index_Interaction()
         Energy_LL[i] = 1.0 + 0.2 * i;
         Energy_UL[i] = 1.2 + 0.2 * i;
 
-        h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i),  20,-10,10);  
-        h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i),  20,-10,10);  
+        h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i),  28,-14,14);  
+        h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i),  28,-14,14);  
 
         for( int j= 0; j<14 ;j++)
         {
-            h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j), 20,-10,10);  
-            h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j), 20,-10,10);    
+            h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j), 28,-14,14);  
+            h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j), 28,-14,14);    
             Layer[j] = 0.5 + j;
             Layer_Err[j] = 0.5;
         }
@@ -75,7 +75,7 @@ void Longti_Peak_Index_Interaction()
         int    seg_len_to_peak   = 0;   // 从起点到增长最大值的索引
         int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
         if(p_energy_index < 0 || p_energy_index > 14) continue;    
-        if(p_First_Had_Type < 1 ) continue;
+        if(p_First_Had_Type != 1 ) continue;
         bar_Change_info[0] = log10((*p_EnergyVec)[0] / 0.092);
         for (int layer = 1; layer < 14; ++layer) 
         {
@@ -105,7 +105,7 @@ void Longti_Peak_Index_Interaction()
         int    seg_len_to_peak   = 0;   // 从起点到增长最大值的索引
         int d_energy_index = int(floor((log10(d_Total_E) - 1) / 0.2));
         if(d_energy_index < 0 || d_energy_index > 14) continue;
-        if(d_First_Had_Type < 1 ) continue;
+        if(d_First_Had_Type !=1 ) continue;
         bar_Change_info[0] = log10((*d_EnergyVec)[0] / 0.092);
         for(int layer = 1 ; layer<14 ; layer++)
         {   
