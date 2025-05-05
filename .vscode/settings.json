@@ -51,6 +51,9 @@
         "iostream": "cpp",
         "memory": "cpp",
         "sstream": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "__tree": "cpp",
+        "fstream": "cpp",
+        "map": "cpp"
     }
 }

@@ -2,7 +2,7 @@ void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int
 
 void FindMaxValueInPositiveSegment(const double array[], int start_index, int length, double& out_max_value, int& out_max_index);
 
-void Longti_Peak_Index_Interaction()
+void Longti_Start_Emax_Len_Interaction()
 {
     int p_First_Had_Layer; int p_First_Had_Type; double p_Total_E;  std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr; double p_weight;
     int d_First_Had_Layer; int d_First_Had_Type; double d_Total_E;  std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr; double d_weight;
@@ -48,13 +48,13 @@ void Longti_Peak_Index_Interaction()
         Energy_LL[i] = 1.0 + 0.2 * i;
         Energy_UL[i] = 1.2 + 0.2 * i;
 
-        h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i),  20,-10,10);  
-        h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i),  20,-10,10);  
+        h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i), 14,0,14);  
+        h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i), 14,0,14);  
 
         for( int j= 0; j<14 ;j++)
         {
-            h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j), 20,-10,10);  
-            h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j), 20,-10,10);    
+            h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j),14,0,14);  
+            h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j),14,0,14);    
             Layer[j] = 0.5 + j;
             Layer_Err[j] = 0.5;
         }
@@ -76,7 +76,7 @@ void Longti_Peak_Index_Interaction()
         int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
         if(p_energy_index < 0 || p_energy_index > 14) continue;    
         if(p_First_Had_Type < 1 ) continue;
-        bar_Change_info[0] = log10((*p_EnergyVec)[0] / 0.092);
+        bar_Change_info[0] = log10((*p_EnergyVec)[0] / 0.023);
         for (int layer = 1; layer < 14; ++layer) 
         {
             if ((*p_EnergyVec)[layer - 1] == 0 || (*p_EnergyVec)[layer] == 0) bar_Change_info[layer] = -5; 
@@ -85,9 +85,18 @@ void Longti_Peak_Index_Interaction()
         }
         FindMaxPositiveSegment(bar_Change_info,14,seg_sum,seg_len,seg_start_idx);
         FindMaxValueInPositiveSegment(bar_Change_info,seg_start_idx,seg_len,seg_peak_value,seg_peak_idx);
+
+
+        auto p_start = p_EnergyVec->begin();  auto p_end = p_EnergyVec->end();  
+        auto p_maxIt = std::max_element(p_start, p_end);
+        auto p_minIt = std::min_element(p_start, p_end);
+        int p_maxIndex = std::distance(p_start, p_maxIt);
+        int p_minIndex = std::distance(p_start, p_minIt);
+        double p_maxVal = *p_maxIt;
+        double p_minVal = *p_minIt;
         // cout << seg_peak_value << endl;
-        h1_p[p_energy_index][p_First_Had_Layer]->Fill( (seg_peak_idx - p_First_Had_Layer) );
-        h1_p_inter[p_energy_index]->Fill((seg_peak_idx - p_First_Had_Layer) ) ;
+        h1_p[p_energy_index][p_First_Had_Layer]->Fill(p_maxIndex-seg_start_idx);
+        h1_p_inter[p_energy_index]->Fill(p_maxIndex-seg_start_idx) ;
     }
 
     for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
@@ -106,7 +115,7 @@ void Longti_Peak_Index_Interaction()
         int d_energy_index = int(floor((log10(d_Total_E) - 1) / 0.2));
         if(d_energy_index < 0 || d_energy_index > 14) continue;
         if(d_First_Had_Type < 1 ) continue;
-        bar_Change_info[0] = log10((*d_EnergyVec)[0] / 0.092);
+        bar_Change_info[0] = log10((*d_EnergyVec)[0] / 0.023);
         for(int layer = 1 ; layer<14 ; layer++)
         {   
             if ((*d_EnergyVec)[layer - 1] == 0 || (*d_EnergyVec)[layer] == 0) bar_Change_info[layer] = -5; 
@@ -114,8 +123,17 @@ void Longti_Peak_Index_Interaction()
         }
         FindMaxPositiveSegment(bar_Change_info,14,seg_sum,seg_len,seg_start_idx);
         FindMaxValueInPositiveSegment(bar_Change_info,seg_start_idx,seg_len,seg_peak_value,seg_peak_idx);
-        h1_d[d_energy_index][d_First_Had_Layer]->Fill((seg_peak_idx - d_First_Had_Layer));
-        h1_d_inter[d_energy_index]->Fill((seg_peak_idx - d_First_Had_Layer)) ;
+
+        auto d_start = d_EnergyVec->begin();  auto d_end = d_EnergyVec->end();  
+        auto d_maxIt = std::max_element(d_start, d_end);
+        auto d_minIt = std::min_element(d_start, d_end);
+        int d_maxIndex = std::distance(d_start, d_maxIt);
+        int d_minIndex = std::distance(d_start, d_minIt);
+        double d_maxVal = *d_maxIt;
+        double d_minVal = *d_minIt;
+
+        h1_d[d_energy_index][d_First_Had_Layer]->Fill(d_maxIndex-seg_start_idx);
+        h1_d_inter[d_energy_index]->Fill(d_maxIndex-seg_start_idx) ;
     }
 
     for (int i = 9; i < 10; i++) // Deposit Energy Bin
@@ -136,7 +154,7 @@ void Longti_Peak_Index_Interaction()
             h1_d[i][j]->Scale(1.0/h1_d[i][j]->Integral());
             h1_p[i][j]->GetYaxis()->SetRangeUser(0,h1_p[i][j]->GetMaximum()*1.2);
 
-            h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV]Interaction happened in L%d;Layer Distance (Peak Increased - Interaction);Normalized Count", pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j ));
+            h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV]Interaction happened in L%d;Layer Distance (Peak - Start);Normalized Count", pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j ));
             h1_p[i][j]->Draw("hist");
             h1_d[i][j]->Draw("histsame");
 
@@ -155,7 +173,7 @@ void Longti_Peak_Index_Interaction()
         h1_p_inter[i]->Scale(1.0/h1_p_inter[i]->Integral()); 
         h1_d_inter[i]->Scale(1.0/h1_d_inter[i]->Integral()); 
         h1_p_inter[i]->GetYaxis()->SetRangeUser(0,h1_p_inter[i]->GetMaximum()*1.2);
-        h1_p_inter[i]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] Stack Multi Layer;Layer Distance (Peak Increased - Interaction);Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
+        h1_p_inter[i]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] Stack Multi Layer;Layer Distance (Peak - Start);Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
         h1_p_inter[i]->Draw("hist");
         h1_d_inter[i]->Draw("histsame");
     }

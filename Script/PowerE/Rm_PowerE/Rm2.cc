@@ -3,7 +3,7 @@ void Rm2()
     int p_First_Had_Layer;  double p_Total_E;  std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr;    std::vector<double>* p_L_EnergyVec = nullptr;
     int d_First_Had_Layer;  double d_Total_E;  std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr;    std::vector<double>* d_L_EnergyVec = nullptr;
 
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_PowerLaw.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
     proton_tree->SetBranchAddress("BarEnergyVector"  ,&p_EnergyVec);
@@ -12,7 +12,7 @@ void Rm2()
     proton_tree->SetBranchAddress("First_Had_Layer"  ,&p_First_Had_Layer);
     proton_tree->SetBranchAddress("Total_E"          ,&p_Total_E);
 
-    auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_PowerLaw.root");
+    auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
     auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
     deuteron_tree->SetBranchAddress("RMS"              ,&d_RMSVec);
     deuteron_tree->SetBranchAddress("BarEnergyVector"  ,&d_EnergyVec);

@@ -1,8 +1,4 @@
-void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int& out_len, int& out_start_index);
-
-void FindMaxValueInPositiveSegment(const double array[], int start_index, int length, double& out_max_value, int& out_max_index);
-
-void Longti_Increase_Start_Index_Interaction()
+void Longti_EmaxIndex_Interaction()
 {
     int p_First_Had_Layer; int p_First_Had_Type; double p_Total_E;  std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr; double p_weight;
     int d_First_Had_Layer; int d_First_Had_Type; double d_Total_E;  std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr; double d_weight;
@@ -64,58 +60,30 @@ void Longti_Increase_Start_Index_Interaction()
     {
         proton_tree->GetEntry(entry);   
         double sum_p = 0;
-        double bar_Change_info[14] = {0};
-        double rate_max_min      = 0;
-        double seg_sum           = 0;   // 总增长和
-        int    seg_len           = 0;   // 连续正增长长度
-        int    seg_start_idx     = 0;   // 连续正增长起点索引
-        double seg_peak_value    = 0;   // 正段增长最大值
-        int    seg_peak_idx      = 0;   // 正段增长最大值的索引
-        double seg_sum_to_peak   = 0;   // 从起点到增长最大值的增长和
-        int    seg_len_to_peak   = 0;   // 从起点到增长最大值的索引
         int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
         if(p_energy_index < 0 || p_energy_index > 14) continue;    
-        if(p_First_Had_Type < 1 ) continue;
-        bar_Change_info[0] = log10((*p_EnergyVec)[0] / 0.023);
-        for (int layer = 1; layer < 14; ++layer) 
-        {
-            if ((*p_EnergyVec)[layer - 1] == 0 || (*p_EnergyVec)[layer] == 0) bar_Change_info[layer] = -5; 
-            else  bar_Change_info[layer] = log10((*p_EnergyVec)[layer] / (*p_EnergyVec)[layer - 1]);
-            // cout << bar_Change_info[layer] << endl;
-        }
-        FindMaxPositiveSegment(bar_Change_info,14,seg_sum,seg_len,seg_start_idx);
-        FindMaxValueInPositiveSegment(bar_Change_info,seg_start_idx,seg_len,seg_peak_value,seg_peak_idx);
-        // cout << seg_peak_value << endl;
-        h1_p[p_energy_index][p_First_Had_Layer]->Fill(seg_start_idx);
-        h1_p_inter[p_energy_index]->Fill(seg_start_idx) ;
+        if(p_First_Had_Type!=1) continue;
+        auto p_start = p_EnergyVec->begin();  auto p_end = p_EnergyVec->end();  
+        auto p_maxIt = std::max_element(p_start, p_end);
+        int p_maxIndex = std::distance(p_start, p_maxIt);
+        double p_maxVal = *p_maxIt;
+        h1_p[p_energy_index][p_First_Had_Layer]->Fill(p_maxIndex-p_First_Had_Layer);
+        h1_p_inter[p_energy_index]->Fill(p_maxIndex-p_First_Had_Layer) ;
     }
 
     for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
     {
         deuteron_tree->GetEntry(entry);
         double sum_d = 0;
-        double bar_Change_info[14] = {0};
-        double rate_max_min      = 0;
-        double seg_sum           = 0;   // 总增长和
-        int    seg_len           = 0;   // 连续正增长长度
-        int    seg_start_idx     = 0;   // 连续正增长起点索引
-        double seg_peak_value    = 0;   // 正段增长最大值
-        int    seg_peak_idx      = 0;   // 正段增长最大值的索引
-        double seg_sum_to_peak   = 0;   // 从起点到增长最大值的增长和
-        int    seg_len_to_peak   = 0;   // 从起点到增长最大值的索引
         int d_energy_index = int(floor((log10(d_Total_E) - 1) / 0.2));
         if(d_energy_index < 0 || d_energy_index > 14) continue;
-        if(d_First_Had_Type < 1 ) continue;
-        bar_Change_info[0] = log10((*d_EnergyVec)[0] / 0.023);
-        for(int layer = 1 ; layer<14 ; layer++)
-        {   
-            if ((*d_EnergyVec)[layer - 1] == 0 || (*d_EnergyVec)[layer] == 0) bar_Change_info[layer] = -5; 
-            else  bar_Change_info[layer] = log10((*d_EnergyVec)[layer] / (*d_EnergyVec)[layer - 1]);
-        }
-        FindMaxPositiveSegment(bar_Change_info,14,seg_sum,seg_len,seg_start_idx);
-        FindMaxValueInPositiveSegment(bar_Change_info,seg_start_idx,seg_len,seg_peak_value,seg_peak_idx);
-        h1_d[d_energy_index][d_First_Had_Layer]->Fill(seg_start_idx);
-        h1_d_inter[d_energy_index]->Fill(seg_start_idx) ;
+        if(d_First_Had_Type!=1) continue;
+        auto d_start = d_EnergyVec->begin();  auto d_end = d_EnergyVec->end();  
+        auto d_maxIt = std::max_element(d_start, d_end);
+        int d_maxIndex = std::distance(d_start, d_maxIt);
+        double d_maxVal = *d_maxIt;
+        h1_d[d_energy_index][d_First_Had_Layer]->Fill(d_maxIndex-d_First_Had_Layer);
+        h1_d_inter[d_energy_index]->Fill(d_maxIndex-d_First_Had_Layer) ;
     }
 
     for (int i = 9; i < 10; i++) // Deposit Energy Bin
@@ -125,6 +93,9 @@ void Longti_Increase_Start_Index_Interaction()
         c1->Divide(5,3);
         gStyle->SetOptStat(0);
 
+        double Proton_Ratio[14]={0};     double Deuteron_Ratio[14]={0};     
+        double Proton_Ratio_LL[14]={0};  double Deuteron_Ratio_LL[14]={0};  
+        double Proton_Ratio_UL[14]={0};  double Deuteron_Ratio_UL[14]={0};  
         for (int j = 0; j < 14; j++) // layer
         {
             h1_p[i][j]->SetLineColor(kRed);   h1_p[i][j]->SetMarkerColor(kRed);  h1_p[i][j]->SetLineWidth(2);   h1_p[i][j]->Sumw2();
@@ -136,7 +107,7 @@ void Longti_Increase_Start_Index_Interaction()
             h1_d[i][j]->Scale(1.0/h1_d[i][j]->Integral());
             h1_p[i][j]->GetYaxis()->SetRangeUser(0,h1_p[i][j]->GetMaximum()*1.2);
 
-            h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV]Interaction happened in L%d;log10(Peak Change Ratio);Normalized Count", pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j ));
+            h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV]Interaction happened in L%d;Layer Distance(Interaction - Emax);Normalized Count", pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j ));
             h1_p[i][j]->Draw("hist");
             h1_d[i][j]->Draw("histsame");
 
@@ -147,6 +118,7 @@ void Longti_Increase_Start_Index_Interaction()
         legend1->AddEntry(h1_p[i][0], "Proton", "l");
         legend1->AddEntry(h1_d[i][0], "Deuteron", "l");     
         legend1->Draw();       
+        // c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Longti_PowerE/PDF/Longti_EnergyVec_%.2f_%.2f.pdf",Energy_LL[i],Energy_UL[i]));
 
         auto c2 = new TCanvas("c2","c2",1000,1000);
         c2->cd();
@@ -155,69 +127,9 @@ void Longti_Increase_Start_Index_Interaction()
         h1_p_inter[i]->Scale(1.0/h1_p_inter[i]->Integral()); 
         h1_d_inter[i]->Scale(1.0/h1_d_inter[i]->Integral()); 
         h1_p_inter[i]->GetYaxis()->SetRangeUser(0,h1_p_inter[i]->GetMaximum()*1.2);
-        h1_p_inter[i]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] Stack Multi Layer;log10(Peak Change Ratio);Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
+        h1_p_inter[i]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] Stack Multi Layer;Layer Distance(Interaction - Emax);Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
         h1_p_inter[i]->Draw("hist");
         h1_d_inter[i]->Draw("histsame");
-    }
-}
 
-void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int& out_len, int& out_start_index) 
-{
-    double max_sum = 0;
-    int max_len = 0;
-    int max_start_index = -1;
-
-    double curr_sum = 0;
-    int curr_len = 0;
-    int curr_start_index = -1;
-
-    for (int i = 0; i < size; ++i) 
-    {
-        double content = array[i];
-        // std::cout << "bar_Change_info[" << i << "] = " << content << std::endl;
-
-        if (content > 0) 
-        {
-            if (curr_len == 0)
-                curr_start_index = i ;  // 新的一段开始
-
-            curr_sum += content;
-            curr_len++;
-
-            // if (curr_len > max_len || (curr_sum > max_sum && curr_len == max_len)) 
-            if (curr_sum > max_sum || (curr_sum == max_sum && curr_len > max_len)) 
-
-            {
-                max_sum = curr_sum;
-                max_len = curr_len;
-                max_start_index = curr_start_index;  // 记录最大段的起点
-            }
-        } 
-        else 
-        {
-            curr_sum = 0;
-            curr_len = 0;
-            curr_start_index = -1;
-        }
-    }
-
-    out_sum = max_sum;
-    out_len = max_len;
-    out_start_index = max_start_index;
-}
-
-void FindMaxValueInPositiveSegment(const double array[], int start_index, int length, double& out_max_value, int& out_max_index)
-{
-    out_max_value = -1e9;  // 初始值很小
-    out_max_index = -1;
-
-    for (int i = start_index; i < start_index + length; ++i) 
-    {
-        double content = array[i];
-        if (content > out_max_value) 
-        {
-        out_max_value = content;
-        out_max_index = i;
-        }
     }
 }

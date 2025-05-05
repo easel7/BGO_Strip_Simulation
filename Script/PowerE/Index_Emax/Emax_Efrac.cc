@@ -1,12 +1,12 @@
-void Longti_COG_from_Interaction()
+void Emax_Efrac()
 {
-    int p_First_Had_Layer; int p_First_Had_Type; double p_Total_E;  std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_L_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr; double p_weight;
-    int d_First_Had_Layer; int d_First_Had_Type; double d_Total_E;  std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_L_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr; double d_weight;
+    int p_First_Had_Layer; int p_First_Had_Type; double p_Total_E;  std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_EnergyVec = nullptr;    std::vector<double>* p_Efrac = nullptr; double p_weight;
+    int d_First_Had_Layer; int d_First_Had_Type; double d_Total_E;  std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_EnergyVec = nullptr;    std::vector<double>* d_Efrac = nullptr; double d_weight;
 
     auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
-    proton_tree->SetBranchAddress("LayerEnergyVector",&p_L_EnergyVec);
+    proton_tree->SetBranchAddress("LayerEnergyVector",&p_EnergyVec);
     proton_tree->SetBranchAddress("Efrac"            ,&p_Efrac);
     proton_tree->SetBranchAddress("First_Had_Layer"  ,&p_First_Had_Layer);
     proton_tree->SetBranchAddress("First_Had_Type"  ,&p_First_Had_Type);
@@ -16,7 +16,7 @@ void Longti_COG_from_Interaction()
     auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
     auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
     deuteron_tree->SetBranchAddress("RMS"              ,&d_RMSVec);
-    deuteron_tree->SetBranchAddress("LayerEnergyVector",&d_L_EnergyVec);
+    deuteron_tree->SetBranchAddress("LayerEnergyVector",&d_EnergyVec);
     deuteron_tree->SetBranchAddress("Efrac"            ,&d_Efrac);
     deuteron_tree->SetBranchAddress("First_Had_Layer"  ,&d_First_Had_Layer);
     deuteron_tree->SetBranchAddress("First_Had_Type"   ,&d_First_Had_Type);
@@ -44,13 +44,13 @@ void Longti_COG_from_Interaction()
         Energy_LL[i] = 1.0 + 0.2 * i;
         Energy_UL[i] = 1.2 + 0.2 * i;
 
-        h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i), 14,0,14);  
-        h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i), 14,0,14);  
+        h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i), 20,-2,0);  
+        h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i), 20,-2,0);  
 
         for( int j= 0; j<14 ;j++)
         {
-            h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j),14,0,14);  
-            h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j),14,0,14);    
+            h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j),20,-2,0);
+            h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j),20,-2,0);
             Layer[j] = 0.5 + j;
             Layer_Err[j] = 0.5;
         }
@@ -63,12 +63,15 @@ void Longti_COG_from_Interaction()
         int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
         if(p_energy_index < 0 || p_energy_index > 14) continue;    
         if(p_First_Had_Type!=1) continue;
-        for(int i=p_First_Had_Layer ;i<14-p_First_Had_Layer; i++)
-        {
-            sum_p += (*p_L_EnergyVec)[i] * (i-p_First_Had_Layer) / p_Total_E;
-        }
-        h1_p[p_energy_index][p_First_Had_Layer]->Fill(sum_p);
-        h1_p_inter[p_energy_index]->Fill(sum_p) ;
+        auto p_start = p_EnergyVec->begin();  auto p_end = p_EnergyVec->end();  
+        auto p_maxIt = std::max_element(p_start, p_end);
+        auto p_minIt = std::min_element(p_start, p_end);
+        int p_maxIndex = std::distance(p_start, p_maxIt);
+        int p_minIndex = std::distance(p_start, p_minIt);
+        double p_maxVal = *p_maxIt;
+        double p_minVal = *p_minIt;
+        h1_p[p_energy_index][p_First_Had_Layer]->Fill( log10((*p_Efrac)[p_maxIndex]) );
+        h1_p_inter[p_energy_index]->Fill( log10((*p_Efrac)[p_maxIndex]) ) ;
     }
 
     for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
@@ -78,12 +81,15 @@ void Longti_COG_from_Interaction()
         int d_energy_index = int(floor((log10(d_Total_E) - 1) / 0.2));
         if(d_energy_index < 0 || d_energy_index > 14) continue;
         if(d_First_Had_Type!=1) continue;
-        for(int i=d_First_Had_Layer ;i<14- d_First_Had_Layer; i++)
-        {
-            sum_d += (*d_L_EnergyVec)[i] * (i - d_First_Had_Layer) /d_Total_E;
-        }
-        h1_d[d_energy_index][d_First_Had_Layer]->Fill(sum_d);
-        h1_d_inter[d_energy_index]->Fill(sum_d);
+        auto d_start = d_EnergyVec->begin();  auto d_end = d_EnergyVec->end();  
+        auto d_maxIt = std::max_element(d_start, d_end);
+        auto d_minIt = std::min_element(d_start, d_end);
+        int d_maxIndex = std::distance(d_start, d_maxIt);
+        int d_minIndex = std::distance(d_start, d_minIt);
+        double d_maxVal = *d_maxIt;
+        double d_minVal = *d_minIt;
+        h1_d[d_energy_index][d_First_Had_Layer]->Fill( log10((*d_Efrac)[d_maxIndex]) );
+        h1_d_inter[d_energy_index]->Fill( log10((*d_Efrac)[d_maxIndex]) ) ;
     }
 
     for (int i = 9; i < 10; i++) // Deposit Energy Bin
@@ -107,7 +113,7 @@ void Longti_COG_from_Interaction()
             h1_d[i][j]->Scale(1.0/h1_d[i][j]->Integral());
             h1_p[i][j]->GetYaxis()->SetRangeUser(0,h1_p[i][j]->GetMaximum()*1.2);
 
-            h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV]Interaction happened in L%d;Layer COG;Normalized Count", pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j ));
+            h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV]Interaction happened in L%d;log10(E/Etot);Normalized Count", pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j ));
             h1_p[i][j]->Draw("hist");
             h1_d[i][j]->Draw("histsame");
 
@@ -118,7 +124,7 @@ void Longti_COG_from_Interaction()
         legend1->AddEntry(h1_p[i][0], "Proton", "l");
         legend1->AddEntry(h1_d[i][0], "Deuteron", "l");     
         legend1->Draw();       
-        // c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Longti_PowerE/PDF/Longti_L_EnergyVec_%.2f_%.2f.pdf",Energy_LL[i],Energy_UL[i]));
+        // c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Longti_PowerE/PDF/Longti_EnergyVec_%.2f_%.2f.pdf",Energy_LL[i],Energy_UL[i]));
 
         auto c2 = new TCanvas("c2","c2",1000,1000);
         c2->cd();
@@ -127,7 +133,7 @@ void Longti_COG_from_Interaction()
         h1_p_inter[i]->Scale(1.0/h1_p_inter[i]->Integral()); 
         h1_d_inter[i]->Scale(1.0/h1_d_inter[i]->Integral()); 
         h1_p_inter[i]->GetYaxis()->SetRangeUser(0,h1_p_inter[i]->GetMaximum()*1.2);
-        h1_p_inter[i]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] Stack Multi Layer;Layer COG;Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
+        h1_p_inter[i]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] Stack Multi Layer;log10(E/Etot);Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
         h1_p_inter[i]->Draw("hist");
         h1_d_inter[i]->Draw("histsame");
 
