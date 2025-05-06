@@ -30,16 +30,9 @@ void Draw_Pattern()
     int p_Nhits;
 
     const char* string1;
-    // const char* string2 = "Proton_1000GeV";
-    // const char* string2 = "Proton_10000GeV";
-    // const char* string2 = "Deuteron_1000GeV";
-    // const char* string2 = "Deuteron_10000GeV";
-    const char* string2 = "Deuteron_PowerLaw";
+    const char* string2 = "Proton_1000GeV";
 
-
-    // auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
-    auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Weight/%s.root",string2));
-    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
+    auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("BarEnergyVector", &p_EnergyVec);
     proton_tree->SetBranchAddress("RMS"            , &p_RMSVec);

@@ -1,74 +1,274 @@
-import ROOT
+import uproot
+import awkward as ak
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+from scipy.optimize import minimize
+import math  
+import os
 
-# 载入 ROOT 文件
-filename = "/Users/xiongzheng/software/B4/B4e/ROOT/Proton_1000GeV.root"
-file = ROOT.TFile.Open(filename)
-tree = file["B4"]
 
-BarEnergyVector = r.vector('double')()
+# Find the most longest increasing segment, find where it start and it value, and how long it is 
+def find_max_positive_bin_segment(bar_info):
+    max_sum = 0
+    max_len = 0
+    max_start_bin = -1
 
-# 读取分支
-energy_vecs = tree["BarEnergyVector"].arrays(library="np")["BarEnergyVector"]
-rms_vecs    = tree["RMS"].arrays(library="np")["RMS"]
-fh_depth    = tree["First_Had_Depth"].array(library="np")
-fh_layer    = tree["First_Had_Layer"].array(library="np")
-fh_type     = tree["First_Had_Type"].array(library="np")
-nhits       = tree["Nhits"].array(library="np")
+    curr_sum = 0
+    curr_len = 0
+    curr_start_bin = -1
 
-# 直方图容器
-h_max_min0 = []
-h_max_min1 = []
-h_max_min2 = []
-h_max_min3 = []
+    for i in range(len(bar_info)):
+        content = bar_info[i]
 
-# 用于 scatter plot 的容器
-sum_len0 = []
-sum_len1 = []
-sum_len2 = []
-sum_len3 = []
+        if content > 0:
+            if curr_len == 0:
+                curr_start_bin = i  
 
-# 遍历事件进行分析
-for i in range(len(energy_vecs)):
-    energy = energy_vecs[i]
-    if len(energy) < 1:
-        continue
+            curr_sum += content
+            curr_len += 1
 
-    bar_change = np.diff(energy)  # 模拟“增长段”
-    positive_indices = np.where(bar_change > 0)[0]
+            if curr_sum > max_sum or (curr_sum == max_sum and curr_len > max_len):
+                max_sum = curr_sum
+                max_len = curr_len
+                max_start_bin = curr_start_bin
+        else:
+            curr_sum = 0
+            curr_len = 0
+            curr_start_bin = -1
 
-    if len(positive_indices) == 0:
-        continue
+    return max_sum, max_len, max_start_bin
 
-    growth_start = positive_indices[0]
-    growth_sum = np.sum(bar_change[positive_indices])
-    growth_len = len(positive_indices)
+# Use ar_Change_info Array to Find the largest value and it index
+def find_max_value_in_positive_segment(bar_info, start_bin, length):
+    max_value = -1e9 
+    max_bin = -1
 
-    max_val = np.max(bar_change[positive_indices])
-    min_val = np.min(bar_change[positive_indices])
-    delta_max_min = max_val - min_val
+    for i in range(start_bin, start_bin + length):
+        content = bar_info[i]
+        if content > max_value:
+            max_value = content
+            max_bin = i
 
-    # 分类填入
-    t = fh_type[i]
-    if t == 0:
-        h_max_min0.append(delta_max_min)
-        sum_len0.append((growth_len, growth_sum))
-    elif t == 1:
-        h_max_min1.append(delta_max_min)
-        sum_len1.append((growth_len, growth_sum))
-    elif t == 2:
-        h_max_min2.append(delta_max_min)
-        sum_len2.append((growth_len, growth_sum))
+    return max_value, max_bin
+
+# Import ROOT
+string2 = "Proton_1000GeV"
+file_path = f"/Users/xiongzheng/software/B4/B4e/Root/{string2}.root" ### Change your path!!!
+with uproot.open(file_path) as f:
+    tree = f["B4"]
+    # Import Brancch
+    data = tree.arrays([
+        "BarEnergyVector", 
+        "RMS", 
+        "First_Had_Depth", 
+        "First_Had_Layer", 
+        "First_Had_Type", 
+        "Nhits"
+    ])
+
+# Read Entry
+# entry = 5                                     ### Change your entry, you can make this entry as a loop !!!
+for entry in range(10):  # from 0 - 10
+    print(f"Processing entry: {entry}")
+    Energy_vec  = data["BarEnergyVector"][entry]
+    RMS_vec     = data["RMS"][entry]
+    FH_Dep      = data["First_Had_Depth"][entry]
+    FH_Lay      = data["First_Had_Layer"][entry]
+    FH_Type     = data["First_Had_Type"][entry]
+    Nhits       = data["Nhits"][entry]
+
+    color_map = {
+        -1:'orange',
+        1: 'red',
+        2: 'magenta',
+    }
+
+    if FH_Type == 1:
+        string1 = "Inelastic"
+    elif FH_Type == 2:
+        string1 = "Elastic"
     else:
-        h_max_min3.append(delta_max_min)
-        sum_len3.append((growth_len, growth_sum))
+        string1 = "Pass"
+    line_color = color_map.get(FH_Type, 'black')
 
-# 示例绘图
-plt.hist(h_max_min0, bins=60, range=(-1, 5), alpha=0.5, label="Type 0")
-plt.hist(h_max_min1, bins=60, range=(-1, 5), alpha=0.5, label="Inelastic")
-plt.hist(h_max_min2, bins=60, range=(-1, 5), alpha=0.5, label="Elastic")
-plt.hist(h_max_min3, bins=60, range=(-1, 5), alpha=0.5, label="Pass")
-plt.legend()
-plt.title("Δ(Max - Min) in Growth Region")
-plt.show()
+    # Create 2D histogram
+    hXZ = np.full((14, 22), -5.0)
+    hYZ = np.full((14, 22), -5.0)
+
+    # Fill the 2D histogram
+    for i, energy in enumerate(Energy_vec):
+        layer = i // 22
+        bar = i % 22
+        logE = math.log10(energy) if energy >= 1e-2 else -5.0
+
+        if layer % 2 == 0:
+            hXZ[layer, bar] = logE
+        else:
+            hYZ[layer, bar] = logE
+
+    layer_start = 4
+    RMS_threshold = 15.0
+    bar_info = [0, 0]
+    bar_info_assigned = False
+
+    # ---------- Reconstruction ----------
+
+    # ---------- Step1. find the thin trajory ----------
+    for k in range(layer_start, 13):
+        if RMS_vec[k] <= RMS_threshold and RMS_vec[k+1] <= RMS_threshold:
+            max_index1 = np.argmax(Energy_vec[k*22:(k+1)*22])
+            bar1 = max_index1
+            max_index2 = np.argmax(Energy_vec[(k+1)*22:(k+2)*22])
+            bar2 = max_index2
+            if k % 2 == 0:
+                bar_info = [bar1, bar2]
+            else:
+                bar_info = [bar2, bar1]
+            bar_info_assigned = True
+            break
+
+    # ---------- Fit the track of shower axis----------
+    if not bar_info_assigned:
+        print("No bar_info assigned, start fitting...")
+
+        def fit_func(x, bars, energies):
+            return np.sum((bars - x[0])**2 * energies)
+
+        # Fit the odd layer
+        bars = np.arange(22)
+        energies = Energy_vec[layer_start*22:(layer_start+1)*22]
+        res = minimize(fit_func, [11], args=(bars, energies))
+        bar_info[0] = round(res.x[0])
+
+        # Fit the even layer
+        energies = Energy_vec[(layer_start+1)*22:(layer_start+2)*22]
+        res = minimize(fit_func, [11], args=(bars, energies))
+        bar_info[1] = round(res.x[0])
+
+
+    print("bar_info[0]=",bar_info[0])
+    print("bar_info[1]=",bar_info[1])
+
+    # Create histogram to store the information
+    bar_Energy_info = np.zeros(14)
+    bar_Change_info = np.zeros(14)
+
+    for layer in range(14):
+        print(f"RMS {layer} , {RMS_vec[layer]}")
+        center_bar = bar_info[0] if layer % 2 == 0 else bar_info[1]
+        for k in range(center_bar - 1, center_bar + 2):
+            if 0 <= k < 22:
+                bar_Energy_info[layer] += Energy_vec[layer * 22 + k]
+        
+        if layer == 0:
+            bar_Change_info[0] = np.log10(bar_Energy_info[0] / 0.023)
+        else:
+            prev = bar_Energy_info[layer-1]
+            curr = bar_Energy_info[layer]
+            if prev == 0:
+                bar_Change_info[layer-1] = -5
+            elif curr == 0:
+                bar_Change_info[layer-1] = -4
+            else:
+                bar_Change_info[layer] = np.log10(curr / prev)
+
+    # Use bar_Change_info Array to Find the most longest increasing segment, find where it start and it value, and how long it is 
+    max_sum, max_len, max_start_bin = find_max_positive_bin_segment(bar_Change_info)
+    print(f"Positive Increase Sum: {max_sum}, Positive Increase Length: {max_len}, Start at Bin: {max_start_bin}")
+
+    # Use ar_Change_info Array to Find the largest value and it index
+    max_value, max_bin = find_max_value_in_positive_segment(bar_Change_info, max_start_bin, max_len)
+    print(f"Max Changed Value: {max_value} at Bin: {max_bin}")
+
+    # --------------------------- PLOT -------------------------------------
+
+
+    fig, axs = plt.subplots(2, 2, figsize=(12, 12))
+
+    masked_hXZ = np.ma.masked_less(hXZ, -2)  # mask the value < -2 
+    masked_hYZ = np.ma.masked_less(hYZ, -2)
+    # Create colormap：
+    cmap = plt.cm.viridis
+    cmap.set_bad(color='white')  # make the value < -2 is white
+
+    # 1st SubPlot XZ plane
+    axs[0, 0].grid(True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
+    im1 = axs[0, 0].imshow(masked_hXZ, cmap='viridis', extent=[0, 22, 14, 0], aspect='auto', vmin=-2, vmax=2)
+    axs[0, 0].set_title("XZ plane")
+    axs[0, 0].set_xticks(np.arange(0, 23, 1))           
+    axs[0, 0].set_xticklabels(np.arange(-11, 12, 1))    
+    fig.colorbar(im1, ax=axs[0, 0], label='log10(Energy)')
+    box0 = patches.Rectangle((bar_info[0]-1, layer_start), width=3, height=14-layer_start, linewidth=1, edgecolor=line_color, facecolor='none')
+    axs[0, 0].add_patch(box0)
+    axs[0, 0].plot([0, 22], [FH_Lay]*2, linestyle='--', color=line_color, linewidth=1)
+    axs[0, 0].scatter(bar_info[0]+0.5, max_start_bin ,  marker='*', color=line_color, s=100, label='Begin to Increase Point')
+    axs[0, 0].scatter(bar_info[0]+0.5, max_bin ,  marker='^', color=line_color, s=100, label='Most Changed Point')
+
+
+    # 2nd SubPlot YZ plane
+    axs[0, 1].grid(True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
+    im2 = axs[0, 1].imshow(masked_hYZ, cmap='viridis', extent=[0, 22, 14, 0], aspect='auto', vmin=-2, vmax=2)
+    axs[0, 1].set_title("YZ plane")
+    axs[0, 1].set_xticks(np.arange(0, 23, 1))
+    axs[0, 1].set_xticklabels(np.arange(-11, 12, 1))
+    fig.colorbar(im2, ax=axs[0, 1], label='log10(Energy)')
+
+    box1 = patches.Rectangle((bar_info[1]-1, layer_start), width=3, height=14-layer_start, linewidth=1, edgecolor=line_color, facecolor='none')
+    axs[0, 1].add_patch(box1)
+    axs[0, 1].plot([0, 22], [FH_Lay]*2, linestyle='--', color=line_color, linewidth=1)
+    axs[0, 1].scatter(bar_info[1]+0.5, max_start_bin ,  marker='*', color=line_color, s=100, label='Begin to Increase Point')
+    axs[0, 1].scatter(bar_info[1]+0.5, max_bin ,  marker='^', color=line_color, s=100, label='Most Changed Point')
+
+
+    # 3rd Subplot Energy Array
+    axs[1, 0].grid(True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
+    axs[1, 0].hist(
+        np.arange(14),  
+        bins=np.arange(15),  
+        weights=bar_Energy_info, 
+        histtype='step',  
+        linewidth=1.5,
+        color='black'
+    )
+    axs[1, 0].set_xlim(0, 14)
+    axs[1, 0].set_yscale('log')
+    axs[1, 0].set_title("BGO Core Axis Energy Deposit")
+    axs[1, 0].set_xlabel("BGO Layer")
+    axs[1, 0].set_ylabel("3 Bars Energy / GeV")
+    hist_E_min = np.min(bar_Energy_info)  
+    hist_E_max = np.max(bar_Energy_info)  
+    axs[1, 0].plot([FH_Lay, FH_Lay], [hist_E_min, hist_E_max], linestyle='--', color=line_color, linewidth=1)
+    axs[1, 0].scatter(max_start_bin+0.5, bar_Energy_info[max_start_bin], marker='*', color=line_color, s=100, label='Begin to Increase Point')
+    axs[1, 0].scatter(max_bin+0.5, bar_Energy_info[max_bin], marker='^', color=line_color, s=100, label='Most Changed Point')
+
+    # 4th Subplot Change Rate
+    axs[1, 1].grid(True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
+    axs[1, 1].hist(
+        np.arange(14),  
+        bins=np.arange(15) , 
+        weights=bar_Change_info,  
+        histtype='step',  
+        linewidth=1.5,
+        color='black'
+    )
+    axs[1, 1].set_xlim(0, 14)
+    axs[1, 1].set_ylim([-0.5, 2.5])
+    axs[1, 1].set_title("Energy Deposit Change Rate")
+    axs[1, 1].set_xlabel("BGO Layer")
+    axs[1, 1].set_ylabel(r"$\log_{10}(E_i / E_{i-1})$")
+    hist_C_min = np.min(bar_Change_info)  
+    hist_C_max = np.max(bar_Change_info)  
+    axs[1, 1].plot([FH_Lay, FH_Lay], [hist_C_min, hist_C_max], linestyle='--', color=line_color, linewidth=1)
+    axs[1, 1].scatter(max_start_bin+0.5, bar_Change_info[max_start_bin], marker='*', color=line_color, s=100, label='Begin to Increase Point')
+    axs[1, 1].scatter(max_bin+0.5, bar_Change_info[max_bin], marker='^', color=line_color, s=100, label='Most Changed Point')
+
+    if entry < 100:
+        save_path = f"/Users/xiongzheng/software/B4/B4e/Script/Figures/{string1}/{string2}/{entry}_PythonVer.png" ### Change your path!!!
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        plt.savefig(save_path)
+
+    plt.tight_layout()
+    # plt.show()
+
+    entry += 1
