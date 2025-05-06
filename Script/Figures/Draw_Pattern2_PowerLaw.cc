@@ -135,9 +135,7 @@ void Draw_Pattern2_PowerLaw()
 
     int through =0; 
     int el = 0;
-
-    // cout  << proton_tree->GetEntries() << endl;
-    // Long64_t entry  = 99;   
+  
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
     {        
         double bar_info[2] = {0};
@@ -258,7 +256,6 @@ void Draw_Pattern2_PowerLaw()
             h_peak_val1->Fill(seg_peak_value);
             h_layer_1->Fill(p_FH_Lay);
             h_sec_1->Fill(p_FH_Second);
-
             h_peak_rate1->Fill(seg_sum_to_peak - seg_sum);
 
         } 
