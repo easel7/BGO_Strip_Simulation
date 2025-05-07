@@ -31,6 +31,9 @@ void Draw_Pattern2()
     int p_FH_Type;
     int p_FH_Lay;
     int p_Nhits;
+    double p_FI_Dep;
+    int p_FI_Lay;
+
 
     const char* string1;
     const char* string2 = "Proton_1000GeV";
@@ -46,8 +49,8 @@ void Draw_Pattern2()
     proton_tree->SetBranchAddress("First_Had_Type" , &p_FH_Type);
     proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
     proton_tree->SetBranchAddress("Total_E"        , &p_Total_E);
-
-
+    proton_tree->SetBranchAddress("First_Ine_Depth", &p_FI_Dep);
+    proton_tree->SetBranchAddress("First_Ine_Layer", &p_FI_Lay);
     int nbins = 30;
     double xmin = 1e-2;
     double xmax = 1e1;

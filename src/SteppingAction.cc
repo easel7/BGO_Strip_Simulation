@@ -69,15 +69,20 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   G4ThreeVector position = step->GetPostStepPoint()->GetPosition(); // G4cout << "Position X: " << position.x() << G4endl; G4cout << "Position Y: " << position.y() << G4endl;  G4cout << "Position Z: " << position.z() << G4endl;
   G4double interactionDepth = position.z() + fDetConstruction->GetCalorThickness() / 2;  // Depth in detector G4cout << "Depth Z: " << position.z() + fDetConstruction->GetCalorThickness() / 2  << G4endl;
   G4int interactionLayer = step->GetPreStepPoint()->GetTouchableHandle()->GetCopyNumber() / 22;  // Layer number, while GetCopyNumber(depth=0) find its copynumber, 
-  G4int nSecondaries = step->GetSecondaryInCurrentStep()->size();
+  G4int nSecondaries = 0;
+  const auto* secondaries = step->GetSecondaryInCurrentStep();
+  for (const auto& sec : *secondaries) {
+    if (sec->GetDefinition()->GetPDGCharge() != 0.0) {
+      ++nSecondaries;
+    }
+  }
   G4ProcessType processType = process->GetProcessType();
   G4int processSubType = process->GetProcessSubType();
 
   
   // G4cout << "First Interaction Position: " << fEventAction->GetInteractionDepth() << G4endl; // G4cout << "First Interaction Layer: " << fEventAction->GetInteractionLayer() << G4endl;
  
-
-  if (fEventAction) 
+   if (fEventAction) 
   {
     // 记录第一次 interaction（EM / Had / Other）
     if (fEventAction->GetInteractionType() == -1) {
