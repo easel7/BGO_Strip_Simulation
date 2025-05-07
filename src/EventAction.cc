@@ -83,6 +83,11 @@ void EventAction::BeginOfEventAction(const G4Event* /*event*/)
   fHadrInteractionLayer = -1;
   fHadrSecondaries = -1;
   fHadronicTag=-1; 
+
+  fFirstIneDepth = -1;
+  fFirstIneLayer = -1;
+  fFirstIneSecondaries = -1;
+  fFirstIneTag=-1; 
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -127,6 +132,10 @@ void EventAction::EndOfEventAction(const G4Event* event)
   analysisManager->FillNtupleIColumn(7, fHadrInteractionLayer); // First Hadronic Interaction Layer
   analysisManager->FillNtupleIColumn(8, fHadrSecondaries);      // First Hadronic Interaction No Secondaries
   analysisManager->FillNtupleIColumn(9, fHadronicTag);          // First Hadronic Type
+
+  analysisManager->FillNtupleDColumn(10, fFirstIneDepth);        // First Inelastic Interaction Depth
+  analysisManager->FillNtupleIColumn(11, fFirstIneLayer);        // First Inelastic Interaction Layer
+  analysisManager->FillNtupleIColumn(12, fFirstIneSecondaries);  // First Inelastic Interaction No Secondaries
 
   int     HitsArray[15] = {0};
   double  EdepArray[15] = {0};
@@ -187,10 +196,10 @@ void EventAction::EndOfEventAction(const G4Event* event)
   }
   Zeta = pow(Sum_RMS,4) * lastNonZeroFEfrac / 8e6;
   // if(eventID ==73) G4cout << "Check Total Edep " << EdepArray[14] << " GeV, Length " << LengArray[14] << " m, Fire Bars " << HitsArray[14] << " FL "<<  lastNonZeroFEfrac <<" Zeta " << Zeta << G4endl;
-  analysisManager->FillNtupleDColumn(18, Zeta);
-  analysisManager->FillNtupleIColumn(19, HitsArray[14]); 
-  analysisManager->FillNtupleDColumn(20, EdepArray[14]);
-  analysisManager->FillNtupleDColumn(21, LengArray[14]);
+  analysisManager->FillNtupleDColumn(21, Zeta);
+  analysisManager->FillNtupleIColumn(22, HitsArray[14]); 
+  analysisManager->FillNtupleDColumn(23, EdepArray[14]);
+  analysisManager->FillNtupleDColumn(24, LengArray[14]);
   analysisManager->AddNtupleRow();
 
 

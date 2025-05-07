@@ -87,6 +87,18 @@ class EventAction : public G4UserEventAction
     void SetHadrTag(G4int Tag) { fHadronicTag = Tag; }
     G4int GetHadrTag() const { return fHadronicTag; }
 
+    void SetFirstIneSecondaries(G4int Secondaries) { fFirstIneSecondaries = Secondaries;}
+    G4int GetFirstIneSecondaries() const { return fFirstIneSecondaries; }
+
+    void SetFirstIneLayer(G4int Layer) { fFirstIneLayer = Layer; }
+    G4int GetFirstIneLayer() const { return fFirstIneLayer; }
+
+    void SetFirstIneDepth(G4double InteractionDepth) { fFirstIneDepth = InteractionDepth; }
+    G4double GetFirstIneDepth() const { return fFirstIneDepth; }
+
+    void SetFirstIneTag(G4int Tag) { fFirstIneTag = Tag; }
+    G4int GetFirstIneTag() const { return fFirstIneTag; }
+
     std::vector<G4double>& GetEmCalEdep() { return fCalEdep; }
     std::vector<G4double>& GetEmCalLeng() { return fCalLeng; }
     std::vector<G4int>&    GetLayerHits() { return fLayHits; }
@@ -106,15 +118,19 @@ class EventAction : public G4UserEventAction
 
     G4ThreeVector fFirstInteraction = G4ThreeVector(-1e9, -1e9, -1e9);  // 记录第一个电磁相互作用点
     G4double fInteractionDepth = -1;
-    G4int fInteractionLayer = -1;
-    G4int fSecondaries = -1;
-    G4int fInteractionType = -1;
+    G4int    fInteractionLayer = -1;
+    G4int    fSecondaries = -1;
+    G4int    fInteractionType = -1;
     
     G4double fHadrInteractionDepth = -1;
-    G4int fHadrInteractionLayer = -1;
-    G4int fHadrSecondaries = -1;
+    G4int    fHadrInteractionLayer = -1;
+    G4int    fHadrSecondaries = -1;
+    G4int    fHadronicTag=-1; 
 
-    G4int fHadronicTag=-1; 
+    G4double fFirstIneDepth = -1;
+    G4int    fFirstIneLayer = -1;
+    G4int    fFirstIneSecondaries = -1;
+    G4int    fFirstIneTag=-1; 
 
     std::vector<G4double> fCalEdep{ std::vector<G4double>(kNofEmCells, 0.) };
     std::vector<G4double> fCalLeng{ std::vector<G4double>(kNofEmCells, 0.) };

@@ -59,6 +59,9 @@ RunAction::RunAction(B4::EventAction* eventAction) : fEventAction(eventAction)
   analysisManager->CreateNtupleIColumn("First_Had_Layer"); // Layer (0,1,2...)
   analysisManager->CreateNtupleIColumn("First_Had_Second");  // Number of Secondaries
   analysisManager->CreateNtupleIColumn("First_Had_Type");    // -1 initial; 0 exclude Inelasitc ; 1 -Inelastic 
+  analysisManager->CreateNtupleDColumn("First_Ine_Depth"); // Depth ()
+  analysisManager->CreateNtupleIColumn("First_Ine_Layer"); // Layer (0,1,2...)
+  analysisManager->CreateNtupleIColumn("First_Ine_Second");  // Number of Secondaries
 
   if (fEventAction) {
     analysisManager->CreateNtupleIColumn("LayerHitsVector"  , fEventAction->GetLayerHits()); 

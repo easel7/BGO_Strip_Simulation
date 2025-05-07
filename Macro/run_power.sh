@@ -1,5 +1,5 @@
 exe=/Users/xiongzheng/software/B4/B4e/build/exampleB4e
-Tag=(Proton Deuteron Electron Helium4 Carbon Helium3) #Proton Deuteron Electron Helium4 Carbon Helium3 
+Tag=(Proton Deuteron) #Proton Deuteron Electron Helium4 Carbon Helium3  Deuteron
 
 for i in "${!Tag[@]}"; 
 do

@@ -77,54 +77,38 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   // G4cout << "First Interaction Position: " << fEventAction->GetInteractionDepth() << G4endl; // G4cout << "First Interaction Layer: " << fEventAction->GetInteractionLayer() << G4endl;
  
 
-  // Record the first interaction type if the GetInteractionType is initial value
-  if (fEventAction && fEventAction->GetInteractionType() == -1) 
-  { 
-    if (processType == fElectromagnetic) 
-    {   
-      fEventAction->SetInteractionType(0); 
-      fEventAction->SetSecondaries(nSecondaries);
-      fEventAction->SetInteractionDepth(interactionDepth);
-      fEventAction->SetInteractionLayer(interactionLayer);
-    }// EM interaction
-    else if (processType == fHadronic)   
-    { 
-      fEventAction->SetInteractionType(1); 
-      fEventAction->SetSecondaries(nSecondaries);
-      fEventAction->SetInteractionDepth(interactionDepth);
-      fEventAction->SetInteractionLayer(interactionLayer);
-      fEventAction->SetHadrInteractionDepth(interactionDepth);
-      fEventAction->SetHadrInteractionLayer(interactionLayer);
-      fEventAction->SetHadrSecondaries(nSecondaries);
-      fEventAction->SetHadrTag(0);
-      if (processSubType == fHadronInelastic)       {fEventAction->SetHadrTag(1);}
-      else if(processSubType == fHadronElastic)     {fEventAction->SetHadrTag(2);}
-    }// HD interaction
-    else                                               
-    { 
-      fEventAction->SetInteractionType(2); 
-      fEventAction->SetSecondaries(nSecondaries);
-      fEventAction->SetInteractionDepth(interactionDepth);
-      fEventAction->SetInteractionLayer(interactionLayer);
-    }// Other interaction
-    // Print the first interaction position / Type / No. Secondaries
-    // G4cout << "First interaction at: " << position/mm  << " mm, Type: " << fEventAction->GetInteractionType() << " #Secondaries = " << fEventAction->GetSecondaries() << G4endl;
-  }
-  if (fEventAction && fEventAction->GetHadrTag() == -1)
+  if (fEventAction) 
   {
-    if (processType == fHadronic)   
-    {
+    // 记录第一次 interaction（EM / Had / Other）
+    if (fEventAction->GetInteractionType() == -1) {
+      G4int typeCode = (processType == fElectromagnetic) ? 0 :
+                       (processType == fHadronic)        ? 1 : 2;
+      fEventAction->SetInteractionType(typeCode);
+      fEventAction->SetSecondaries(nSecondaries);
+      fEventAction->SetInteractionDepth(interactionDepth);
+      fEventAction->SetInteractionLayer(interactionLayer);
+    }
+  
+    // 记录第一次强相互作用（无论是否为第一次 overall interaction）
+    if (processType == fHadronic && fEventAction->GetHadrTag() == -1) {
       fEventAction->SetHadrInteractionDepth(interactionDepth);
       fEventAction->SetHadrInteractionLayer(interactionLayer);
       fEventAction->SetHadrSecondaries(nSecondaries);
-      fEventAction->SetHadrTag(0);
-      if (processSubType == fHadronInelastic)       {fEventAction->SetHadrTag(1);}
-      else if(processSubType == fHadronElastic)     {fEventAction->SetHadrTag(2);}
-      
+      if (processSubType == fHadronInelastic)          {         fEventAction->SetHadrTag(1);        } // 非弹性强相互作用
+      else if (processSubType == fHadronElastic)       {         fEventAction->SetHadrTag(2);        } // 弹性强相互作用
+      else                                             {         fEventAction->SetHadrTag(0);        } // 其他强相互作用
+    }
+  
+    // 记录第一次非弹性强相互作用
+    if (processType == fHadronic && processSubType == fHadronInelastic && fEventAction->GetFirstIneTag() == -1) 
+    {
+      fEventAction->SetFirstIneDepth(interactionDepth);
+      fEventAction->SetFirstIneLayer(interactionLayer);
+      fEventAction->SetFirstIneSecondaries(nSecondaries);
+      fEventAction->SetFirstIneTag(1);
     }
   }
 }
-
 
   //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
