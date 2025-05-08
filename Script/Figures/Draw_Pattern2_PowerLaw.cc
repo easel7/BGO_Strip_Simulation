@@ -1,26 +1,4 @@
-std::vector<int> g_fit_bars;
-std::vector<double> g_fit_energies;
-double g_fit_total_energy = 0;
-
-int FindMaxMiddleIndex(std::vector<double>* p_EnergyVec, int layer);
-
-void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int& out_len, int& out_start_index);
-
-void FindMaxValueInPositiveSegment(const double array[], int start_index, int length, double& out_max_value, int& out_max_index);
-
-double MaxMinRatio(const double array[], int size);
-
-void PrepareFitData(
-    std::vector<double>* p_EnergyVec,
-    int layer_start,
-    int layer_end,
-    std::vector<int>& bars,
-    std::vector<double>& energies,
-    double& total_energy);
-
-void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_t flag);
-
-double AccumIncreaseToPeak(const double array[], int start_idx, int end_idx);
+#include "/Users/xiongzheng/software/B4/B4e/Script/Ulti.hh"
 
 void Draw_Pattern2_PowerLaw()
 {
@@ -32,6 +10,8 @@ void Draw_Pattern2_PowerLaw()
     int p_FH_Lay;
     int p_Nhits;
     int p_FH_Second;
+    double p_FI_Dep;
+    int p_FI_Lay;
 
 
     const char* string1;
@@ -48,7 +28,8 @@ void Draw_Pattern2_PowerLaw()
     proton_tree->SetBranchAddress("First_Had_Second", &p_FH_Second);
     proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
     proton_tree->SetBranchAddress("Total_E"        , &p_Total_E);
-
+    proton_tree->SetBranchAddress("First_Ine_Depth", &p_FI_Dep);
+    proton_tree->SetBranchAddress("First_Ine_Layer", &p_FI_Lay);
 
     int nbins = 30;
     double xmin = 1e-2;
@@ -91,6 +72,8 @@ void Draw_Pattern2_PowerLaw()
     auto g_sum_len2 = new TGraph();  int point_counter_e = 0; int pc_e = 0;
     auto g_sum_len3 = new TGraph();  int point_counter_p = 0; int pc_p = 0;
 
+
+
     auto h_peak_had0 = new TH2I("h_peak_had0","h_peak_had0",14,0,14,16,-2,14);
     auto h_peak_had1 = new TH2I("h_peak_had1","h_peak_had1",14,0,14,16,-2,14);
     auto h_peak_had2 = new TH2I("h_peak_had2","h_peak_had2",14,0,14,16,-2,14);
@@ -127,11 +110,13 @@ void Draw_Pattern2_PowerLaw()
     auto h_sp_bin3 = new TH1D("h_sp_bin3","h_sp_bin3",14,0,14); // Pass
 
     auto h_int      = new TH1D("h_int","h_int",14,0,14);
-    auto h_sur        = new TH1D("h_sur","h_sur",14,0,14);
+    auto h_sur      = new TH1D("h_sur","h_sur",14,0,14);
 
     auto h_peak_rate1 = new TH1D("h_peak_rate1","h_peak_rate1",50,-5,0); // Inelastic
     auto h_peak_rate2 = new TH1D("h_peak_rate2","h_peak_rate2",50,-5,0); // Elastic
     auto h_peak_rate3 = new TH1D("h_peak_rate3","h_peak_rate3",50,-5,0); // Pass
+
+    auto h_peak_Ine = new TH2I("h_peak_Ine","h_peak_Ine",14,0,14,16,-2,14);
 
     int through =0; 
     int el = 0;
@@ -239,6 +224,9 @@ void Draw_Pattern2_PowerLaw()
         if ((*p_RMSVec)[13] < 15 &&  (*p_RMSVec)[12] < 15 )
         { through ++ ;}
         // cout << entry << " , " << p_Total_E << endl;
+        h_peak_Ine ->Fill(seg_peak_idx,p_FI_Lay);
+
+        
         
         
         if(p_FH_Type == 1)       {  string1 = "Inelastic"; 
@@ -613,161 +601,4 @@ void Draw_Pattern2_PowerLaw()
     h_sec_2->Draw("histsame");
     h_sec_3->Draw("histsame");
     legend0->Draw();
-}
-
-void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int& out_len, int& out_start_index) 
-{
-    double max_sum = 0;
-    int max_len = 0;
-    int max_start_index = -1;
-
-    double curr_sum = 0;
-    int curr_len = 0;
-    int curr_start_index = -1;
-
-    for (int i = 0; i < size; ++i) 
-    {
-        double content = array[i];
-        // std::cout << "bar_Change_info[" << i << "] = " << content << std::endl;
-
-        if (content > 0) 
-        {
-            if (curr_len == 0)
-                curr_start_index = i ;  // 新的一段开始
-
-            curr_sum += content;
-            curr_len++;
-
-            // if (curr_len > max_len || (curr_sum > max_sum && curr_len == max_len)) 
-            if (curr_sum > max_sum || (curr_sum == max_sum && curr_len > max_len)) 
-
-            {
-                max_sum = curr_sum;
-                max_len = curr_len;
-                max_start_index = curr_start_index;  // 记录最大段的起点
-            }
-        } 
-        else 
-        {
-            curr_sum = 0;
-            curr_len = 0;
-            curr_start_index = -1;
-        }
-    }
-
-    out_sum = max_sum;
-    out_len = max_len;
-    out_start_index = max_start_index;
-}
-
-
-void FindMaxValueInPositiveSegment(const double array[], int start_index, int length, double& out_max_value, int& out_max_index)
-{
-    out_max_value = -1e9;  // 初始值很小
-    out_max_index = -1;
-
-    for (int i = start_index; i < start_index + length; ++i) 
-    {
-        double content = array[i];
-        if (content > out_max_value) 
-        {
-        out_max_value = content;
-        out_max_index = i;
-        }
-    }
-}
-
-double MaxMinRatio(const double array[], int size) 
-{
-    if (size <= 0) throw std::invalid_argument("数组不能为空");
-
-    double max_val = 0;
-    double min_val = 1e4;
-
-    for (int i = 0; i < size; ++i) 
-    {
-        if (array[i] > max_val) max_val = array[i];
-        if (array[i] < min_val && array[i] > 0) min_val = array[i];
-        // cout << array[i] <<  " , min =  " << min_val <<  " ,  max " << max_val <<  endl;
-    }
-
-    if (min_val == 0) throw std::runtime_error("最小值为 0，无法计算比值");
-
-    return max_val / min_val;
-}
-
-int FindMaxMiddleIndex(std::vector<double>* p_EnergyVec, int layer) 
-{
-    auto p_start = p_EnergyVec->begin() + layer * 22;
-    auto p_end   = p_EnergyVec->begin() + (layer + 1) * 22;
-
-    double max_sum = -1e9;
-    int best_index = -1;
-
-    for (auto it = p_start + 1; it < p_end - 1; ++it) {
-        double left = *(it - 1);
-        double mid  = *it;
-        double right = *(it + 1);
-
-        double sum = left + mid + right;
-
-        if (mid >= left && mid >= right) { // 中间最大
-            if (sum > max_sum) {
-                max_sum = sum;
-                best_index = std::distance(p_EnergyVec->begin(), it); // 得到整体中的 index
-            }
-        }
-    }
-    return best_index; // 返回的是中间值的 index
-}
-
-void PrepareFitData(
-    std::vector<double>* p_EnergyVec,
-    int layer_start,
-    int layer_end,
-    std::vector<int>& bars,
-    std::vector<double>& energies,
-    double& total_energy)
-{
-    bars.clear();
-    energies.clear();
-    total_energy = 0.0;
-    for (int layer = layer_start; layer < layer_end; layer += 2) 
-    {
-        int max_index = FindMaxMiddleIndex(p_EnergyVec, layer);
-        int base = layer * 22;
-        // cout << "layer = " << layer << " max_index = " << max_index << endl;
-        for (int offset = -2; offset <= 2; ++offset) {
-            int idx = max_index + offset;
-            if (idx >= base && idx < base + 22) {
-                int bar = idx % 22;
-                double energy = (*p_EnergyVec)[idx];
-                // cout << " bar " << bar << " , energy = " << energy << endl;
-                bars.push_back(bar);
-                energies.push_back(energy);
-                total_energy += energy;
-            }
-        }
-    }
-}
-
-void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_t flag)
-{
-    double bar0 = par[0];
-    double cost = 0;
-    for (size_t i = 0; i < g_fit_bars.size(); ++i) 
-    {
-        double diff = g_fit_bars[i] - bar0;
-        cost += diff * diff * g_fit_energies[i] / g_fit_total_energy;
-    }
-    fval = cost;
-}
-
-double AccumIncreaseToPeak(const double array[], int start_idx, int end_idx) 
-{
-    double sum = 0;
-    for (int i = start_idx; i <= end_idx; ++i) {
-        sum += array[i];
-    }
-    return sum;
 }

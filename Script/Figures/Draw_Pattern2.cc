@@ -1,26 +1,4 @@
-std::vector<int> g_fit_bars;
-std::vector<double> g_fit_energies;
-double g_fit_total_energy = 0;
-
-int FindMaxMiddleIndex(std::vector<double>* p_EnergyVec, int layer);
-
-void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int& out_len, int& out_start_index);
-
-void FindMaxValueInPositiveSegment(const double array[], int start_index, int length, double& out_max_value, int& out_max_index);
-
-double MaxMinRatio(const double array[], int size);
-
-void PrepareFitData(
-    std::vector<double>* p_EnergyVec,
-    int layer_start,
-    int layer_end,
-    std::vector<int>& bars,
-    std::vector<double>& energies,
-    double& total_energy);
-
-double AccumIncreaseToPeak(const double array[], int start_idx, int end_idx);
-
-void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_t flag);
+#include "/Users/xiongzheng/software/B4/B4e/Script/Ulti.hh"
 
 void Draw_Pattern2()
 {
@@ -30,15 +8,15 @@ void Draw_Pattern2()
     double p_Total_E;
     int p_FH_Type;
     int p_FH_Lay;
-    int p_Nhits;
+    int p_Nhits;    
+    int p_FH_Second;
     double p_FI_Dep;
     int p_FI_Lay;
 
-
     const char* string1;
-    const char* string2 = "Proton_1000GeV";
+    // const char* string2 = "Proton_1000GeV";
     // const char* string2 = "Proton_10000GeV";
-    // const char* string2 = "Deuteron_1000GeV";
+    const char* string2 = "Deuteron_1000GeV";
     // const char* string2 = "Deuteron_10000GeV";
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     auto proton_tree = (TTree*)proton_file->Get("B4");
@@ -46,7 +24,8 @@ void Draw_Pattern2()
     proton_tree->SetBranchAddress("RMS"            , &p_RMSVec);
     proton_tree->SetBranchAddress("First_Had_Depth", &p_FH_Dep);
     proton_tree->SetBranchAddress("First_Had_Layer", &p_FH_Lay);
-    proton_tree->SetBranchAddress("First_Had_Type" , &p_FH_Type);
+    proton_tree->SetBranchAddress("First_Had_Type" , &p_FH_Type);    
+    proton_tree->SetBranchAddress("First_Had_Second", &p_FH_Second);
     proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
     proton_tree->SetBranchAddress("Total_E"        , &p_Total_E);
     proton_tree->SetBranchAddress("First_Ine_Depth", &p_FI_Dep);
@@ -116,7 +95,9 @@ void Draw_Pattern2()
     auto h_sp_bin3 = new TH1D("h_sp_bin3","h_sp_bin3",14,0,14); // Pass
 
     auto h_int      = new TH1D("h_int","h_int",14,0,14);
-    auto h_sur        = new TH1D("h_sur","h_sur",14,0,14);
+    auto h_sur      = new TH1D("h_sur","h_sur",14,0,14);
+
+    auto h_peak_Ine = new TH2I("h_peak_Ine","h_peak_Ine",14,0,14,14,0,14);
 
     // cout  << proton_tree->GetEntries() << endl;
     Long64_t entry  = 99;   
@@ -207,8 +188,7 @@ void Draw_Pattern2()
             }
             else // (layer>0) 
             {
-                if( bar_Energy_info[layer-1] == 0) { bar_Change_info[layer-1] = -5 ;  }//  cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
-                else if( bar_Energy_info[layer] == 0) { bar_Change_info[layer-1] = -4 ; }//  cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
+                if( bar_Energy_info[layer-1] == 0 || bar_Energy_info[layer] == 0) { bar_Change_info[layer-1] = -5 ;  }//  cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
                 else {bar_Change_info[layer] = log10(bar_Energy_info[layer]/bar_Energy_info[layer-1]); }// cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
             }
         }
@@ -230,6 +210,7 @@ void Draw_Pattern2()
         // if (rate_max_min < 100 && rate_max_min>60  && p_FH_Type == 1 && p_FH_Lay>11) { cout << entry << " , " <<  rate_max_min <<  endl; }
         if (rate_max_min >  1e2 )
         {}
+        h_peak_Ine ->Fill(seg_peak_idx,p_FI_Lay);
         
         
         if(p_FH_Type == 1)       {  string1 = "Inelastic"; 
@@ -396,6 +377,13 @@ void Draw_Pattern2()
     h_peak_had3->SetTitle("Pass through;Bin of Maximum Change Ratio; First Hadronic Layer");
     h_peak_had3->Draw("colz");
 
+    c1->cd(4);
+    gPad->SetLogz();
+    h_peak_Ine->SetTitle(";Bin of Maximum Change Ratio; First Inelastic Layer");
+    h_peak_Ine->Draw("colz");
+    double cov0 = h_peak_Ine->GetCorrelationFactor();
+    cout << " cov0 = " << cov0 << endl;
+
     ///////////////////////////////
 
     for(int ii = 1 ; ii <= 14 ; ii++)
@@ -542,161 +530,8 @@ void Draw_Pattern2()
     h_peak_val2->Draw("histsame");
     h_peak_val3->Draw("histsame");
     legend0->Draw();
-}
-
-void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int& out_len, int& out_start_index) 
-{
-    double max_sum = 0;
-    int max_len = 0;
-    int max_start_index = -1;
-
-    double curr_sum = 0;
-    int curr_len = 0;
-    int curr_start_index = -1;
-
-    for (int i = 0; i < size; ++i) 
-    {
-        double content = array[i];
-        // std::cout << "bar_Change_info[" << i << "] = " << content << std::endl;
-
-        if (content > 0) 
-        {
-            if (curr_len == 0)
-                curr_start_index = i ;  // 新的一段开始
-
-            curr_sum += content;
-            curr_len++;
-
-            // if (curr_len > max_len || (curr_sum > max_sum && curr_len == max_len)) 
-            if (curr_sum > max_sum || (curr_sum == max_sum && curr_len > max_len)) 
-
-            {
-                max_sum = curr_sum;
-                max_len = curr_len;
-                max_start_index = curr_start_index;  // 记录最大段的起点
-            }
-        } 
-        else 
-        {
-            curr_sum = 0;
-            curr_len = 0;
-            curr_start_index = -1;
-        }
-    }
-
-    out_sum = max_sum;
-    out_len = max_len;
-    out_start_index = max_start_index;
-}
 
 
-void FindMaxValueInPositiveSegment(const double array[], int start_index, int length, double& out_max_value, int& out_max_index)
-{
-    out_max_value = -1e9;  // 初始值很小
-    out_max_index = -1;
 
-    for (int i = start_index; i < start_index + length; ++i) 
-    {
-        double content = array[i];
-        if (content > out_max_value) 
-        {
-        out_max_value = content;
-        out_max_index = i;
-        }
-    }
-}
 
-double MaxMinRatio(const double array[], int size) 
-{
-    if (size <= 0) throw std::invalid_argument("数组不能为空");
-
-    double max_val = 0;
-    double min_val = 1e4;
-
-    for (int i = 0; i < size; ++i) 
-    {
-        if (array[i] > max_val) max_val = array[i];
-        if (array[i] < min_val && array[i] > 0) min_val = array[i];
-        // cout << array[i] <<  " , min =  " << min_val <<  " ,  max " << max_val <<  endl;
-    }
-
-    if (min_val == 0) throw std::runtime_error("最小值为 0，无法计算比值");
-
-    return max_val / min_val;
-}
-
-int FindMaxMiddleIndex(std::vector<double>* p_EnergyVec, int layer) 
-{
-    auto p_start = p_EnergyVec->begin() + layer * 22;
-    auto p_end   = p_EnergyVec->begin() + (layer + 1) * 22;
-
-    double max_sum = -1e9;
-    int best_index = -1;
-
-    for (auto it = p_start + 1; it < p_end - 1; ++it) {
-        double left = *(it - 1);
-        double mid  = *it;
-        double right = *(it + 1);
-
-        double sum = left + mid + right;
-
-        if (mid >= left && mid >= right) { // 中间最大
-            if (sum > max_sum) {
-                max_sum = sum;
-                best_index = std::distance(p_EnergyVec->begin(), it); // 得到整体中的 index
-            }
-        }
-    }
-    return best_index; // 返回的是中间值的 index
-}
-
-void PrepareFitData(
-    std::vector<double>* p_EnergyVec,
-    int layer_start,
-    int layer_end,
-    std::vector<int>& bars,
-    std::vector<double>& energies,
-    double& total_energy)
-{
-    bars.clear();
-    energies.clear();
-    total_energy = 0.0;
-    for (int layer = layer_start; layer < layer_end; layer += 2) 
-    {
-        int max_index = FindMaxMiddleIndex(p_EnergyVec, layer);
-        int base = layer * 22;
-        // cout << "layer = " << layer << " max_index = " << max_index << endl;
-        for (int offset = -2; offset <= 2; ++offset) {
-            int idx = max_index + offset;
-            if (idx >= base && idx < base + 22) {
-                int bar = idx % 22;
-                double energy = (*p_EnergyVec)[idx];
-                // cout << " bar " << bar << " , energy = " << energy << endl;
-                bars.push_back(bar);
-                energies.push_back(energy);
-                total_energy += energy;
-            }
-        }
-    }
-}
-
-void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_t flag)
-{
-    double bar0 = par[0];
-    double cost = 0;
-    for (size_t i = 0; i < g_fit_bars.size(); ++i) 
-    {
-        double diff = g_fit_bars[i] - bar0;
-        cost += diff * diff * g_fit_energies[i] / g_fit_total_energy;
-    }
-    fval = cost;
-}
-
-double AccumIncreaseToPeak(const double array[], int start_idx, int end_idx) 
-{
-    double sum = 0;
-    for (int i = start_idx; i <= end_idx; ++i) {
-        sum += array[i];
-    }
-    return sum;
 }

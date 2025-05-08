@@ -1,6 +1,4 @@
-void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int& out_len, int& out_start_index);
-
-void FindMaxValueInPositiveSegment(const double array[], int start_index, int length, double& out_max_value, int& out_max_index);
+#include "/Users/xiongzheng/software/B4/B4e/Script/Ulti.hh"
 
 void Longti_Start_Index_Interaction()
 {
@@ -158,66 +156,5 @@ void Longti_Start_Index_Interaction()
         h1_p_inter[i]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] Stack Multi Layer;Layer Distance (Start - Interaction) ;Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
         h1_p_inter[i]->Draw("hist");
         h1_d_inter[i]->Draw("histsame");
-    }
-}
-
-void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int& out_len, int& out_start_index) 
-{
-    double max_sum = 0;
-    int max_len = 0;
-    int max_start_index = -1;
-
-    double curr_sum = 0;
-    int curr_len = 0;
-    int curr_start_index = -1;
-
-    for (int i = 0; i < size; ++i) 
-    {
-        double content = array[i];
-        // std::cout << "bar_Change_info[" << i << "] = " << content << std::endl;
-
-        if (content > 0) 
-        {
-            if (curr_len == 0)
-                curr_start_index = i ;  // 新的一段开始
-
-            curr_sum += content;
-            curr_len++;
-
-            // if (curr_len > max_len || (curr_sum > max_sum && curr_len == max_len)) 
-            if (curr_sum > max_sum || (curr_sum == max_sum && curr_len > max_len)) 
-
-            {
-                max_sum = curr_sum;
-                max_len = curr_len;
-                max_start_index = curr_start_index;  // 记录最大段的起点
-            }
-        } 
-        else 
-        {
-            curr_sum = 0;
-            curr_len = 0;
-            curr_start_index = -1;
-        }
-    }
-
-    out_sum = max_sum;
-    out_len = max_len;
-    out_start_index = max_start_index;
-}
-
-void FindMaxValueInPositiveSegment(const double array[], int start_index, int length, double& out_max_value, int& out_max_index)
-{
-    out_max_value = -1e9;  // 初始值很小
-    out_max_index = -1;
-
-    for (int i = start_index; i < start_index + length; ++i) 
-    {
-        double content = array[i];
-        if (content > out_max_value) 
-        {
-        out_max_value = content;
-        out_max_index = i;
-        }
     }
 }
