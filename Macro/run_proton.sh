@@ -7,14 +7,14 @@ Tag=Proton
 #     ${exe} -m ${Tag}_${energy}GeV.mac
 # done
 
-# for energy in $(seq 100 100 900)
-# do
-#     ${exe} -m ${Tag}_${energy}GeV.mac
-# done
-
-for energy in $(seq 2000 1000 10000)
+for energy in $(seq 100 100 900)
 do
     ${exe} -m ${Tag}_${energy}GeV.mac
 done
+
+# for energy in $(seq 2000 1000 10000)
+# do
+#     ${exe} -m ${Tag}_${energy}GeV.mac
+# done
 
 # ${exe} -m  /Users/xiongzheng/software/B4/B4e/Macro/${Tag}_PowerLaw.mac
