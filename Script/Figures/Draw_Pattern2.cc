@@ -14,9 +14,9 @@ void Draw_Pattern2()
     int p_FI_Lay;
 
     const char* string1;
-    // const char* string2 = "Proton_1000GeV";
+    const char* string2 = "Proton_1000GeV";
     // const char* string2 = "Proton_10000GeV";
-    const char* string2 = "Deuteron_1000GeV";
+    // const char* string2 = "Deuteron_1000GeV";
     // const char* string2 = "Deuteron_10000GeV";
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     auto proton_tree = (TTree*)proton_file->Get("B4");
@@ -101,7 +101,7 @@ void Draw_Pattern2()
     auto h_sur      = new TH1D("h_sur","h_sur",14,0,14);
 
     auto h_peak_Ine = new TH2I("h_peak_Ine","h_peak_Ine",14,0,14,14,0,14);
-    auto h_Ine_Reso = new TH2I("h_Ine_Reso","h_Ine_Reso",14,0,14,28,-14,14);
+    auto h_Ine_Reso = new TH2I("h_Ine_Reso","h_Ine_Reso",14,0,14,14,0,14);
 
 
     // cout  << proton_tree->GetEntries() << endl;
@@ -189,7 +189,7 @@ void Draw_Pattern2()
             }
             if(layer==0)
             {
-                bar_Change_info[0] = log10(bar_Energy_info[0] / 0.02);
+                bar_Change_info[0] = log10(bar_Energy_info[0] / 0.023);
             }
             else // (layer>0) 
             {
@@ -211,13 +211,13 @@ void Draw_Pattern2()
         h_peak_had0->Fill(seg_peak_idx,p_FH_Lay);
         
         
-        if (rate_max_min >  1e2 && seg_len > 5 ) 
+        // if (rate_max_min >  1e2 && seg_len > 5 ) 
         {h_int->Fill(seg_peak_idx);}
         // if (rate_max_min < 100 && rate_max_min>60  && p_FH_Type == 1 && p_FH_Lay>11) { cout << entry << " , " <<  rate_max_min <<  endl; }
         if (rate_max_min >  1e2 )
         {}
         h_peak_Ine->Fill(seg_peak_idx,p_FI_Lay);
-        h_Ine_Reso->Fill(p_FI_Lay,seg_peak_idx-p_FI_Lay);
+        h_Ine_Reso->Fill(p_FI_Lay,abs(seg_peak_idx-p_FI_Lay));
 
         
         if(p_FH_Type == 1)       {  string1 = "Inelastic"; 
@@ -277,8 +277,6 @@ void Draw_Pattern2()
 
     }
     
-
-
     auto c0    = new TCanvas("c0","c0",1200,1200);
     c0->Divide(2,2);
     c0->cd(1);
@@ -413,24 +411,68 @@ void Draw_Pattern2()
     gPad->SetLogz();
     h_Ine_Reso->SetMinimum(minVal_1);
     h_Ine_Reso->SetMaximum(maxVal_1);
-    h_Ine_Reso->SetTitle(";Bin of Maximum Change Ratio; First Inelastic Layer");
+    h_Ine_Reso->SetTitle(";First Inelastic Layer; Bin of Maximum Change Ratio - First Inelastic Layer");
     h_Ine_Reso->Draw("colz");
-
-    ///////////////////////////////
-
     TH1D *h1_p_reso[14];
-
     for (int j = 0; j < 14; j++) // layer
     {
-        h1_p_reso[j] = h_Ine_Reso->ProjectionY("",j,j,""); // CRE weigth^1
+        h1_p_reso[j] = h_Ine_Reso->ProjectionY(Form("h1_p_reso[%d]",j), j+1, j+1, "");
+        cout <<h1_p_reso[j]->Integral()<< endl;
+        h1_p_reso[j]->Scale(1/h1_p_reso[j]->Integral());
+        h1_p_reso[j]->SetTitle(Form("Inelastic in Layer %d;|Bin of Maximum Change Ratio - First Inelastic Layer|; Normalized Count",j));
     }
+    ///////////////////////////////
+
+    double Proton_Acc0[14]={0};   
+    double Proton_Acc1[14]={0};   
+    double Proton_Acc2[14]={0};   
+
+    double Layer[14]={0};   
+
 
     auto c1_2 = new TCanvas("c1_2","c1_2",2000,1200);
-    c1_2->Clear();
     c1_2->Divide(5,3);
-    gStyle->SetOptStat(0);
-    
+    for (int j = 0; j < 14; j++) // layer
+    {
+        c1_2->cd(j+1);
+        gPad->SetLogy();
+        h1_p_reso[j]->Draw("hist");
 
+        Proton_Acc0[j]   = h1_p_reso[j]->Integral(1,1); 
+        Proton_Acc1[j]   = h1_p_reso[j]->Integral(2,2); 
+        Proton_Acc2[j]   = h1_p_reso[j]->Integral(3,14); 
+
+        cout << Proton_Acc0[j] << " , " << Proton_Acc1[j] << " , " << Proton_Acc2[j] << endl;
+        Layer[j] = 0.5 + j;
+    }
+    c1_2->cd(15);
+    auto gre_p = new TGraph(14,Layer,Proton_Acc0);
+    auto gre_d = new TGraph(14,Layer,Proton_Acc1);
+    auto gre_c = new TGraph(14,Layer,Proton_Acc2);
+
+
+    gre_p->SetTitle(Form("Incident %s ; BGO Layer; Percentile",string2));
+    gre_p->SetMarkerStyle(22);
+    gre_p->GetXaxis()->SetLimits(0,14);
+    gre_p->GetYaxis()->SetRangeUser(0,1);
+    gre_p->SetMarkerStyle(20);
+    gre_p->SetMarkerColor(kRed);
+    gre_p->SetLineColor(kRed);
+    gre_d->SetMarkerStyle(21);
+    gre_d->SetMarkerColor(kBlue);
+    gre_d->SetLineColor(kBlue);
+    gre_c->SetMarkerStyle(22);
+    gre_c->SetMarkerColor(kOrange-3);
+    gre_c->SetLineColor(kOrange-3);
+    gre_p->Draw("ALP");
+    gre_d->Draw("LPSAME");
+    gre_c->Draw("LPSAME");
+
+    auto legend1_2 = new TLegend(0.2,0.7,0.7,0.88);
+    legend1_2->AddEntry(gre_p, "#Delta Layer = 0","p");
+    legend1_2->AddEntry(gre_d, "#Delta Layer = 1","p");
+    legend1_2->AddEntry(gre_c, "#Delta Layer >= 2","p");
+    legend1_2->Draw();
 
     ///////////////////////////////
 
@@ -443,7 +485,7 @@ void Draw_Pattern2()
     latex.SetTextSize(0.04);
     latex.SetTextFont(72);
     latex.SetTextAlign(13);  //align at top
-    TF1 *fitFunc0 = new TF1("fitFunc0", "[0]*exp(-x/[1])", 0, 3); fitFunc0->SetParameters(100, 10); fitFunc0->SetLineColor(kBlue);
+    TF1 *fitFunc0 = new TF1("fitFunc0", "[0]*exp(-x/[1])", 0, 5); fitFunc0->SetParameters(100, 10); fitFunc0->SetLineColor(kBlue);
 
     auto c2 = new TCanvas("c2","c2",1200,600);
     c2->Divide(2,1);

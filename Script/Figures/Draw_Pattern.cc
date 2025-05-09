@@ -286,6 +286,10 @@ void Draw_Pattern()
         g_core2->Draw("psame");
         g_ch_2->Draw("psame"); 
 
+        TF1 *sigmoid = new TF1("sigmoid", "[0]/(1 + exp(-(x-[1])/[2]))", 0, 14);
+        sigmoid->SetParameters(1, 6, 1); // 例如最大为1万，中心在第6层，宽度为1层
+        // hist->Fit(sigmoid, "R");
+        sigmoid->Draw("same");
         if(p_FH_Lay%2 != -1 ) {line2->Draw("");}
 
         c1->cd(4);
@@ -304,46 +308,5 @@ void Draw_Pattern()
         if(p_FH_Lay%2 != -1 ) {line3->Draw("");}
         if (entry < 100) { c1->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/%s/%s/%lld.pdf",string1,string2,entry)); }
     }
-
-    /*  Check the Macro Parameter Do not Delete*/
-    // auto c2    = new TCanvas("c2","c2",1400,700);
-    // c2->Divide(2,1);
-    // c2->cd(1);
-    // h_max_min1->SetTitle(";log10(Emax/Emin);Counts");
-
-    // h_max_min1->SetLineColor(kRed);
-    // h_max_min2->SetLineColor(kBlue);
-    // h_max_min3->SetLineColor(kOrange-3);
-
-    // h_max_min1->Draw("hist");
-    // h_max_min2->Draw("histsame");
-    // h_max_min3->Draw("histsame");
-
-    // c2->cd(2);
-    // gPad->SetLogx();
-    // g_sum_len0->SetTitle("; #sum log10(Change Rate);# Continues Positive Bins");
-    // g_sum_len0->GetXaxis()->SetLimits(1e-2, 100);        // X 轴范围
-    // g_sum_len0->GetYaxis()->SetRangeUser(0, 14);    // Y 轴范围
-    // g_sum_len0->SetMarkerColorAlpha(kBlack, 0);  // 0.0 = fully transparent, 1.0 = fully opaque
-    // g_sum_len0->SetMarkerSize(0);
-
-    // g_sum_len1->SetMarkerStyle(20);  
-    // g_sum_len1->SetMarkerColorAlpha(kRed, 0.1);  // 0.0 = fully transparent, 1.0 = fully opaque
-    // g_sum_len1->SetMarkerSize(0.8);
-
-    // g_sum_len2->SetMarkerStyle(21);  
-    // g_sum_len2->SetMarkerColorAlpha(kBlue, 0.1);
-    // g_sum_len2->SetMarkerSize(0.8);
-
-    // g_sum_len3->SetMarkerStyle(22);  
-    // g_sum_len3->SetMarkerColorAlpha(kOrange-3, 0.1);
-    // g_sum_len3->SetMarkerSize(0.8);
-
-    // g_sum_len0->Draw("AP"); 
-    // g_sum_len1->Draw("PSAME");  
-    // g_sum_len2->Draw("PSAME");
-    // g_sum_len3->Draw("PSAME");
-
-    // std::cout << "Number of valid points: " << g_sum_len0->GetN() << std::endl;
 }
 

@@ -117,6 +117,7 @@ void Draw_Pattern2_PowerLaw()
 
 
     auto h_peak_Ine = new TH2I("h_peak_Ine","h_peak_Ine",14,0,14,14,0,14);
+    auto h_Ine_Reso = new TH2I("h_Ine_Reso","h_Ine_Reso",14,0,14,14,0,14);
 
     int through =0; 
     int el = 0;
@@ -217,14 +218,15 @@ void Draw_Pattern2_PowerLaw()
         g_sum_len0->SetPoint(point_counter++,seg_sum,seg_len); 
         h_peak_had0->Fill(seg_peak_idx,p_FH_Lay);
         
-        if (rate_max_min >  1e2 && seg_len > 5 ) 
+        // if (rate_max_min >  1e2 && seg_len > 5 ) 
         {h_int->Fill(seg_peak_idx); }
         // if (rate_max_min < 100 && rate_max_min>60  && p_FH_Type == 1 && p_FH_Lay>11) { cout << entry << " , " <<  rate_max_min <<  endl; }
         
         if ((*p_RMSVec)[13] < 15 &&  (*p_RMSVec)[12] < 15 )
         { through ++ ;}
         // cout << entry << " , " << p_Total_E << endl;
-        h_peak_Ine ->Fill(seg_peak_idx,p_FI_Lay);
+        h_peak_Ine->Fill(seg_peak_idx,p_FI_Lay);
+        h_Ine_Reso->Fill(p_FI_Lay,abs(seg_peak_idx-p_FI_Lay));
 
 
         if(p_FH_Type == 1)       {  string1 = "Inelastic"; 
@@ -389,8 +391,8 @@ void Draw_Pattern2_PowerLaw()
     h_peak_had3->SetMinimum(minVal_1);h_start_had3->SetMinimum(minVal_1); h_Lay_MM3->SetMinimum(minVal_2);
     h_peak_had3->SetMaximum(maxVal_1);h_start_had3->SetMaximum(maxVal_1); h_Lay_MM3->SetMaximum(maxVal_2);
 
-    auto c1 = new TCanvas("c1","c1",1200,1200);
-    c1->Divide(2,2);
+    auto c1 = new TCanvas("c1","c1",1800,1200);
+    c1->Divide(3,2);
     c1->cd(1);
     gPad->SetLogz();
     h_peak_had1->SetTitle("Inelastic;Bin of Maximum Change Ratio; First Hadronic Layer");
@@ -418,6 +420,72 @@ void Draw_Pattern2_PowerLaw()
     double cov0 = h_peak_Ine->GetCorrelationFactor();
     cout << " cov0 = " << cov0 << endl;
 
+    c1->cd(5);
+    gPad->SetLogz();
+    h_Ine_Reso->SetMinimum(minVal_1);
+    h_Ine_Reso->SetMaximum(maxVal_1);
+    h_Ine_Reso->SetTitle(";First Inelastic Layer; Bin of Maximum Change Ratio - First Inelastic Layer");
+    h_Ine_Reso->Draw("colz");
+    TH1D *h1_p_reso[14];
+    for (int j = 0; j < 14; j++) // layer
+    {
+        h1_p_reso[j] = h_Ine_Reso->ProjectionY(Form("h1_p_reso[%d]",j), j+1, j+1, "");
+        cout <<h1_p_reso[j]->Integral()<< endl;
+        h1_p_reso[j]->Scale(1/h1_p_reso[j]->Integral());
+        h1_p_reso[j]->SetTitle(Form("Inelastic in Layer %d;|Bin of Maximum Change Ratio - First Inelastic Layer|; Normalized Count",j));
+    }
+    ///////////////////////////////
+
+    double Proton_Acc0[14]={0};   
+    double Proton_Acc1[14]={0};   
+    double Proton_Acc2[14]={0};   
+
+    double Layer[14]={0};   
+
+
+    auto c1_2 = new TCanvas("c1_2","c1_2",2000,1200);
+    c1_2->Divide(5,3);
+    for (int j = 0; j < 14; j++) // layer
+    {
+        c1_2->cd(j+1);
+        gPad->SetLogy();
+        h1_p_reso[j]->Draw("hist");
+
+        Proton_Acc0[j]   = h1_p_reso[j]->Integral(1,1); 
+        Proton_Acc1[j]   = h1_p_reso[j]->Integral(2,2); 
+        Proton_Acc2[j]   = h1_p_reso[j]->Integral(3,14); 
+
+        cout << Proton_Acc0[j] << " , " << Proton_Acc1[j] << " , " << Proton_Acc2[j] << endl;
+        Layer[j] = 0.5 + j;
+    }
+    c1_2->cd(15);
+    auto gre_p = new TGraph(14,Layer,Proton_Acc0);
+    auto gre_d = new TGraph(14,Layer,Proton_Acc1);
+    auto gre_c = new TGraph(14,Layer,Proton_Acc2);
+
+
+    gre_p->SetTitle(Form("Incident %s ; BGO Layer; Percentile",string2));
+    gre_p->SetMarkerStyle(22);
+    gre_p->GetXaxis()->SetLimits(0,14);
+    gre_p->GetYaxis()->SetRangeUser(0,1);
+    gre_p->SetMarkerStyle(20);
+    gre_p->SetMarkerColor(kRed);
+    gre_p->SetLineColor(kRed);
+    gre_d->SetMarkerStyle(21);
+    gre_d->SetMarkerColor(kBlue);
+    gre_d->SetLineColor(kBlue);
+    gre_c->SetMarkerStyle(22);
+    gre_c->SetMarkerColor(kOrange-3);
+    gre_c->SetLineColor(kOrange-3);
+    gre_p->Draw("ALP");
+    gre_d->Draw("LPSAME");
+    gre_c->Draw("LPSAME");
+
+    auto legend1_2 = new TLegend(0.2,0.7,0.7,0.88);
+    legend1_2->AddEntry(gre_p, "#Delta Layer = 0","p");
+    legend1_2->AddEntry(gre_d, "#Delta Layer = 1","p");
+    legend1_2->AddEntry(gre_c, "#Delta Layer >= 2","p");
+    legend1_2->Draw();
 
     ///////////////////////////////
 
