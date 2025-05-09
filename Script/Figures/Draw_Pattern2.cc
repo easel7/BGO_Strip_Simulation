@@ -42,14 +42,17 @@ void Draw_Pattern2()
         bin_edges[i] = pow(10, logxmin + i * (logxmax - logxmin) / nbins);
     }
 
+    auto h_max_min0 = new TH1D("h_max_min0","h_max_min0",60,-1,5); // Until Inelastic
     auto h_max_min1 = new TH1D("h_max_min1","h_max_min1",60,-1,5); // Inelastic
     auto h_max_min2 = new TH1D("h_max_min2","h_max_min2",60,-1,5); // Elastic
     auto h_max_min3 = new TH1D("h_max_min3","h_max_min3",60,-1,5); // Pass
 
+    auto h_change_0 = new TH1D("h_change_0","h_change_0",nbins, bin_edges.data()); // Until Inelastic
     auto h_change_1 = new TH1D("h_change_1","h_change_1",nbins, bin_edges.data()); // Inelastic
     auto h_change_2 = new TH1D("h_change_2","h_change_2",nbins, bin_edges.data()); // Elastic
     auto h_change_3 = new TH1D("h_change_3","h_change_3",nbins, bin_edges.data()); // Pass
 
+    auto h_contin_0 = new TH1D("h_contin_0","h_contin_0",14,0,14); // Until Inelastic
     auto h_contin_1 = new TH1D("h_contin_1","h_contin_1",14,0,14); // Inelastic
     auto h_contin_2 = new TH1D("h_contin_2","h_contin_2",14,0,14); // Elastic
     auto h_contin_3 = new TH1D("h_contin_3","h_contin_3",14,0,14); // Pass
@@ -98,6 +101,8 @@ void Draw_Pattern2()
     auto h_sur      = new TH1D("h_sur","h_sur",14,0,14);
 
     auto h_peak_Ine = new TH2I("h_peak_Ine","h_peak_Ine",14,0,14,14,0,14);
+    auto h_Ine_Reso = new TH2I("h_Ine_Reso","h_Ine_Reso",14,0,14,28,-14,14);
+
 
     // cout  << proton_tree->GetEntries() << endl;
     Long64_t entry  = 99;   
@@ -205,13 +210,15 @@ void Draw_Pattern2()
         g_sum_len0->SetPoint(point_counter++,seg_sum,seg_len); 
         h_peak_had0->Fill(seg_peak_idx,p_FH_Lay);
         
+        
         if (rate_max_min >  1e2 && seg_len > 5 ) 
         {h_int->Fill(seg_peak_idx);}
         // if (rate_max_min < 100 && rate_max_min>60  && p_FH_Type == 1 && p_FH_Lay>11) { cout << entry << " , " <<  rate_max_min <<  endl; }
         if (rate_max_min >  1e2 )
         {}
-        h_peak_Ine ->Fill(seg_peak_idx,p_FI_Lay);
-        
+        h_peak_Ine->Fill(seg_peak_idx,p_FI_Lay);
+        h_Ine_Reso->Fill(p_FI_Lay,seg_peak_idx-p_FI_Lay);
+
         
         if(p_FH_Type == 1)       {  string1 = "Inelastic"; 
             h_max_min1->Fill(log10(rate_max_min)); 
@@ -242,7 +249,12 @@ void Draw_Pattern2()
             h_sp_rate2->Fill(seg_sum_to_peak);
             h_sp_bin2->Fill(seg_len_to_peak);
             h_peak_val2->Fill(seg_peak_value);
-
+            if(p_FI_Dep>0)
+            {   
+                h_max_min0->Fill(log10(rate_max_min)); 
+                h_change_0->Fill(seg_sum); 
+                h_contin_0->Fill(seg_len); 
+            }
         }
         else                     {  string1 = "Pass";      
             h_max_min3->Fill(log10(rate_max_min)); 
@@ -262,7 +274,11 @@ void Draw_Pattern2()
 
         }
         
+
     }
+    
+
+
     auto c0    = new TCanvas("c0","c0",1200,1200);
     c0->Divide(2,2);
     c0->cd(1);
@@ -273,14 +289,18 @@ void Draw_Pattern2()
     h_max_min1->SetLineColor(kRed);
     h_max_min2->SetLineColor(kBlue);
     h_max_min3->SetLineColor(kOrange-3);
+    h_max_min0->SetLineColor(kBlack);
     h_max_min1->Draw("hist");
     h_max_min2->Draw("histsame");
     h_max_min3->Draw("histsame");
+    h_max_min0->Draw("histsame");
+
 
     auto legend0 = new TLegend(0.12,0.7,0.32,0.88);
     legend0->AddEntry(h_max_min1, "FH Inlastic","l");
     legend0->AddEntry(h_max_min2, "FH Elastic","l");
     legend0->AddEntry(h_max_min3, "Pass through","l");
+    legend0->AddEntry(h_max_min0, "Until Inelastic","l");
     legend0->Draw();
 
     c0->cd(2);
@@ -292,9 +312,11 @@ void Draw_Pattern2()
     h_change_1->SetLineColor(kRed);
     h_change_2->SetLineColor(kBlue);
     h_change_3->SetLineColor(kOrange-3);
+    h_change_0->SetLineColor(kBlack);
     h_change_1->Draw("hist");
     h_change_2->Draw("histsame");
     h_change_3->Draw("histsame");
+    h_change_0->Draw("histsame");
 
     legend0->Draw();
 
@@ -306,10 +328,11 @@ void Draw_Pattern2()
     h_contin_1->SetLineColor(kRed);
     h_contin_2->SetLineColor(kBlue);
     h_contin_3->SetLineColor(kOrange-3);
+    h_contin_0->SetLineColor(kBlack);
     h_contin_1->Draw("hist");
     h_contin_2->Draw("histsame");
     h_contin_3->Draw("histsame");
-
+    h_contin_0->Draw("histsame");
     legend0->Draw();
 
     c0->cd(4);
@@ -357,8 +380,8 @@ void Draw_Pattern2()
     h_peak_had3->SetMinimum(minVal_1);h_start_had3->SetMinimum(minVal_1); h_Lay_MM3->SetMinimum(minVal_2);
     h_peak_had3->SetMaximum(maxVal_1);h_start_had3->SetMaximum(maxVal_1); h_Lay_MM3->SetMaximum(maxVal_2);
 
-    auto c1 = new TCanvas("c1","c1",1200,1200);
-    c1->Divide(2,2);
+    auto c1 = new TCanvas("c1","c1",1800,1200);
+    c1->Divide(3,2);
     c1->cd(1);
     gPad->SetLogz();
     h_peak_had1->SetTitle("Inelastic;Bin of Maximum Change Ratio; First Hadronic Layer");
@@ -379,10 +402,35 @@ void Draw_Pattern2()
 
     c1->cd(4);
     gPad->SetLogz();
+    h_peak_Ine->SetMinimum(minVal_1);
+    h_peak_Ine->SetMaximum(maxVal_1);
     h_peak_Ine->SetTitle(";Bin of Maximum Change Ratio; First Inelastic Layer");
     h_peak_Ine->Draw("colz");
     double cov0 = h_peak_Ine->GetCorrelationFactor();
     cout << " cov0 = " << cov0 << endl;
+
+    c1->cd(5);
+    gPad->SetLogz();
+    h_Ine_Reso->SetMinimum(minVal_1);
+    h_Ine_Reso->SetMaximum(maxVal_1);
+    h_Ine_Reso->SetTitle(";Bin of Maximum Change Ratio; First Inelastic Layer");
+    h_Ine_Reso->Draw("colz");
+
+    ///////////////////////////////
+
+    TH1D *h1_p_reso[14];
+
+    for (int j = 0; j < 14; j++) // layer
+    {
+        h1_p_reso[j] = h_Ine_Reso->ProjectionY("",j,j,""); // CRE weigth^1
+    }
+
+    auto c1_2 = new TCanvas("c1_2","c1_2",2000,1200);
+    c1_2->Clear();
+    c1_2->Divide(5,3);
+    gStyle->SetOptStat(0);
+    
+
 
     ///////////////////////////////
 

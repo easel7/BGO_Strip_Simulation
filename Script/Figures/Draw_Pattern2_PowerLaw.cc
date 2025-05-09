@@ -13,7 +13,6 @@ void Draw_Pattern2_PowerLaw()
     double p_FI_Dep;
     int p_FI_Lay;
 
-
     const char* string1;
     // const char* string2 = "Proton_PowerLaw";
     const char* string2 = "Deuteron_PowerLaw";
@@ -116,7 +115,8 @@ void Draw_Pattern2_PowerLaw()
     auto h_peak_rate2 = new TH1D("h_peak_rate2","h_peak_rate2",50,-5,0); // Elastic
     auto h_peak_rate3 = new TH1D("h_peak_rate3","h_peak_rate3",50,-5,0); // Pass
 
-    auto h_peak_Ine = new TH2I("h_peak_Ine","h_peak_Ine",14,0,14,16,-2,14);
+
+    auto h_peak_Ine = new TH2I("h_peak_Ine","h_peak_Ine",14,0,14,14,0,14);
 
     int through =0; 
     int el = 0;
@@ -226,9 +226,7 @@ void Draw_Pattern2_PowerLaw()
         // cout << entry << " , " << p_Total_E << endl;
         h_peak_Ine ->Fill(seg_peak_idx,p_FI_Lay);
 
-        
-        
-        
+
         if(p_FH_Type == 1)       {  string1 = "Inelastic"; 
             h_max_min1->Fill(log10(rate_max_min)); 
             h_change_1->Fill(seg_sum); 
@@ -410,6 +408,16 @@ void Draw_Pattern2_PowerLaw()
     gPad->SetLogz();
     h_peak_had3->SetTitle("Pass through;Bin of Maximum Change Ratio; First Hadronic Layer");
     h_peak_had3->Draw("colz");
+
+    c1->cd(4);
+    gPad->SetLogz();
+    h_peak_Ine->SetMinimum(minVal_1);
+    h_peak_Ine->SetMaximum(maxVal_1);
+    h_peak_Ine->SetTitle(";Bin of Maximum Change Ratio; First Inelastic Layer");
+    h_peak_Ine->Draw("colz");
+    double cov0 = h_peak_Ine->GetCorrelationFactor();
+    cout << " cov0 = " << cov0 << endl;
+
 
     ///////////////////////////////
 
