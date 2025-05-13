@@ -103,7 +103,6 @@ void Draw_Pattern2()
     auto h_peak_Ine = new TH2I("h_peak_Ine","h_peak_Ine",14,0,14,14,0,14);
     auto h_Ine_Reso = new TH2I("h_Ine_Reso","h_Ine_Reso",14,0,14,14,0,14);
 
-
     // cout  << proton_tree->GetEntries() << endl;
     Long64_t entry  = 99;   
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
@@ -112,7 +111,9 @@ void Draw_Pattern2()
         double bar_info[2] = {0};
         double bar_Energy_info[14] = {0};
         double bar_Change_info[14] = {0};
-        
+        double bar_Accumu_info[14] = {0};
+        double bar_Accumu_error[14] = {0};
+
         double rate_max_min      = 0;
         double seg_sum           = 0;   // 总增长和
         int    seg_len           = 0;   // 连续正增长长度
@@ -122,12 +123,8 @@ void Draw_Pattern2()
         double seg_sum_to_peak   = 0;   // 从起点到增长最大值的增长和
         int    seg_len_to_peak   = 0;   // 从起点到增长最大值的索引
         
-
         proton_tree->GetEntry(entry);
         if (p_Nhits < 10 ) continue;
-        // cout << entry << endl;
-        // cout << " Depth " << p_FH_Dep << " layer " <<  p_FH_Lay << " Type =" << p_FH_Type << endl;
-        
         int layer_start = 4;
         const double RMS_threshold = 15.0;  // 自定义阈值，越小越“直”，你可以调整
         bool bar_info_assigned = false;  // 标志变量，判断是否已赋值
@@ -168,7 +165,6 @@ void Draw_Pattern2()
             bar_info[0] = std::round(bar_odd);
 
             PrepareFitData(p_EnergyVec, layer_start+1, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
-            
             TMinuit minuit1(1);
             minuit1.SetFCN(FitAxisFunction);
             minuit1.SetPrintLevel(-1);
@@ -196,7 +192,19 @@ void Draw_Pattern2()
                 if( bar_Energy_info[layer-1] == 0 || bar_Energy_info[layer] == 0) { bar_Change_info[layer-1] = -5 ;  }//  cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
                 else {bar_Change_info[layer] = log10(bar_Energy_info[layer]/bar_Energy_info[layer-1]); }// cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
             }
+            bar_Accumu_info[layer]  += bar_Accumu_info[layer-1] + bar_Energy_info[layer];
+            bar_Accumu_error[layer] = 0.3 * bar_Accumu_info[layer];
         }
+
+        PrepareSigmoidData(bar_Accumu_info,bar_Accumu_error);
+        TMinuit minuit(4);
+        minuit.SetFCN(SigmoidFCN);
+        minuit.SetPrintLevel(-1); // 静默输出
+        minuit.SetErrorDef(1.0);  // Δχ² = 1 规则
+        
+
+
+
 
         FindMaxPositiveSegment(bar_Change_info,14,seg_sum,seg_len,seg_start_idx);
         FindMaxValueInPositiveSegment(bar_Change_info,seg_start_idx,seg_len,seg_peak_value,seg_peak_idx);
@@ -271,10 +279,7 @@ void Draw_Pattern2()
             h_sp_rate3->Fill(seg_sum_to_peak);
             h_sp_bin3->Fill(seg_len_to_peak);
             h_peak_val3->Fill(seg_peak_value);
-
         }
-        
-
     }
     
     auto c0    = new TCanvas("c0","c0",1200,1200);

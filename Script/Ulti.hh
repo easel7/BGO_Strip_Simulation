@@ -1,5 +1,6 @@
 std::vector<int> g_fit_bars;
 std::vector<double> g_fit_energies;
+std::vector<double> g_fit_errors;
 double g_fit_total_energy = 0;
 
 void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int& out_len, int& out_start_index) 
@@ -138,6 +139,8 @@ void PrepareFitData(
     }
 }
 
+
+
 void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_t flag)
 {
     double bar0 = par[0];
@@ -148,6 +151,40 @@ void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par,
         cost += diff * diff * g_fit_energies[i] / g_fit_total_energy;
     }
     fval = cost;
+}
+
+void PrepareSigmoidData(
+    const std::vector<double>& accumu, 
+    const std::vector<double>& error
+)
+{
+    g_fit_layers.clear();
+    g_fit_energies.clear();
+    g_fit_errors.clear();
+    for (int i = 0; i < 14; ++i) 
+    {
+        g_fit_layers.push_back(i);
+        g_fit_energies.push_back(accumu[i]);
+        g_fit_errors.push_back(error[i]);
+    }
+}
+
+void SigmoidFCN(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_t iflag)
+{
+    double chi2 = 0;
+
+    for (size_t i = 0; i < g_fit_layers.size(); ++i) {
+        double x = g_fit_layers[i];
+        double y = g_fit_energies[i];
+        double err = g_fit_errors[i];
+
+        double model = par[0] + 0.02 * x + (par[1] - par[0] - 0.02 * x) / (1 + exp(-(x - par[2]) / par[3]));
+
+        if (err > 0)
+            chi2 += pow((y - model) / err, 2);
+    }
+
+    fval = chi2;
 }
 
 double AccumIncreaseToPeak(const double array[], int start_idx, int end_idx) 

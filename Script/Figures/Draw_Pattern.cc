@@ -9,8 +9,11 @@ void Draw_Pattern()
     int p_FH_Lay;
     int p_Nhits;
 
+    double p_FI_Dep;
+    int p_FI_Lay;
+
     const char* string1;
-    const char* string2 = "Proton_1000GeV";
+    const char* string2 = "Deuteron_1000GeV";
 
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     auto proton_tree = (TTree*)proton_file->Get("B4");
@@ -20,6 +23,9 @@ void Draw_Pattern()
     proton_tree->SetBranchAddress("First_Had_Layer", &p_FH_Lay);
     proton_tree->SetBranchAddress("First_Had_Type" , &p_FH_Type);
     proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
+    proton_tree->SetBranchAddress("First_Ine_Depth", &p_FI_Dep);
+    proton_tree->SetBranchAddress("First_Ine_Layer", &p_FI_Lay);
+
     auto h_max_min0 = new TH1D("h_max_min0","h_max_min0",60,-1,5); 
     auto h_max_min1 = new TH1D("h_max_min1","h_max_min1",60,-1,5); // Inelastic
     auto h_max_min2 = new TH1D("h_max_min2","h_max_min2",60,-1,5); // Elastic
@@ -36,19 +42,21 @@ void Draw_Pattern()
     int point_counter_p = 0;
 
     // cout  << proton_tree->GetEntries() << endl;
-    Long64_t entry  = 162;   
-    // for (Long64_t entry = 0; entry < 100; entry++)
+    // Long64_t entry  = 16;   
+    for (Long64_t entry = 0; entry < 100; entry++)
     {
-        auto c1    = new TCanvas("c1","c1",1400,1400);
+        auto c1    = new TCanvas("c1","c1",2100,1400);
         auto hXZ   = new TH2D("hXZ","BGO X-Z Plane",22,-11,11,14,0,14);
         auto hYZ   = new TH2D("hYZ","BGO Y-Z Plane",22,-11,11,14,0,14);
         auto hBGO1 = new TH1D("hBGO1","BGO Core Axis Energy Deposit",14,0,14); 
         auto hBGO2 = new TH1D("hBGO2","Deposit Energy Change Ratio",14,0,14); 
-        
-        auto *g_core0 = new TGraph();          auto *g_ch_0 = new TGraph();
-        auto *g_core1 = new TGraph();          auto *g_ch_1 = new TGraph();
-        auto *g_core2 = new TGraph();          auto *g_ch_2 = new TGraph();
-        auto *g_core3 = new TGraph();          auto *g_ch_3 = new TGraph();
+        auto hBGO3 = new TH1D("hBGO3","Accumulated Deposit Energy",14,0,14); 
+        auto  hResidual = new TH1D("hResidual","Accumulated Deposit Energy - Fit",14,0,14); 
+
+        auto *g_core0 = new TGraph();          auto *g_ch_0 = new TGraph();            auto *g_vert0 = new TGraph();
+        auto *g_core1 = new TGraph();          auto *g_ch_1 = new TGraph();            auto *g_vert1 = new TGraph();
+        auto *g_core2 = new TGraph();          auto *g_ch_2 = new TGraph();            auto *g_vert2 = new TGraph();
+        auto *g_core3 = new TGraph();          auto *g_ch_3 = new TGraph();            auto *g_vert3 = new TGraph();
 
         auto    *box0 = new TBox();
         auto    *box1 = new TBox();
@@ -56,6 +64,7 @@ void Draw_Pattern()
         double bar_info[2] = {0};
         double bar_Energy_info[14] = {0};
         double bar_Change_info[14] = {0};
+        double bar_Accumu_info[14] = {0};
         double rate_sum      = 0;
         int    rate_len      = 0;
         int    rate_poi      = 0;
@@ -63,7 +72,7 @@ void Draw_Pattern()
         int max_rate_index   = 0;
 
         proton_tree->GetEntry(entry);
-        // if (p_Nhits < 10 ) continue;
+        if (p_Nhits < 10 ) continue;
         // cout << " RMS at 0 layer = " << p_FH_Lay << endl;
 
         for(size_t i = 0; i < p_EnergyVec->size(); i++) 
@@ -172,6 +181,10 @@ void Draw_Pattern()
             }
             hBGO1->SetBinContent(layer+1, bar_Energy_info[layer]);
             hBGO2->SetBinContent(layer+1, bar_Change_info[layer]);
+            bar_Accumu_info[layer] += bar_Accumu_info[layer-1] + bar_Energy_info[layer];
+            hBGO3->SetBinContent(layer+1, bar_Accumu_info[layer]);
+            hBGO3->SetBinError(layer+1, 0.3 * bar_Accumu_info[layer]);
+
         }
         FindMaxPositiveBinSegment(hBGO2,rate_sum,rate_len,rate_poi);
         FindMaxValueInPositiveSegment(hBGO2,rate_poi,rate_len,max_rate,max_rate_index);
@@ -193,6 +206,14 @@ void Draw_Pattern()
         line4->SetLineColor(kBlack);
         line4->SetLineWidth(2);
         line4->SetLineStyle(9);
+
+        double vert_layer = p_FI_Dep / 25.5; 
+        cout << "vert_layer = " << vert_layer << endl;
+        g_vert0->SetPoint(0, bar_info[0] - 10.5, 15 - vert_layer);
+        g_vert1->SetPoint(0, bar_info[1] - 10.5, 15 - vert_layer);   
+        g_vert2->SetPoint(0, vert_layer, hBGO1->GetBinContent(ceil(vert_layer)) );
+        g_vert3->SetPoint(0, vert_layer, hBGO2->GetBinContent(ceil(vert_layer)) );
+
         h_max_min0->Fill(log10(MaxMinRatio(hBGO1)));
         g_sum_len0->SetPoint(point_counter++,rate_sum,rate_len);
         if(p_FH_Type == 1)       {  h_max_min1->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len1->SetPoint(point_counter_i++,rate_sum,rate_len+0.1);}
@@ -205,10 +226,11 @@ void Draw_Pattern()
         
         box0->SetFillStyle(0);        box0->SetLineWidth(2);
         box1->SetFillStyle(0);        box1->SetLineWidth(2);
-        g_core0->SetMarkerStyle(29);  g_core0->SetMarkerSize(2);    g_ch_0->SetMarkerStyle(22);   g_ch_0->SetMarkerSize(2);
-        g_core1->SetMarkerStyle(29);  g_core1->SetMarkerSize(2);    g_ch_1->SetMarkerStyle(22);   g_ch_1->SetMarkerSize(2);
-        g_core2->SetMarkerStyle(29);  g_core2->SetMarkerSize(2);    g_ch_2->SetMarkerStyle(22);   g_ch_2->SetMarkerSize(2);
-        g_core3->SetMarkerStyle(29);  g_core3->SetMarkerSize(2);    g_ch_3->SetMarkerStyle(22);   g_ch_3->SetMarkerSize(2);
+        g_core0->SetMarkerStyle(29);  g_core0->SetMarkerSize(2);    g_ch_0->SetMarkerStyle(22);   g_ch_0->SetMarkerSize(2); g_vert0->SetMarkerStyle(3);   g_vert0->SetMarkerColor(3);
+        g_core1->SetMarkerStyle(29);  g_core1->SetMarkerSize(2);    g_ch_1->SetMarkerStyle(22);   g_ch_1->SetMarkerSize(2); g_vert1->SetMarkerStyle(3);   g_vert1->SetMarkerColor(3);
+        g_core2->SetMarkerStyle(29);  g_core2->SetMarkerSize(2);    g_ch_2->SetMarkerStyle(22);   g_ch_2->SetMarkerSize(2); g_vert2->SetMarkerStyle(3);   g_vert2->SetMarkerColor(3);
+        g_core3->SetMarkerStyle(29);  g_core3->SetMarkerSize(2);    g_ch_3->SetMarkerStyle(22);   g_ch_3->SetMarkerSize(2); g_vert3->SetMarkerStyle(3);   g_vert3->SetMarkerColor(3);
+
         line1->SetLineWidth(2);       line4->SetLineColor(kBlack);
         line2->SetLineWidth(2);       line4->SetLineWidth(2);
         line3->SetLineWidth(2);       line4->SetLineStyle(9);
@@ -231,14 +253,14 @@ void Draw_Pattern()
         TLatex latex;
         latex.SetTextSize(0.03);
         latex.SetTextColor(kBlack);
-        c1->Divide(2,2);
+        c1->Divide(3,2);
         c1->cd(1);
         gStyle->SetOptStat(0);
         hXZ->Draw("colz");
         line1->Draw("same");
         g_core0->Draw("psame"); 
         g_ch_0->Draw("psame"); 
-
+        g_vert0->Draw("psame"); 
         box0->Draw("psame");
 
         
@@ -259,6 +281,7 @@ void Draw_Pattern()
         line1->Draw("same");
         g_core1->Draw("psame"); 
         g_ch_1->Draw("psame"); 
+        g_vert1->Draw("psame"); 
 
         box1->Draw("psame");
 
@@ -274,7 +297,7 @@ void Draw_Pattern()
         latex.DrawLatexNDC(0.82, 0.92, "log_{10}(E/GeV)");
 
 
-        c1->cd(3);
+        c1->cd(4);
         gPad->SetLogy();
         hBGO1->SetLineColor(kBlack);
         hBGO1->SetLineWidth(2);
@@ -285,14 +308,10 @@ void Draw_Pattern()
         hBGO1->Draw("hist");
         g_core2->Draw("psame");
         g_ch_2->Draw("psame"); 
-
-        TF1 *sigmoid = new TF1("sigmoid", "[0]/(1 + exp(-(x-[1])/[2]))", 0, 14);
-        sigmoid->SetParameters(1, 6, 1); // 例如最大为1万，中心在第6层，宽度为1层
-        // hist->Fit(sigmoid, "R");
-        sigmoid->Draw("same");
+        g_vert2->Draw("psame"); 
         if(p_FH_Lay%2 != -1 ) {line2->Draw("");}
 
-        c1->cd(4);
+        c1->cd(5);
         hBGO2->SetLineColor(kBlack);
         hBGO2->SetLineWidth(2);
         hBGO2->SetTitle("BGO Core Axis Energy Deposit Change Rate;BGO Layer; log10(^{}E^{}_{i}/^{}E^{}_{i-1})");
@@ -304,8 +323,70 @@ void Draw_Pattern()
         line4->Draw();
         g_core3->Draw("psame");
         g_ch_3->Draw("psame"); 
-
+        g_vert3->Draw("psame"); 
         if(p_FH_Lay%2 != -1 ) {line3->Draw("");}
+
+
+        c1->cd(6);
+        TPad *pad1 = new TPad("pad1", "pad1", 0, 0.35, 1, 1.0);
+        pad1->SetBottomMargin(0); // Upper and lower plot are joined
+        pad1->SetGrid(1, 1);      // Vertical ,Horizontal grid
+        pad1->SetLogy(1);
+        pad1->SetLogx(0);
+        pad1->Draw();             // Draw the upper pad: pad1
+        pad1->cd();               // pad1 becomes the current pad
+        hBGO3->SetLineColor(kBlack);
+        hBGO3->SetLineWidth(2);
+        hBGO3->SetTitle("Accumulated Energy Deposit;BGO Layer; Energy / GeV");
+        hBGO3->GetYaxis()->CenterTitle();
+        hBGO3->GetYaxis()->SetTitleOffset(0.97);
+        hBGO3->GetXaxis()->CenterTitle();
+        hBGO3->Draw("hist");
+        
+        TF1 *sigmoid = new TF1("sigmoid", "[0]+ 0.02*x + ([1]-[0] - 0.02*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
+        sigmoid->SetParameters(10, 100, 6, 1); 
+        sigmoid->FixParameter(0,hBGO3->GetMinimum()); 
+        sigmoid->FixParameter(1,hBGO3->GetMaximum()); 
+        hBGO3->Fit(sigmoid, "R");
+        sigmoid->Draw("same");
+        double percentile = (sigmoid->Eval(p_FH_Lay) - hBGO3->GetMinimum()) / (hBGO3->GetMaximum() - hBGO3->GetMinimum());
+        cout << "Percentile = " << percentile << endl;
+        latex.DrawLatexNDC(0.12, 0.82, Form("Ine Vertex Sigmoid Percentile:%.2f %%", percentile*100));
+
+        c1->cd(6);
+        TPad *pad2 = new TPad("pad2", "pad2", 0, 0.0, 1, 0.35);
+        pad2->SetTopMargin(0);
+        pad2->SetBottomMargin(0.2);
+        pad2->SetGrid(1, 1);      // Vertical ,Horizontal grid
+        pad2->SetLogy(0);
+        pad2->SetLogx(0);
+        pad2->Draw();
+        pad2->cd();       // pad2 becomes the current pad
+        hResidual->SetTitle(";BGO Layer; (Data - Fit)/Err");
+        hResidual->GetXaxis()->SetLabelSize(0.06);
+        hResidual->GetXaxis()->SetTitleSize(0.1);
+        hResidual->GetYaxis()->SetLabelSize(0.06);
+        hResidual->GetYaxis()->SetTitleOffset(0.5);
+        hResidual->GetYaxis()->SetTitleSize(0.07);
+
+        for (int i = 1; i <= 14; ++i) {
+            double x =     hBGO3->GetBinCenter(i);
+            double yData = hBGO3->GetBinContent(i);
+            double yFit  = sigmoid->Eval(x);
+            double yErr = hBGO3->GetBinError(i);
+            if (yErr > 0) hResidual->SetBinContent(i, (yData - yFit) / yErr);
+        }
+        // hResidual->GetYaxis()->SetRangeUser(-1,1);
+        hResidual->SetLineColor(kBlack);
+        hResidual->SetLineWidth(2);
+        hResidual->Draw("hist");
+        auto line0 = new TLine(0,0,14,0);
+        line0->SetLineColor(kRed);
+        line0->SetLineWidth(2);
+        line0->SetLineStyle(2);
+        line0->Draw("same");
+
+
         if (entry < 100) { c1->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/%s/%s/%lld.pdf",string1,string2,entry)); }
     }
 }
