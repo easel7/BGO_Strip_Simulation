@@ -172,12 +172,10 @@ void SigmoidFCN(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_
     double chi2 = 0;
 
     for (size_t i = 0; i < 14; ++i) {
-        double x = i;
+        double x = i + 0.5;
         double y = g_fit_energies[i];
         double err = g_fit_errors[i];
-
         double model = par[0] + 0.02 * x + (par[1] - par[0] - 0.02 * x) / (1 + exp(-(x - par[2]) / par[3]));
-
         if (err > 0)
             chi2 += pow((y - model) / err, 2);
     }

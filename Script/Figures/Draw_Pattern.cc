@@ -184,6 +184,7 @@ void Draw_Pattern()
             bar_Accumu_info[layer] += bar_Accumu_info[layer-1] + bar_Energy_info[layer];
             hBGO3->SetBinContent(layer+1, bar_Accumu_info[layer]);
             hBGO3->SetBinError(layer+1, 0.3 * bar_Accumu_info[layer]);
+            cout << "Info " << bar_Accumu_info[layer] << " ± " << 0.3 * bar_Accumu_info[layer] << endl;
 
         }
         FindMaxPositiveBinSegment(hBGO2,rate_sum,rate_len,rate_poi);
@@ -344,7 +345,8 @@ void Draw_Pattern()
         hBGO3->Draw("hist");
         
         TF1 *sigmoid = new TF1("sigmoid", "[0]+ 0.02*x + ([1]-[0] - 0.02*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
-        sigmoid->SetParameters(hBGO3->GetMinimum(), hBGO3->GetMaximum(), max_rate_index, 1); 
+        cout << max_rate_index << endl;
+        sigmoid->SetParameters(hBGO3->GetMinimum(), hBGO3->GetMaximum(), max_rate_index - 1, 1); 
         sigmoid->FixParameter(0,hBGO3->GetMinimum()); 
         sigmoid->FixParameter(1,hBGO3->GetMaximum()); 
         hBGO3->Fit(sigmoid, "R");

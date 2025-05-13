@@ -127,6 +127,8 @@ void Draw_Pattern2_PowerLaw()
         double bar_info[2] = {0};
         double bar_Energy_info[14] = {0};
         double bar_Change_info[14] = {0};
+        double bar_Accumu_info[14] = {0};
+        double bar_Accumu_error[14] = {0};
         double rate_max_min      = 0;
         double seg_sum           = 0;   // 总增长和
         int    seg_len           = 0;   // 连续正增长长度
@@ -142,7 +144,7 @@ void Draw_Pattern2_PowerLaw()
         
         int layer_start = 4;
         const double RMS_threshold = 15.0;  // 自定义阈值，越小越“直”，你可以调整
-        bool bar_info_assigned = false;     // 标志变量，判断是否已赋值
+        bool bar_info_assigned = false;  // 标志变量，判断是否已赋值
         for (int k = layer_start; k <= 12; k ++) 
         {  // 每次两层作为一个窗口
             if((*p_RMSVec)[k]<=RMS_threshold && (*p_RMSVec)[k+1]<=RMS_threshold)
@@ -179,7 +181,6 @@ void Draw_Pattern2_PowerLaw()
             bar_info[0] = std::round(bar_odd);
 
             PrepareFitData(p_EnergyVec, layer_start+1, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
-            
             TMinuit minuit1(1);
             minuit1.SetFCN(FitAxisFunction);
             minuit1.SetPrintLevel(-1);
@@ -200,10 +201,14 @@ void Draw_Pattern2_PowerLaw()
             }
         }
         bar_Change_info[0] = log10(bar_Energy_info[0] / 0.023);
+        bar_Accumu_info[0] = bar_Energy_info[0];
+        bar_Accumu_error[0] = 0.3 * bar_Accumu_info[0];
         for(int layer = 1 ; layer<14 ; layer++)
         {
             if( bar_Energy_info[layer-1] == 0 || bar_Energy_info[layer] == 0) { bar_Change_info[layer-1] = -5 ;  }//  cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
             else {bar_Change_info[layer] = log10(bar_Energy_info[layer]/bar_Energy_info[layer-1]); }// cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
+            bar_Accumu_info[layer]  += bar_Accumu_info[layer-1] + bar_Energy_info[layer];
+            bar_Accumu_error[layer] = 0.3 * bar_Accumu_info[layer];
         }
 
         FindMaxPositiveSegment(bar_Change_info,14,seg_sum,seg_len,seg_start_idx);
@@ -216,6 +221,36 @@ void Draw_Pattern2_PowerLaw()
         // cout << "Max Increase Rate = " <<  seg_peak_value << endl;
         // cout << "Max Increase Rate Bin = " << seg_peak_idx << endl;
         g_sum_len0->SetPoint(point_counter++,seg_sum,seg_len); 
+
+        PrepareSigmoidData(bar_Accumu_info,bar_Accumu_error);
+        TMinuit minuit(4);
+        minuit.SetFCN(SigmoidFCN);
+        minuit.SetPrintLevel(-1); // 静默输出
+        minuit.SetErrorDef(1.0);  // Δχ² = 1 规则
+        minuit.DefineParameter(0, "Ymin", bar_Accumu_info[0], 1, 0, bar_Accumu_info[13]); // initVal, initErr, LowerL, UpperL
+        minuit.DefineParameter(1, "Ymax", bar_Accumu_info[13], 1, 0, bar_Accumu_info[13]); 
+        minuit.DefineParameter(2, "Xmid", seg_peak_idx, 0.5, 1, 14); // 拐点
+        minuit.DefineParameter(3, "Slope", 1.0, 0.1, 0.1, 5); // 斜率
+        minuit.FixParameter(0);
+        minuit.FixParameter(1);
+        minuit.Migrad();
+        int fit_status = minuit.Migrad();
+        if (fit_status != 0) {
+            std::cerr << "WARNING: Fit did not converge! Status: " << fit_status << std::endl;
+        }
+        double Ymin, Ymin_err, Ymax, Ymax_err;
+        double Slope, Slope_err, Xmid, Xmid_err;
+        minuit.GetParameter(0, Ymin, Ymin_err);
+        minuit.GetParameter(1, Ymax, Ymax_err);
+        minuit.GetParameter(2, Xmid, Xmid_err);
+        minuit.GetParameter(3, Slope, Slope_err);
+        cout << seg_peak_idx << endl;
+        cout << "Ymin: " << Ymin << " ± " << Ymin_err    << endl;
+        cout << "Ymax: " << Ymax << " ± " << Ymax_err    << endl;
+        cout << "Xmid: " << Xmid << " ± " << Xmid_err    << endl;
+        cout << "Slope: " << Slope << " ± " << Slope_err << endl;
+        double percentile = Mod_Sigmoid_Percentile(p_FI_Lay,Xmid,Slope);
+        cout << "perenctile: " << percentile << endl; 
         h_peak_had0->Fill(seg_peak_idx,p_FH_Lay);
         
         // if (rate_max_min >  1e2 && seg_len > 5 ) 
