@@ -13,7 +13,7 @@ void Draw_Pattern()
     int p_FI_Lay;
 
     const char* string1;
-    const char* string2 = "Deuteron_1000GeV";
+    const char* string2 = "Proton_1000GeV";
 
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     auto proton_tree = (TTree*)proton_file->Get("B4");
@@ -42,8 +42,8 @@ void Draw_Pattern()
     int point_counter_p = 0;
 
     // cout  << proton_tree->GetEntries() << endl;
-    // Long64_t entry  = 16;   
-    for (Long64_t entry = 0; entry < 100; entry++)
+    Long64_t entry  = 162;   
+    // for (Long64_t entry = 0; entry < 100; entry++)
     {
         auto c1    = new TCanvas("c1","c1",2100,1400);
         auto hXZ   = new TH2D("hXZ","BGO X-Z Plane",22,-11,11,14,0,14);
@@ -72,7 +72,7 @@ void Draw_Pattern()
         int max_rate_index   = 0;
 
         proton_tree->GetEntry(entry);
-        if (p_Nhits < 10 ) continue;
+        // if (p_Nhits < 10 ) continue;
         // cout << " RMS at 0 layer = " << p_FH_Lay << endl;
 
         for(size_t i = 0; i < p_EnergyVec->size(); i++) 
@@ -344,13 +344,16 @@ void Draw_Pattern()
         hBGO3->Draw("hist");
         
         TF1 *sigmoid = new TF1("sigmoid", "[0]+ 0.02*x + ([1]-[0] - 0.02*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
-        sigmoid->SetParameters(10, 100, 6, 1); 
+        sigmoid->SetParameters(hBGO3->GetMinimum(), hBGO3->GetMaximum(), max_rate_index, 1); 
         sigmoid->FixParameter(0,hBGO3->GetMinimum()); 
         sigmoid->FixParameter(1,hBGO3->GetMaximum()); 
         hBGO3->Fit(sigmoid, "R");
         sigmoid->Draw("same");
-        double percentile = (sigmoid->Eval(p_FH_Lay) - hBGO3->GetMinimum()) / (hBGO3->GetMaximum() - hBGO3->GetMinimum());
+        double percentile = (sigmoid->Eval(p_FH_Lay) - hBGO3->GetMinimum() - 0.02 * p_FH_Lay) / (hBGO3->GetMaximum() - hBGO3->GetMinimum() - 0.02 * p_FH_Lay);
         cout << "Percentile = " << percentile << endl;
+
+        double percentile2 = Mod_Sigmoid_Percentile(p_FI_Lay,sigmoid->GetParameter(2),sigmoid->GetParameter(3));
+        cout << "perenctile2: " << percentile2 << endl; 
         latex.DrawLatexNDC(0.12, 0.82, Form("Ine Vertex Sigmoid Percentile:%.2f %%", percentile*100));
 
         c1->cd(6);

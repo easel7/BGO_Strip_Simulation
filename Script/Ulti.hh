@@ -154,16 +154,14 @@ void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par,
 }
 
 void PrepareSigmoidData(
-    const std::vector<double>& accumu, 
-    const std::vector<double>& error
+    const double accumu[], 
+    const double error[]
 )
 {
-    g_fit_layers.clear();
     g_fit_energies.clear();
     g_fit_errors.clear();
     for (int i = 0; i < 14; ++i) 
     {
-        g_fit_layers.push_back(i);
         g_fit_energies.push_back(accumu[i]);
         g_fit_errors.push_back(error[i]);
     }
@@ -173,8 +171,8 @@ void SigmoidFCN(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_
 {
     double chi2 = 0;
 
-    for (size_t i = 0; i < g_fit_layers.size(); ++i) {
-        double x = g_fit_layers[i];
+    for (size_t i = 0; i < 14; ++i) {
+        double x = i;
         double y = g_fit_energies[i];
         double err = g_fit_errors[i];
 
@@ -185,6 +183,12 @@ void SigmoidFCN(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_
     }
 
     fval = chi2;
+}
+
+double  Mod_Sigmoid_Percentile(double Depth2Layer, double Xmid, double Slope)
+{
+    double model = 1 / (1 + exp(-(Depth2Layer - Xmid) / Slope));
+    return model;
 }
 
 double AccumIncreaseToPeak(const double array[], int start_idx, int end_idx) 

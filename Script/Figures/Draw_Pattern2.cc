@@ -104,8 +104,8 @@ void Draw_Pattern2()
     auto h_Ine_Reso = new TH2I("h_Ine_Reso","h_Ine_Reso",14,0,14,14,0,14);
 
     // cout  << proton_tree->GetEntries() << endl;
-    Long64_t entry  = 99;   
-    for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
+    Long64_t entry  = 162;   
+    // for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
     // for (Long64_t entry = 0; entry < 100; entry++)
     {        
         double bar_info[2] = {0};
@@ -124,7 +124,7 @@ void Draw_Pattern2()
         int    seg_len_to_peak   = 0;   // 从起点到增长最大值的索引
         
         proton_tree->GetEntry(entry);
-        if (p_Nhits < 10 ) continue;
+        // if (p_Nhits < 10 ) continue;
         int layer_start = 4;
         const double RMS_threshold = 15.0;  // 自定义阈值，越小越“直”，你可以调整
         bool bar_info_assigned = false;  // 标志变量，判断是否已赋值
@@ -201,10 +201,25 @@ void Draw_Pattern2()
         minuit.SetFCN(SigmoidFCN);
         minuit.SetPrintLevel(-1); // 静默输出
         minuit.SetErrorDef(1.0);  // Δχ² = 1 规则
-        
-
-
-
+        minuit.DefineParameter(0, "Ymin", bar_Accumu_info[0], 1, 0, bar_Accumu_info[13]); // initVal, initErr, LowerL, UpperL
+        minuit.DefineParameter(1, "Ymax", bar_Accumu_info[13], 1, 0, bar_Accumu_info[13]*1.5); 
+        minuit.DefineParameter(2, "Xmid", seg_peak_idx, 0.1, 1, 14); // 拐点
+        minuit.DefineParameter(3, "Slope", 1.0, 0.1, 0.1, 5); // 斜率
+        minuit.FixParameter(0);
+        minuit.FixParameter(1);
+        minuit.Migrad();
+        double Ymin, Ymin_err, Ymax, Ymax_err;
+        double Slope, Slope_err, Xmid, Xmid_err;
+        minuit.GetParameter(0, Ymin, Ymin_err);
+        minuit.GetParameter(1, Ymax, Ymax_err);
+        minuit.GetParameter(2, Xmid, Xmid_err);
+        minuit.GetParameter(3, Slope, Slope_err);
+        cout << "Ymin: " << Ymin << " ± " << Ymin_err    << endl;
+        cout << "Ymax: " << Ymax << " ± " << Ymax_err    << endl;
+        cout << "Xmid: " << Xmid << " ± " << Xmid_err    << endl;
+        cout << "Slope: " << Slope << " ± " << Slope_err << endl;
+        double percentile = Mod_Sigmoid_Percentile(p_FI_Lay,Xmid,Slope);
+        cout << "perenctile: " << percentile << endl; 
 
         FindMaxPositiveSegment(bar_Change_info,14,seg_sum,seg_len,seg_start_idx);
         FindMaxValueInPositiveSegment(bar_Change_info,seg_start_idx,seg_len,seg_peak_value,seg_peak_idx);
@@ -216,7 +231,6 @@ void Draw_Pattern2()
         // cout << "Max Increase Rate = " <<  seg_peak_value << endl;
         // cout << "Max Increase Rate Bin = " << seg_peak_idx << endl;
         g_sum_len0->SetPoint(point_counter++,seg_sum,seg_len); 
-        h_peak_had0->Fill(seg_peak_idx,p_FH_Lay);
         
         
         // if (rate_max_min >  1e2 && seg_len > 5 ) 

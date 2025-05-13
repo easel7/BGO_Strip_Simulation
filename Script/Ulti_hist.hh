@@ -140,6 +140,12 @@ void PrepareFitData(
     }
 }
 
+double  Mod_Sigmoid_Percentile(double Depth2Layer, double Xmid, double Slope)
+{
+    double model = 1 / (1 + exp(-(Depth2Layer - Xmid) / Slope));
+    return model;
+}
+
 void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_t flag)
 {
     double bar0 = par[0];
