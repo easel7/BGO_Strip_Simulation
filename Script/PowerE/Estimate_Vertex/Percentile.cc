@@ -58,12 +58,12 @@ void Percentile()
         Energy_LL[i] = 1.0 + 0.2 * i;
         Energy_UL[i] = 1.2 + 0.2 * i;
 
-        h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i),50,-6,-1);  
-        h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i),50,-6,-1);  
+        h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i),100,-10,0);  
+        h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i),100,-10,0);  
         for( int j= 0; j<14 ;j++)
         {
-            h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j),50,-6,-1);  
-            h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j),50,-6,-1);  
+            h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j),100,-10,0);  
+            h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j),100,-10,0);  
             Layer[j] = 0.5 + j;
             Layer_Err[j] = 0.5;
         }
@@ -74,7 +74,7 @@ void Percentile()
         proton_tree->GetEntry(entry);
         int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
         if(p_energy_index < 0 || p_energy_index > 14) continue;
-        if(p_FI_Lay < 0) continue;
+        if(p_FI_Dep < 0) continue;
         if (p_Nhits < 10 ) continue;
         double sum_p = 0;
         double bar_info[2] = {0};
@@ -187,7 +187,7 @@ void Percentile()
         minuit.GetParameter(1, Ymax, Ymax_err);
         minuit.GetParameter(2, Xmid, Xmid_err);
         minuit.GetParameter(3, Slope, Slope_err);
-        double percentile = Mod_Sigmoid_Percentile(p_FI_Lay,Xmid,Slope);
+        double percentile = Mod_Sigmoid_Percentile(p_FI_Dep/25.5,Xmid,Slope);
 
         h1_p[p_energy_index][p_FI_Lay]->Fill(log10(percentile));
         h1_p_inter[p_energy_index]->Fill(log10(percentile)) ;
@@ -198,7 +198,7 @@ void Percentile()
         deuteron_tree->GetEntry(entry);
         int d_energy_index = int(floor((log10(d_Total_E) - 1) / 0.2));
         if(d_energy_index < 0 || d_energy_index > 14) continue;
-        if(d_FI_Lay < 0) continue;
+        if(d_FI_Dep < 0) continue;
         if (d_Nhits < 10 ) continue;
         double sum_d = 0;
         double bar_info[2] = {0};
@@ -312,7 +312,7 @@ void Percentile()
         minuit.GetParameter(1, Ymax, Ymax_err);
         minuit.GetParameter(2, Xmid, Xmid_err);
         minuit.GetParameter(3, Slope, Slope_err);
-        double percentile = Mod_Sigmoid_Percentile(p_FI_Lay,Xmid,Slope);
+        double percentile = Mod_Sigmoid_Percentile(d_FI_Dep/25.5,Xmid,Slope);
 
         h1_d[d_energy_index][d_FI_Lay]->Fill(log10(percentile));
         h1_d_inter[d_energy_index]->Fill(log10(percentile)) ;

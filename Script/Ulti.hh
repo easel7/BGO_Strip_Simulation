@@ -189,6 +189,18 @@ double  Mod_Sigmoid_Percentile(double Depth2Layer, double Xmid, double Slope)
     return model;
 }
 
+
+int Inverse_Mod_sigmoid(double percentile,double Xmid, double Slope)
+{
+    if (percentile <= 0 || percentile >= 1) {
+        std::cerr << "Percentile p must be in (0,1)" << std::endl;
+        return -999;
+    }
+    double X =  Xmid + Slope * log(percentile / (1.0 - percentile));
+    return floor(X);
+}
+
+
 double AccumIncreaseToPeak(const double array[], int start_idx, int end_idx) 
 {
     double sum = 0;

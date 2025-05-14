@@ -8,10 +8,9 @@ void Draw_Pattern()
     int p_FH_Type;
     int p_FH_Lay;
     int p_Nhits;
-
     double p_FI_Dep;
     int p_FI_Lay;
-
+    double p_Total_E;
     const char* string1;
     const char* string2 = "Proton_1000GeV";
 
@@ -25,6 +24,7 @@ void Draw_Pattern()
     proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
     proton_tree->SetBranchAddress("First_Ine_Depth", &p_FI_Dep);
     proton_tree->SetBranchAddress("First_Ine_Layer", &p_FI_Lay);
+    proton_tree->SetBranchAddress("Total_E"         ,&p_Total_E);
 
     auto h_max_min0 = new TH1D("h_max_min0","h_max_min0",60,-1,5); 
     auto h_max_min1 = new TH1D("h_max_min1","h_max_min1",60,-1,5); // Inelastic
@@ -43,7 +43,8 @@ void Draw_Pattern()
 
     // cout  << proton_tree->GetEntries() << endl;
     Long64_t entry  = 162;   
-    // for (Long64_t entry = 0; entry < 100; entry++)
+    int Counts = 0;
+    // for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
     {
         auto c1    = new TCanvas("c1","c1",2100,1400);
         auto hXZ   = new TH2D("hXZ","BGO X-Z Plane",22,-11,11,14,0,14);
@@ -73,7 +74,8 @@ void Draw_Pattern()
 
         proton_tree->GetEntry(entry);
         // if (p_Nhits < 10 ) continue;
-        // cout << " RMS at 0 layer = " << p_FH_Lay << endl;
+        int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
+        // if(p_energy_index < 0 || p_energy_index > 14) continue;
 
         for(size_t i = 0; i < p_EnergyVec->size(); i++) 
         {
@@ -264,7 +266,6 @@ void Draw_Pattern()
         g_vert0->Draw("psame"); 
         box0->Draw("psame");
 
-        
         gPad->Update();
         auto *palette1 = (TPaletteAxis*) hXZ->GetListOfFunctions()->FindObject("palette");
         if(palette1)
@@ -353,10 +354,12 @@ void Draw_Pattern()
         sigmoid->Draw("same");
         double percentile = (sigmoid->Eval(p_FH_Lay) - hBGO3->GetMinimum() - 0.02 * p_FH_Lay) / (hBGO3->GetMaximum() - hBGO3->GetMinimum() - 0.02 * p_FH_Lay);
         cout << "Percentile = " << percentile << endl;
-
         double percentile2 = Mod_Sigmoid_Percentile(p_FI_Lay,sigmoid->GetParameter(2),sigmoid->GetParameter(3));
         cout << "perenctile2: " << percentile2 << endl; 
         latex.DrawLatexNDC(0.12, 0.82, Form("Ine Vertex Sigmoid Percentile:%.2f %%", percentile*100));
+
+        int Percent2Layer = Inverse_Mod_sigmoid(percentile, sigmoid->GetParameter(2), sigmoid->GetParameter(3));
+        cout << "Percent2Layer : " << Percent2Layer << endl;
 
         c1->cd(6);
         TPad *pad2 = new TPad("pad2", "pad2", 0, 0.0, 1, 0.35);
@@ -390,9 +393,9 @@ void Draw_Pattern()
         line0->SetLineWidth(2);
         line0->SetLineStyle(2);
         line0->Draw("same");
-
-
-        if (entry < 100) { c1->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/%s/%s/%lld.pdf",string1,string2,entry)); }
+        Counts++;
+        if (Counts < 100) { c1->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/%s/%s/%lld.pdf",string1,string2,entry)); }
+        // else {break;}
     }
 }
 

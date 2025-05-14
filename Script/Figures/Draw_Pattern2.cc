@@ -235,7 +235,8 @@ void Draw_Pattern2()
         cout << "Slope: " << Slope << " ± " << Slope_err << endl;
         double percentile = Mod_Sigmoid_Percentile(p_FI_Lay,Xmid,Slope);
         cout << "perenctile: " << percentile << endl; 
-        
+        int Percent2Layer = Inverse_Mod_sigmoid(percentile, Xmid,Slope);
+        cout << "Percent2Layer : " << Percent2Layer << endl;
         
         // if (rate_max_min >  1e2 && seg_len > 5 ) 
         {h_int->Fill(seg_peak_idx);}

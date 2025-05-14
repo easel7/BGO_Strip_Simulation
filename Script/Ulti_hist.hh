@@ -146,6 +146,16 @@ double  Mod_Sigmoid_Percentile(double Depth2Layer, double Xmid, double Slope)
     return model;
 }
 
+int Inverse_Mod_sigmoid(double percentile,double Xmid, double Slope)
+{
+    if (percentile <= 0 || percentile >= 1) {
+        std::cerr << "Percentile p must be in (0,1)" << std::endl;
+        return -999;
+    }
+    double X =  Xmid + Slope * log(percentile / (1.0 - percentile));
+    return floor(X);
+}
+
 void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_t flag)
 {
     double bar0 = par[0];

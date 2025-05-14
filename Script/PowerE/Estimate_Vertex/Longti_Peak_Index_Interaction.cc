@@ -2,31 +2,37 @@
 
 void Longti_Peak_Index_Interaction()
 {
-    int p_First_Had_Layer; int p_First_Had_Type; double p_Total_E;      int p_Nhits;std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_L_EnergyVec = nullptr;   std::vector<double>* p_EnergyVec = nullptr;   std::vector<double>* p_Efrac = nullptr; double p_weight;
-    int d_First_Had_Layer; int d_First_Had_Type; double d_Total_E;      int d_Nhits;std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_L_EnergyVec = nullptr;   std::vector<double>* d_EnergyVec = nullptr;   std::vector<double>* d_Efrac = nullptr; double d_weight;
-
+    int p_FH_Lay; int p_FH_Type; double p_Total_E;      int p_Nhits;std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_L_EnergyVec = nullptr;   std::vector<double>* p_EnergyVec = nullptr;   std::vector<double>* p_Efrac = nullptr; double p_weight;
+    int d_FH_Lay; int d_FH_Type; double d_Total_E;      int d_Nhits;std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_L_EnergyVec = nullptr;   std::vector<double>* d_EnergyVec = nullptr;   std::vector<double>* d_Efrac = nullptr; double d_weight;
+    int p_FI_Lay;    double p_FI_Dep;    int p_particle;
+    int d_FI_Lay;    double d_FI_Dep;    int d_particle;
     auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
     auto proton_tree = (TTree*)proton_file->Get("B4");
+    proton_tree->SetBranchAddress("Particle"         ,&p_particle);
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
     proton_tree->SetBranchAddress("LayerEnergyVector",&p_L_EnergyVec);
     proton_tree->SetBranchAddress("BarEnergyVector",&p_EnergyVec);
     proton_tree->SetBranchAddress("Efrac"            ,&p_Efrac);
-    proton_tree->SetBranchAddress("First_Had_Layer"  ,&p_First_Had_Layer);
-    proton_tree->SetBranchAddress("First_Had_Type"  ,&p_First_Had_Type);
-    proton_tree->SetBranchAddress("Total_E"          ,&p_Total_E);
-    proton_tree->SetBranchAddress("weight"           ,&p_weight);
+    proton_tree->SetBranchAddress("First_Had_Layer"  ,&p_FH_Lay);
+    proton_tree->SetBranchAddress("First_Had_Type"   ,&p_FH_Type);
+    proton_tree->SetBranchAddress("First_Ine_Depth", &p_FI_Dep);
+    proton_tree->SetBranchAddress("First_Ine_Layer", &p_FI_Lay);
+    proton_tree->SetBranchAddress("Total_E"         ,&p_Total_E);
+    proton_tree->SetBranchAddress("weight"          ,&p_weight);
     proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
 
 
     auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
     auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
+    deuteron_tree->SetBranchAddress("Particle"         ,&d_particle);
     deuteron_tree->SetBranchAddress("RMS"              ,&d_RMSVec);
     deuteron_tree->SetBranchAddress("LayerEnergyVector",&d_L_EnergyVec);
     deuteron_tree->SetBranchAddress("BarEnergyVector"  ,&d_EnergyVec);
-
     deuteron_tree->SetBranchAddress("Efrac"            ,&d_Efrac);
-    deuteron_tree->SetBranchAddress("First_Had_Layer"  ,&d_First_Had_Layer);
-    deuteron_tree->SetBranchAddress("First_Had_Type"   ,&d_First_Had_Type);
+    deuteron_tree->SetBranchAddress("First_Had_Layer"  ,&d_FH_Lay);
+    deuteron_tree->SetBranchAddress("First_Had_Type"   ,&d_FH_Type);
+    deuteron_tree->SetBranchAddress("First_Ine_Depth", &d_FI_Dep);
+    deuteron_tree->SetBranchAddress("First_Ine_Layer", &d_FI_Lay);
     deuteron_tree->SetBranchAddress("Total_E"          ,&d_Total_E);
     deuteron_tree->SetBranchAddress("weight"           ,&d_weight);
     deuteron_tree->SetBranchAddress("Nhits"          , &d_Nhits);
@@ -70,7 +76,7 @@ void Longti_Peak_Index_Interaction()
         double sum_p = 0;
         int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
         if(p_energy_index < 0 || p_energy_index > 14) continue;    
-        if(p_First_Had_Type!=1) continue;
+        if(p_FI_Dep<0) continue;
 
         double bar_info[2] = {0};
         double bar_Energy_info[14] = {0};
@@ -167,8 +173,8 @@ void Longti_Peak_Index_Interaction()
         double p_maxVal = *p_maxIt;
         double p_minVal = *p_minIt;
 
-        h1_p[p_energy_index][p_First_Had_Layer]->Fill(seg_peak_idx - p_First_Had_Layer);
-        h1_p_inter[p_energy_index]->Fill(seg_peak_idx - p_First_Had_Layer) ;
+        h1_p[p_energy_index][p_FI_Lay]->Fill(seg_peak_idx - p_FI_Lay);
+        h1_p_inter[p_energy_index]->Fill(seg_peak_idx - p_FI_Lay) ;
     }
 
     for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
@@ -177,7 +183,7 @@ void Longti_Peak_Index_Interaction()
         double sum_d = 0;
         int d_energy_index = int(floor((log10(d_Total_E) - 1) / 0.2));
         if(d_energy_index < 0 || d_energy_index > 14) continue;
-        if(d_First_Had_Type!=1) continue;
+        if(d_FI_Dep<0) continue;
 
         double bar_info[2] = {0};
         double bar_Energy_info[14] = {0};
@@ -274,8 +280,8 @@ void Longti_Peak_Index_Interaction()
         double d_maxVal = *d_maxIt;
         double d_minVal = *d_minIt;
 
-        h1_d[d_energy_index][d_First_Had_Layer]->Fill(seg_peak_idx - d_First_Had_Layer);
-        h1_d_inter[d_energy_index]->Fill(seg_peak_idx - d_First_Had_Layer) ;
+        h1_d[d_energy_index][d_FI_Lay]->Fill(seg_peak_idx - d_FI_Lay);
+        h1_d_inter[d_energy_index]->Fill(seg_peak_idx - d_FI_Lay) ;
     }
 
     for (int i = 9; i < 10; i++) // Deposit Energy Bin

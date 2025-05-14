@@ -4,6 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from scipy.optimize import minimize
+from scipy.optimize import curve_fit
+from matplotlib.gridspec import GridSpec
+
 import math  
 import os
 
@@ -52,6 +55,13 @@ def find_max_value_in_positive_segment(bar_info, start_bin, length):
 
     return max_value, max_bin
 
+# Modified Sigmoid function
+def modified_sigmoid(x, Ymin, Ymax, Xmid, Slope):
+    return Ymin + 0.02 * x + (Ymax - Ymin - 0.02 * x) / (1 + np.exp(-(x - Xmid) / Slope))
+
+def Mod_Sigmoid_Percentile(x, Xmid, Slope):
+    return 1 / (1 + np.exp(-(x - Xmid) / Slope))
+
 # Import ROOT
 string2 = "Proton_1000GeV"
 file_path = f"/Users/xiongzheng/software/B4/B4e/Root/{string2}.root" ### Change your path!!!
@@ -63,12 +73,14 @@ with uproot.open(file_path) as f:
         "RMS", 
         "First_Had_Depth", 
         "First_Had_Layer", 
+        "First_Ine_Depth", 
+        "First_Ine_Layer", 
         "First_Had_Type", 
         "Nhits"
     ])
 
 # Read Entry
-# entry = 5                                     ### Change your entry, you can make this entry as a loop !!!
+entry = 5                                     ### Change your entry, you can make this entry as a loop !!!
 for entry in range(10):  # from 0 - 10
     print(f"Processing entry: {entry}")
     Energy_vec  = data["BarEnergyVector"][entry]
@@ -76,6 +88,8 @@ for entry in range(10):  # from 0 - 10
     FH_Dep      = data["First_Had_Depth"][entry]
     FH_Lay      = data["First_Had_Layer"][entry]
     FH_Type     = data["First_Had_Type"][entry]
+    FI_Dep      = data["First_Ine_Depth"][entry]
+    FI_Lay      = data["First_Ine_Layer"][entry]
     Nhits       = data["Nhits"][entry]
 
     color_map = {
@@ -153,6 +167,8 @@ for entry in range(10):  # from 0 - 10
     # Create histogram to store the information
     bar_Energy_info = np.zeros(14)
     bar_Change_info = np.zeros(14)
+    bar_Accumu_info = np.zeros(14)
+    bar_Accumu_error = np.zeros(14)
 
     for layer in range(14):
         print(f"RMS {layer} , {RMS_vec[layer]}")
@@ -163,9 +179,14 @@ for entry in range(10):  # from 0 - 10
         
         if layer == 0:
             bar_Change_info[0] = np.log10(bar_Energy_info[0] / 0.023)
+            bar_Accumu_info[0] = bar_Energy_info[0]
+            bar_Accumu_error[0] = 0.3 * bar_Accumu_info[0]
         else:
             prev = bar_Energy_info[layer-1]
             curr = bar_Energy_info[layer]
+            bar_Accumu_info[layer] = bar_Accumu_info[layer-1] + bar_Energy_info[layer]
+            bar_Accumu_error[layer] = 0.3 * bar_Accumu_info[layer]
+
             if prev == 0:
                 bar_Change_info[layer-1] = -5
             elif curr == 0:
@@ -184,7 +205,7 @@ for entry in range(10):  # from 0 - 10
     # --------------------------- PLOT -------------------------------------
 
 
-    fig, axs = plt.subplots(2, 2, figsize=(12, 12))
+    fig, axs = plt.subplots(2, 3, figsize=(18, 12))
 
     masked_hXZ = np.ma.masked_less(hXZ, -2)  # mask the value < -2 
     masked_hYZ = np.ma.masked_less(hYZ, -2)
@@ -241,6 +262,7 @@ for entry in range(10):  # from 0 - 10
     axs[1, 0].plot([FH_Lay, FH_Lay], [hist_E_min, hist_E_max], linestyle='--', color=line_color, linewidth=1)
     axs[1, 0].scatter(max_start_bin+0.5, bar_Energy_info[max_start_bin], marker='*', color=line_color, s=100, label='Begin to Increase Point')
     axs[1, 0].scatter(max_bin+0.5, bar_Energy_info[max_bin], marker='^', color=line_color, s=100, label='Most Changed Point')
+    axs[1, 0].scatter(FI_Dep/25.5, bar_Energy_info[int(FI_Dep/25.5)], marker='X', color=line_color, s=100, label='Inelastic Point')
 
     # 4th Subplot Change Rate
     axs[1, 1].grid(True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
@@ -255,13 +277,77 @@ for entry in range(10):  # from 0 - 10
     axs[1, 1].set_xlim(0, 14)
     axs[1, 1].set_ylim([-0.5, 2.5])
     axs[1, 1].set_title("Energy Deposit Change Rate")
-    axs[1, 1].set_xlabel("BGO Layer")
+    # axs[1, 1].set_xlabel("BGO Layer")
     axs[1, 1].set_ylabel(r"$\log_{10}(E_i / E_{i-1})$")
     hist_C_min = np.min(bar_Change_info)  
     hist_C_max = np.max(bar_Change_info)  
     axs[1, 1].plot([FH_Lay, FH_Lay], [hist_C_min, hist_C_max], linestyle='--', color=line_color, linewidth=1)
     axs[1, 1].scatter(max_start_bin+0.5, bar_Change_info[max_start_bin], marker='*', color=line_color, s=100, label='Begin to Increase Point')
     axs[1, 1].scatter(max_bin+0.5, bar_Change_info[max_bin], marker='^', color=line_color, s=100, label='Most Changed Point')
+    axs[1, 1].scatter(FI_Dep/25.5, bar_Change_info[int(FI_Dep/25.5)], marker='X', color=line_color, s=100, label='Inelastic Point')
+
+    # 5th Subplot Change Rate
+    axs[1, 2].grid(True, which='both', linestyle='--', linewidth=0.5, alpha=0.7)
+    axs[1, 2].hist(
+        np.arange(14),  
+        bins=np.arange(15),  
+        weights=bar_Accumu_info, 
+        histtype='step',  
+        linewidth=1.5,
+        color='black'
+    )
+    axs[1, 2].set_xlim(0, 14)
+    axs[1, 2].set_yscale('log')
+    axs[1, 2].set_title("Accumulated Energy Deposit")
+    axs[1, 2].set_xlabel("BGO Layer")
+    axs[1, 2].set_ylabel("3 Bars Energy / GeV")
+    hist_E_min = np.min(bar_Accumu_info)  
+    hist_E_max = np.max(bar_Accumu_info)  
+    axs[1, 2].plot([FH_Lay, FH_Lay], [hist_E_min, hist_E_max], linestyle='--', color=line_color, linewidth=1)
+    axs[1, 2].scatter(max_start_bin+0.5, bar_Accumu_info[max_start_bin], marker='*', color=line_color, s=100, label='Begin to Increase Point')
+    axs[1, 2].scatter(max_bin+0.5, bar_Accumu_info[max_bin], marker='^', color=line_color, s=100, label='Most Changed Point')
+    axs[1, 2].scatter(FI_Dep/25.5, bar_Accumu_info[int(FI_Dep/25.5)], marker='X', color=line_color, s=100, label='Inelastic Point')
+
+
+    # 1. Prepare fitting Array
+    x_vals = np.arange(14) + 0.5
+    y_vals = np.array(bar_Accumu_info)
+    y_errs = np.array(bar_Accumu_error)
+
+    # 2. Mod sigmoid function (done, above)
+    # 3. Initial Value for fitting
+    p0 = [y_vals[0], y_vals[-1], 6.0, 1.0]  # Ymin, Ymax, Xmid, Slope
+
+    # 4. Fit
+    popt, pcov = curve_fit(modified_sigmoid, x_vals, y_vals, sigma=y_errs, p0=p0, absolute_sigma=True)
+    Ymin, Ymax, Xmid, Slope = popt
+    fit_vals = modified_sigmoid(x_vals, *popt)
+    percentile2 = Mod_Sigmoid_Percentile(FI_Dep/25.5, Xmid, Slope)
+    axs[1, 2].text(
+        0.6, 0.85,  # x, y in axes fraction (0~1)
+        f"FI Layer Percentile: {percentile2*100:.2f}%",
+        transform=axs[1, 2].transAxes,
+        fontsize=10,
+        color='blue',
+        bbox=dict(boxstyle="round,pad=0.3", facecolor="white", edgecolor="blue")
+    )
+    # 5. Residual: (Data - Fit)/Err
+    residuals = (y_vals - fit_vals) / y_errs
+
+    # 6. Add fitting line to the histogram
+    axs[1, 2].plot(x_vals, fit_vals, label='Sigmoid Fit', color='red', linestyle='-')
+    axs[1, 2].legend()
+
+    # 7. Add Residual Subplot
+    axs[0, 2].bar(x_vals, residuals, width=0.8, color='gray', edgecolor='black')
+    axs[0, 2].axhline(0, color='red', linestyle='--', linewidth=1)
+    axs[0, 2].set_xlim(0, 14)
+    axs[0, 2].set_ylim(-max(abs(residuals)) * 1.2, max(abs(residuals)) * 1.2)
+    axs[0, 2].set_title("Residual (Data - Fit) / Err")
+    axs[0, 2].set_xlabel("BGO Layer")
+    axs[0, 2].set_ylabel("Residual")
+    axs[0, 2].grid(True, linestyle='--', linewidth=0.5, alpha=0.7)
+
 
     if entry < 100:
         save_path = f"/Users/xiongzheng/software/B4/B4e/Script/Figures/{string1}/{string2}/{entry}_PythonVer.png" ### Change your path!!!
