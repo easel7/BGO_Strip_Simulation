@@ -352,9 +352,9 @@ void Draw_Pattern()
         sigmoid->FixParameter(1,hBGO3->GetMaximum()); 
         hBGO3->Fit(sigmoid, "R");
         sigmoid->Draw("same");
-        double percentile = (sigmoid->Eval(p_FH_Lay) - hBGO3->GetMinimum() - 0.02 * p_FH_Lay) / (hBGO3->GetMaximum() - hBGO3->GetMinimum() - 0.02 * p_FH_Lay);
+        double percentile = (sigmoid->Eval(p_FI_Dep/25.5) - hBGO3->GetMinimum() - 0.02 * p_FI_Dep/25.5) / (hBGO3->GetMaximum() - hBGO3->GetMinimum() - 0.02 * p_FI_Dep/25.5);
         cout << "Percentile = " << percentile << endl;
-        double percentile2 = Mod_Sigmoid_Percentile(p_FI_Lay,sigmoid->GetParameter(2),sigmoid->GetParameter(3));
+        double percentile2 = Mod_Sigmoid_Percentile(p_FI_Dep/25.5,sigmoid->GetParameter(2),sigmoid->GetParameter(3));
         cout << "perenctile2: " << percentile2 << endl; 
         latex.DrawLatexNDC(0.12, 0.82, Form("Ine Vertex Sigmoid Percentile:%.2f %%", percentile*100));
 
