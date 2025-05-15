@@ -12,7 +12,7 @@ do
     ${exe} -m ${Tag}_${energy}GeV.mac
 done
 
-for energy in $(seq 1000 1000 9000)
+for energy in $(seq 10000 1000 10000)
 do
     ${exe} -m ${Tag}_${energy}GeV.mac
 done
