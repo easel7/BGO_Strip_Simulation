@@ -165,7 +165,7 @@ void Percentile()
         seg_sum_to_peak = AccumIncreaseToPeak(bar_Change_info,seg_start_idx,seg_peak_idx);
         seg_len_to_peak = seg_peak_idx - seg_start_idx;
 
-        PrepareSigmoidData(bar_Accumu_info,bar_Accumu_error);
+        PrepareSigmoidData(bar_Accumu_info,bar_Accumu_error,bar_Energy_info,g_fit_E00,g_fit_E13);
         TMinuit minuit(4);
         minuit.SetFCN(SigmoidFCN);
         minuit.SetPrintLevel(-1); // 静默输出
@@ -290,7 +290,8 @@ void Percentile()
         seg_sum_to_peak = AccumIncreaseToPeak(bar_Change_info,seg_start_idx,seg_peak_idx);
         seg_len_to_peak = seg_peak_idx - seg_start_idx;
 
-        PrepareSigmoidData(bar_Accumu_info,bar_Accumu_error);
+        PrepareSigmoidData(bar_Accumu_info,bar_Accumu_error,bar_Energy_info,g_fit_E00,g_fit_E13);
+
         TMinuit minuit(4);
         minuit.SetFCN(SigmoidFCN);
         minuit.SetPrintLevel(-1); // 静默输出

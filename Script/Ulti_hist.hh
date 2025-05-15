@@ -167,3 +167,20 @@ void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par,
     }
     fval = cost;
 }
+
+double ModifiedSigmoid(Double_t *x, Double_t *par) {
+    double xx = x[0];
+    double Ymin = par[0];
+    double Ymax = par[1];
+    double Xmid = par[2];
+    double Slope = par[3];
+    double Efirst = par[4];
+    double Elast = par[5];
+
+    if (xx < Xmid - 5 * Slope)
+        return Ymin - Efirst * (Xmid - 5 * Slope - xx);
+    else if (xx > Xmid + 2 * Slope)
+        return Ymax + Elast * (xx - Xmid - 2 * Slope);
+    else
+        return Ymin + (Ymax - Ymin ) / (1 + exp(-(xx - Xmid) / Slope));
+}

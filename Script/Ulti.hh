@@ -2,6 +2,9 @@ std::vector<int> g_fit_bars;
 std::vector<double> g_fit_energies;
 std::vector<double> g_fit_errors;
 double g_fit_total_energy = 0;
+double g_fit_E00;
+double g_fit_E13;
+
 
 void FindMaxPositiveSegment(const double array[], int size, double& out_sum, int& out_len, int& out_start_index) 
 {
@@ -155,16 +158,24 @@ void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par,
 
 void PrepareSigmoidData(
     const double accumu[], 
-    const double error[]
+    const double error[],
+    const double energy[],
+    double& g_fit_E00,
+    double& g_fit_E13
 )
 {
     g_fit_energies.clear();
     g_fit_errors.clear();
+    g_fit_E00 = 0;
+    g_fit_E13 = 0;
     for (int i = 0; i < 14; ++i) 
     {
         g_fit_energies.push_back(accumu[i]);
         g_fit_errors.push_back(error[i]);
+
     }
+    g_fit_E00 = energy[0];
+    g_fit_E13 = energy[13];
 }
 
 void SigmoidFCN(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_t iflag)

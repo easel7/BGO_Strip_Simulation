@@ -345,8 +345,11 @@ void Draw_Pattern()
         hBGO3->GetXaxis()->CenterTitle();
         hBGO3->Draw("hist");
         
+        // TF1 *sigmoid = new TF1("ModifiedSigmoid", ModifiedSigmoid, 0, 14, 6);
+        // sigmoid->SetParameters(1, 100, max_rate_index - 1, 1,hBGO1->GetBinContent(1),hBGO1->GetBinContent(14)); 
+        // sigmoid->FixParameter(4,hBGO1->GetBinContent(1)); 
+        // sigmoid->FixParameter(5,hBGO1->GetBinContent(14)); 
         TF1 *sigmoid = new TF1("sigmoid", "[0]+ 0.02*x + ([1]-[0] - 0.02*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
-        cout << max_rate_index << endl;
         sigmoid->SetParameters(hBGO3->GetMinimum(), hBGO3->GetMaximum(), max_rate_index - 1, 1); 
         sigmoid->FixParameter(0,hBGO3->GetMinimum()); 
         sigmoid->FixParameter(1,hBGO3->GetMaximum()); 
