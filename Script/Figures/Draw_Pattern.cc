@@ -12,7 +12,7 @@ void Draw_Pattern()
     int p_FI_Lay;
     double p_Total_E;
     const char* string1;
-    const char* string2 = "Proton_1000GeV";
+    const char* string2 = "Proton_PowerLaw";
 
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     auto proton_tree = (TTree*)proton_file->Get("B4");
@@ -42,9 +42,9 @@ void Draw_Pattern()
     int point_counter_p = 0;
 
     // cout  << proton_tree->GetEntries() << endl;
-    Long64_t entry  = 162;   
+    Long64_t entry  = 1981;   
     int Counts = 0;
-    // for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
+    // for (Long64_t entry = 0; entry < 100; entry++)
     {
         auto c1    = new TCanvas("c1","c1",2100,1400);
         auto hXZ   = new TH2D("hXZ","BGO X-Z Plane",22,-11,11,14,0,14);
@@ -66,6 +66,7 @@ void Draw_Pattern()
         double bar_Energy_info[14] = {0};
         double bar_Change_info[14] = {0};
         double bar_Accumu_info[14] = {0};
+        double bar_Accumu_error[14] = {0};
         double rate_sum      = 0;
         int    rate_len      = 0;
         int    rate_poi      = 0;
@@ -127,30 +128,18 @@ void Draw_Pattern()
         
         if (!bar_info_assigned) {
             cout << "No bar_info assigned, starting fit to determine cluster trajectory." << endl;
-            PrepareFitData(p_EnergyVec, layer_start, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
-            TMinuit minuit0(1);
-            minuit0.SetFCN(FitAxisFunction);
-            minuit0.SetPrintLevel(-1);
-            minuit0.DefineParameter(0, "bar_odd", g_fit_bars[1], 0.01, 2, 19);
-            minuit0.Migrad();
             double bar_odd, bar_odd_err;
-            minuit0.GetParameter(0, bar_odd, bar_odd_err);
-            // cout << " bar_odd = " << bar_odd << endl;
-            bar_info[0] = std::round(bar_odd);
+            double bar_even, bar_even_err;
+            PrepareFitData(p_EnergyVec, layer_start, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
+            bool success_odd = Fit1DParameter(FitAxisFunction, g_fit_bars[1], 0.01, 2, 19,  bar_odd, bar_odd_err);
+            if (success_odd)              bar_info[0] = std::round(bar_odd);
+            else                std::cerr << "Failed to fit bar_odd." << std::endl;
 
             PrepareFitData(p_EnergyVec, layer_start+1, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
-            
-            TMinuit minuit1(1);
-            minuit1.SetFCN(FitAxisFunction);
-            minuit1.SetPrintLevel(-1);
-            minuit1.DefineParameter(0, "bar_even", g_fit_bars[1], 0.01, 2, 19);
-            minuit1.Migrad();
-            double bar_even, bar_even_err;
-            minuit1.GetParameter(0, bar_even, bar_even_err);
-            // cout << " bar_even = " << bar_even << endl;
-            bar_info[1] = std::round(bar_even);
+            bool success_even = Fit1DParameter(FitAxisFunction, g_fit_bars[1], 0.01, 2, 19,  bar_even, bar_even_err);
+            if (success_even) bar_info[1] = std::round(bar_even);
+            else std::cerr << "Failed to fit bar_odd." << std::endl;
         }
-
 
         box0->SetX1(bar_info[0] - 9);
         box0->SetY1(0);
@@ -170,25 +159,27 @@ void Draw_Pattern()
             {
                 bar_Energy_info[layer] += (*p_EnergyVec)[layer * 22 + k];
             }
+        }
 
-            if(layer==0)
-            {
-                bar_Change_info[0] = log10(bar_Energy_info[0] / 0.02);
-            }
-            else // (layer>0) 
-            {
-                if( bar_Energy_info[layer-1] == 0) { bar_Change_info[layer-1] = -5 ;   cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
-                else if( bar_Energy_info[layer] == 0) { bar_Change_info[layer-1] = -4 ;   cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
-                else {bar_Change_info[layer] = log10(bar_Energy_info[layer]/bar_Energy_info[layer-1]);  cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
-            }
+        bar_Change_info[0] = log10(bar_Energy_info[0] / 0.023);
+        bar_Accumu_info[0] = bar_Energy_info[0];
+        bar_Accumu_error[0] = 0.3 * bar_Accumu_info[0];
+        for(int layer = 1 ; layer<14 ; layer++)
+        {
+            if( bar_Energy_info[layer-1] == 0 || bar_Energy_info[layer] == 0) { bar_Change_info[layer-1] = -5 ;    cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
+            else {bar_Change_info[layer] = log10(bar_Energy_info[layer]/bar_Energy_info[layer-1]);                 cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
+            bar_Accumu_info[layer]  += bar_Accumu_info[layer-1] + bar_Energy_info[layer];
+            bar_Accumu_error[layer] = 0.3 * bar_Accumu_info[layer];
+        }
+
+        for(int layer =0 ; layer<14 ; layer++)
+        {
             hBGO1->SetBinContent(layer+1, bar_Energy_info[layer]);
             hBGO2->SetBinContent(layer+1, bar_Change_info[layer]);
-            bar_Accumu_info[layer] += bar_Accumu_info[layer-1] + bar_Energy_info[layer];
             hBGO3->SetBinContent(layer+1, bar_Accumu_info[layer]);
             hBGO3->SetBinError(layer+1, 0.3 * bar_Accumu_info[layer]);
-            cout << "Info " << bar_Accumu_info[layer] << " ± " << 0.3 * bar_Accumu_info[layer] << endl;
-
         }
+
         FindMaxPositiveBinSegment(hBGO2,rate_sum,rate_len,rate_poi);
         FindMaxValueInPositiveSegment(hBGO2,rate_poi,rate_len,max_rate,max_rate_index);
 
@@ -196,7 +187,6 @@ void Draw_Pattern()
         cout << "Max Positive Bin Length = " << rate_len << endl;
         cout << "Max Increase Rate = " <<  max_rate << endl;
         cout << "Max Increase Rate Bin = " << max_rate_index << endl;
-
 
         auto *line1 = new TLine(-11,14 - p_FH_Lay,11,14 - p_FH_Lay);
         auto *line2 = new TLine(p_FH_Lay,hBGO1->GetMinimum(),p_FH_Lay,hBGO1->GetMaximum());
@@ -211,11 +201,12 @@ void Draw_Pattern()
         line4->SetLineStyle(9);
 
         double vert_layer = p_FI_Dep / 25.5; 
-        cout << "vert_layer = " << vert_layer << endl;
-        g_vert0->SetPoint(0, bar_info[0] - 10.5, 15 - vert_layer);
-        g_vert1->SetPoint(0, bar_info[1] - 10.5, 15 - vert_layer);   
-        g_vert2->SetPoint(0, vert_layer, hBGO1->GetBinContent(ceil(vert_layer)) );
-        g_vert3->SetPoint(0, vert_layer, hBGO2->GetBinContent(ceil(vert_layer)) );
+        cout << "vert_layer = " << p_FI_Dep << endl;
+        cout << "p_FI_Lay = " << p_FI_Lay << endl;
+        g_vert0->SetPoint(0, bar_info[0] - 10.5, 14 - p_FI_Lay);
+        g_vert1->SetPoint(0, bar_info[1] - 10.5, 14 - p_FI_Lay);   
+        g_vert2->SetPoint(0, vert_layer, hBGO1->GetBinContent(p_FI_Lay+1) );
+        g_vert3->SetPoint(0, vert_layer, hBGO2->GetBinContent(p_FI_Lay+1) );
 
         h_max_min0->Fill(log10(MaxMinRatio(hBGO1)));
         g_sum_len0->SetPoint(point_counter++,rate_sum,rate_len);
@@ -345,23 +336,35 @@ void Draw_Pattern()
         hBGO3->GetXaxis()->CenterTitle();
         hBGO3->Draw("hist");
         
-        // TF1 *sigmoid = new TF1("ModifiedSigmoid", ModifiedSigmoid, 0, 14, 6);
-        // sigmoid->SetParameters(1, 100, max_rate_index - 1, 1,hBGO1->GetBinContent(1),hBGO1->GetBinContent(14)); 
-        // sigmoid->FixParameter(4,hBGO1->GetBinContent(1)); 
-        // sigmoid->FixParameter(5,hBGO1->GetBinContent(14)); 
-        TF1 *sigmoid = new TF1("sigmoid", "[0]+ 0.02*x + ([1]-[0] - 0.02*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
-        sigmoid->SetParameters(hBGO3->GetMinimum(), hBGO3->GetMaximum(), max_rate_index - 1, 1); 
-        sigmoid->FixParameter(0,hBGO3->GetMinimum()); 
-        sigmoid->FixParameter(1,hBGO3->GetMaximum()); 
-        hBGO3->Fit(sigmoid, "R");
+        cout << "Max Value of Energy Info " << hBGO1->GetMaximum() << endl;
+        TF1 *sigmoid = new TF1("sigmoid", "[0]+ [4]*x + ([1]-[0] - [4]*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
+        sigmoid->SetParameters(hBGO1->GetBinContent(1), 
+                               hBGO3->GetBinContent(14), 
+                               max_rate_index - 1, 
+                               1 , 
+                               hBGO1->GetBinContent(1)); 
+        sigmoid->SetParLimits(0, 0                            , hBGO1->GetMaximum()         );   // [0] Ymin
+        sigmoid->SetParLimits(1, hBGO1->GetMaximum()          , 1e6                         );   // [1] Ymax
+        sigmoid->SetParLimits(2, max(max_rate_index -3, -1)   , min(max_rate_index + 2, 14) );   // [2] Xmid
+        sigmoid->SetParLimits(3, 0.1                          , 10                          );   // [3] Slope，避免除0
+        sigmoid->SetParLimits(4, hBGO1->GetBinContent(1) *0.1 , hBGO1->GetBinContent(1) * 10);   // [4] linear bias
+        TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RS");  // R: fit range, S: return TFitResultPtr
+        if (fitResult.Get() && fitResult->IsValid()) {
+            double chi2  = sigmoid->GetChisquare();
+            int ndf      = sigmoid->GetNDF();
+            double prob  = sigmoid->GetProb();
+            std::cout << "Fit converged." << std::endl;
+            std::cout << "Chi2 / NDF = " << chi2 << " / " << ndf
+                      << " = " << (ndf > 0 ? chi2 / ndf : 0) << std::endl;
+            std::cout << "Fit probability = " << prob << std::endl;
+        } else {
+            std::cerr << "WARNING: Fit did not converge!" << std::endl;
+        }
         sigmoid->Draw("same");
-        double percentile = (sigmoid->Eval(p_FI_Dep/25.5) - hBGO3->GetMinimum() - 0.02 * p_FI_Dep/25.5) / (hBGO3->GetMaximum() - hBGO3->GetMinimum() - 0.02 * p_FI_Dep/25.5);
-        cout << "Percentile = " << percentile << endl;
         double percentile2 = Mod_Sigmoid_Percentile(p_FI_Dep/25.5,sigmoid->GetParameter(2),sigmoid->GetParameter(3));
         cout << "perenctile2: " << percentile2 << endl; 
-        latex.DrawLatexNDC(0.12, 0.82, Form("Ine Vertex Sigmoid Percentile:%.2f %%", percentile*100));
-
-        int Percent2Layer = Inverse_Mod_sigmoid(percentile, sigmoid->GetParameter(2), sigmoid->GetParameter(3));
+        latex.DrawLatexNDC(0.12, 0.82, Form("Ine Vertex Sigmoid Percentile:%.2f %%", percentile2*100));
+        int Percent2Layer = Inverse_Mod_sigmoid(percentile2, sigmoid->GetParameter(2), sigmoid->GetParameter(3));
         cout << "Percent2Layer : " << Percent2Layer << endl;
 
         c1->cd(6);

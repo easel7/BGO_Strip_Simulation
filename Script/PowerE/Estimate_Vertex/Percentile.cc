@@ -117,27 +117,17 @@ void Percentile()
         
         if (!bar_info_assigned) {
             // cout << "No bar_info assigned, starting fit to determine cluster trajectory." << endl;
-            PrepareFitData(p_EnergyVec, layer_start, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
-            TMinuit minuit0(1);
-            minuit0.SetFCN(FitAxisFunction);
-            minuit0.SetPrintLevel(-1);
-            minuit0.DefineParameter(0, "bar_odd", g_fit_bars[1], 0.01, 2, 19);
-            minuit0.Migrad();
             double bar_odd, bar_odd_err;
-            minuit0.GetParameter(0, bar_odd, bar_odd_err);
-            // cout << " bar_odd = " << bar_odd << endl;
-            bar_info[0] = std::round(bar_odd);
+            double bar_even, bar_even_err;
+            PrepareFitData(p_EnergyVec, layer_start, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
+            bool success_odd = Fit1DParameter(FitAxisFunction, g_fit_bars[1], 0.01, 2, 19,  bar_odd, bar_odd_err);
+            if (success_odd)              bar_info[0] = std::round(bar_odd);
+            else                std::cerr << "Failed to fit bar_odd." << std::endl;
 
             PrepareFitData(p_EnergyVec, layer_start+1, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
-            TMinuit minuit1(1);
-            minuit1.SetFCN(FitAxisFunction);
-            minuit1.SetPrintLevel(-1);
-            minuit1.DefineParameter(0, "bar_even", g_fit_bars[1], 0.01, 2, 19);
-            minuit1.Migrad();
-            double bar_even, bar_even_err;
-            minuit1.GetParameter(0, bar_even, bar_even_err);
-            // cout << " bar_even = " << bar_even << endl;
-            bar_info[1] = std::round(bar_even);
+            bool success_even = Fit1DParameter(FitAxisFunction, g_fit_bars[1], 0.01, 2, 19,  bar_even, bar_even_err);
+            if (success_even) bar_info[1] = std::round(bar_even);
+            else std::cerr << "Failed to fit bar_odd." << std::endl;
         }
 
         for(int layer = 0 ; layer<14 ; layer++)
@@ -165,28 +155,35 @@ void Percentile()
         seg_sum_to_peak = AccumIncreaseToPeak(bar_Change_info,seg_start_idx,seg_peak_idx);
         seg_len_to_peak = seg_peak_idx - seg_start_idx;
 
-        PrepareSigmoidData(bar_Accumu_info,bar_Accumu_error,bar_Energy_info,g_fit_E00,g_fit_E13);
-        TMinuit minuit(4);
+        double E_L0 = bar_Energy_info[0];
+        double maxE = FindMaxValue(bar_Energy_info, 14);
+        double Amax = bar_Accumu_info[13];
+        PrepareSigmoidData(bar_Accumu_info,bar_Accumu_error);
+        TMinuit minuit(5);
         minuit.SetFCN(SigmoidFCN);
         minuit.SetPrintLevel(-1); // 静默输出
         minuit.SetErrorDef(1.0);  // Δχ² = 1 规则
-        minuit.DefineParameter(0, "Ymin", bar_Accumu_info[0], 1, 0, bar_Accumu_info[13]); // initVal, initErr, LowerL, UpperL
-        minuit.DefineParameter(1, "Ymax", bar_Accumu_info[13], 1, 0, bar_Accumu_info[13]); 
-        minuit.DefineParameter(2, "Xmid", seg_peak_idx, 0.5, 1, 14); // 拐点
-        minuit.DefineParameter(3, "Slope", 1.0, 0.1, 0.1, 5); // 斜率
-        minuit.FixParameter(0);
-        minuit.FixParameter(1);
+        minuit.DefineParameter(0, "Ymin" , E_L0        , E_L0 * 0.1   , 0   , maxE );
+        minuit.DefineParameter(1, "Ymax" , Amax        , Amax * 0.05  , maxE, 1e6 );
+        minuit.DefineParameter(2, "Xmid" , seg_peak_idx, 0.1          , -1  , seg_peak_idx +  3 );
+        minuit.DefineParameter(3, "Slope", 1.0         , 0.1          , 0.1 , 10 );
+        minuit.DefineParameter(4, "E0"   , E_L0        , E_L0 * 0.1   , 0.1 * E_L0, 10. * E_L0);
         minuit.Migrad();
         int fit_status = minuit.Migrad();
         if (fit_status != 0) {
             std::cerr << "WARNING: Fit did not converge! Status: " << fit_status << " particle = " << p_particle << " entry : " << entry << std::endl;
         }
+        double reduced_chi2 = ComputeReducedChi2(minuit, SigmoidFCN, 14, 5);
+        // cout << "Reduced Chi2 = " << reduced_chi2 << endl;
+
         double Ymin, Ymin_err, Ymax, Ymax_err;
         double Slope, Slope_err, Xmid, Xmid_err;
+        double E0, E0_err;
         minuit.GetParameter(0, Ymin, Ymin_err);
         minuit.GetParameter(1, Ymax, Ymax_err);
         minuit.GetParameter(2, Xmid, Xmid_err);
         minuit.GetParameter(3, Slope, Slope_err);
+        minuit.GetParameter(4, E0, E0_err);
         double percentile = Mod_Sigmoid_Percentile(p_FI_Dep/25.5,Xmid,Slope);
 
         h1_p[p_energy_index][p_FI_Lay]->Fill(log10(percentile));
@@ -241,28 +238,17 @@ void Percentile()
         
         if (!bar_info_assigned) {
             // cout << "No bar_info assigned, starting fit to determine cluster trajectory." << endl;
-            PrepareFitData(d_EnergyVec, layer_start, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
-            TMinuit minuit0(1);
-            minuit0.SetFCN(FitAxisFunction);
-            minuit0.SetPrintLevel(-1);
-            minuit0.DefineParameter(0, "bar_odd", g_fit_bars[1], 0.01, 2, 19);
-            minuit0.Migrad();
             double bar_odd, bar_odd_err;
-            minuit0.GetParameter(0, bar_odd, bar_odd_err);
-            // cout << " bar_odd = " << bar_odd << endl;
-            bar_info[0] = std::round(bar_odd);
-
-            PrepareFitData(d_EnergyVec, layer_start+1, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
-            
-            TMinuit minuit1(1);
-            minuit1.SetFCN(FitAxisFunction);
-            minuit1.SetPrintLevel(-1);
-            minuit1.DefineParameter(0, "bar_even", g_fit_bars[1], 0.01, 2, 19);
-            minuit1.Migrad();
             double bar_even, bar_even_err;
-            minuit1.GetParameter(0, bar_even, bar_even_err);
-            // cout << " bar_even = " << bar_even << endl;
-            bar_info[1] = std::round(bar_even);
+            PrepareFitData(p_EnergyVec, layer_start, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
+            bool success_odd = Fit1DParameter(FitAxisFunction, g_fit_bars[1], 0.01, 2, 19,  bar_odd, bar_odd_err);
+            if (success_odd)              bar_info[0] = std::round(bar_odd);
+            else                std::cerr << "Failed to fit bar_odd." << std::endl;
+
+            PrepareFitData(p_EnergyVec, layer_start+1, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
+            bool success_even = Fit1DParameter(FitAxisFunction, g_fit_bars[1], 0.01, 2, 19,  bar_even, bar_even_err);
+            if (success_even) bar_info[1] = std::round(bar_even);
+            else std::cerr << "Failed to fit bar_odd." << std::endl;
         }
 
         for(int layer = 0 ; layer<14 ; layer++)
@@ -278,8 +264,8 @@ void Percentile()
         bar_Accumu_error[0] = 0.3 * bar_Accumu_info[0];
         for(int layer = 1 ; layer<14 ; layer++)
         {
-            if( bar_Energy_info[layer-1] == 0 || bar_Energy_info[layer] == 0) { bar_Change_info[layer-1] = -5 ;  }//  cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
-            else {bar_Change_info[layer] = log10(bar_Energy_info[layer]/bar_Energy_info[layer-1]); }// cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
+            if( bar_Energy_info[layer-1] == 0 || bar_Energy_info[layer] == 0) { bar_Change_info[layer-1] = -5 ;  }
+            else {bar_Change_info[layer] = log10(bar_Energy_info[layer]/bar_Energy_info[layer-1]); }
             bar_Accumu_info[layer]  += bar_Accumu_info[layer-1] + bar_Energy_info[layer];
             bar_Accumu_error[layer] = 0.3 * bar_Accumu_info[layer];
         }
@@ -290,29 +276,35 @@ void Percentile()
         seg_sum_to_peak = AccumIncreaseToPeak(bar_Change_info,seg_start_idx,seg_peak_idx);
         seg_len_to_peak = seg_peak_idx - seg_start_idx;
 
-        PrepareSigmoidData(bar_Accumu_info,bar_Accumu_error,bar_Energy_info,g_fit_E00,g_fit_E13);
-
-        TMinuit minuit(4);
+        double E_L0 = bar_Energy_info[0];
+        double maxE = FindMaxValue(bar_Energy_info, 14);
+        double Amax = bar_Accumu_info[13];
+        PrepareSigmoidData(bar_Accumu_info,bar_Accumu_error);
+        TMinuit minuit(5);
         minuit.SetFCN(SigmoidFCN);
         minuit.SetPrintLevel(-1); // 静默输出
         minuit.SetErrorDef(1.0);  // Δχ² = 1 规则
-        minuit.DefineParameter(0, "Ymin", bar_Accumu_info[0], 1, 0, bar_Accumu_info[13]); // initVal, initErr, LowerL, UpperL
-        minuit.DefineParameter(1, "Ymax", bar_Accumu_info[13], 1, 0, bar_Accumu_info[13]); 
-        minuit.DefineParameter(2, "Xmid", seg_peak_idx, 0.5, 1, 14); // 拐点
-        minuit.DefineParameter(3, "Slope", 1.0, 0.1, 0.1, 5); // 斜率
-        minuit.FixParameter(0);
-        minuit.FixParameter(1);
+        minuit.DefineParameter(0, "Ymin" , E_L0        , E_L0 * 0.1   , 0   , maxE );
+        minuit.DefineParameter(1, "Ymax" , Amax        , Amax * 0.05  , maxE, 1e6 );
+        minuit.DefineParameter(2, "Xmid" , seg_peak_idx, 0.1          , -1  , seg_peak_idx +  3 );
+        minuit.DefineParameter(3, "Slope", 1.0         , 0.1          , 0.1 , 10 );
+        minuit.DefineParameter(4, "E0"   , E_L0        , E_L0 * 0.1   , 0.1 * E_L0, 10. * E_L0);
         minuit.Migrad();
         int fit_status = minuit.Migrad();
         if (fit_status != 0) {
-            std::cerr << "WARNING: Fit did not converge! Status: " << fit_status << " particle = " << d_particle << " entry : " << entry << std::endl;
+            std::cerr << "WARNING: Fit did not converge! Status: " << fit_status << " particle = " << p_particle << " entry : " << entry << std::endl;
         }
+        double reduced_chi2 = ComputeReducedChi2(minuit, SigmoidFCN, 14, 5);
+        // cout << "Reduced Chi2 = " << reduced_chi2 << endl;
+
         double Ymin, Ymin_err, Ymax, Ymax_err;
         double Slope, Slope_err, Xmid, Xmid_err;
+        double E0, E0_err;
         minuit.GetParameter(0, Ymin, Ymin_err);
         minuit.GetParameter(1, Ymax, Ymax_err);
         minuit.GetParameter(2, Xmid, Xmid_err);
         minuit.GetParameter(3, Slope, Slope_err);
+        minuit.GetParameter(4, E0, E0_err);
         double percentile = Mod_Sigmoid_Percentile(d_FI_Dep/25.5,Xmid,Slope);
 
         h1_d[d_energy_index][d_FI_Lay]->Fill(log10(percentile));

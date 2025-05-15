@@ -142,8 +142,6 @@ void PrepareFitData(
     }
 }
 
-
-
 void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_t flag)
 {
     double bar0 = par[0];
@@ -156,26 +154,41 @@ void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par,
     fval = cost;
 }
 
+bool Fit1DParameter(void (*fcn)(Int_t&, Double_t*, Double_t&, Double_t*, Int_t),
+                    double init_val, double init_err,
+                    double lower_bound, double upper_bound,
+                    double& fitted_val, double& fitted_err,
+                    int print_level = -1) {
+    TMinuit minuit(1);
+    minuit.SetFCN(fcn);
+    minuit.SetPrintLevel(print_level);
+    minuit.SetErrorDef(1.0);  // standard chi²
+
+    minuit.DefineParameter(0, "param", init_val, init_err, lower_bound, upper_bound);
+
+    int status = minuit.Migrad();
+    if (status != 0) {
+        std::cerr << "WARNING: Fit did not converge! Status = " << status << std::endl;
+        return false;
+    }
+
+    minuit.GetParameter(0, fitted_val, fitted_err);
+    return true;
+}
+
 void PrepareSigmoidData(
     const double accumu[], 
-    const double error[],
-    const double energy[],
-    double& g_fit_E00,
-    double& g_fit_E13
+    const double error[]
 )
 {
     g_fit_energies.clear();
     g_fit_errors.clear();
-    g_fit_E00 = 0;
-    g_fit_E13 = 0;
     for (int i = 0; i < 14; ++i) 
     {
         g_fit_energies.push_back(accumu[i]);
         g_fit_errors.push_back(error[i]);
 
     }
-    g_fit_E00 = energy[0];
-    g_fit_E13 = energy[13];
 }
 
 void SigmoidFCN(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_t iflag)
@@ -186,7 +199,7 @@ void SigmoidFCN(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_
         double x = i + 0.5;
         double y = g_fit_energies[i];
         double err = g_fit_errors[i];
-        double model = par[0] + 0.02 * x + (par[1] - par[0] - 0.02 * x) / (1 + exp(-(x - par[2]) / par[3]));
+        double model = par[0] + par[4] * x + (par[1] - par[0] - par[4] * x) / (1 + exp(-(x - par[2]) / par[3]));
         if (err > 0)
             chi2 += pow((y - model) / err, 2);
     }
@@ -211,6 +224,35 @@ int Inverse_Mod_sigmoid(double percentile,double Xmid, double Slope)
     return floor(X);
 }
 
+double ComputeReducedChi2(TMinuit& minuit, void (*fcn)(Int_t&, Double_t*, Double_t&, Double_t*, Int_t), int n_points, int npar) {
+    double chi2 = 0;
+    double params[10]; // 足够容纳参数数量（可根据需要扩展）
+    double* dummy_grad = nullptr;
+    int iflag = 0;
+
+    // 获取拟合参数
+    for (int i = 0; i < npar; ++i) {
+        double val, err;
+        minuit.GetParameter(i, val, err);
+        params[i] = val;
+    }
+
+    // 调用 FCN 计算 chi²
+    fcn(npar, dummy_grad, chi2, params, iflag);
+
+    // 计算自由度
+    int n_free_params = minuit.GetNumFreePars();
+    int ndf = n_points - n_free_params;
+
+    if (ndf > 0) {
+        return chi2 / ndf;
+    } else {
+        std::cerr << "WARNING: NDF <= 0, cannot compute reduced chi2" << std::endl;
+        return -1.0;
+    }
+}
+
+
 
 double AccumIncreaseToPeak(const double array[], int start_idx, int end_idx) 
 {
@@ -219,4 +261,8 @@ double AccumIncreaseToPeak(const double array[], int start_idx, int end_idx)
         sum += array[i];
     }
     return sum;
+}
+
+double FindMaxValue(const double* arr, int size) {
+    return *std::max_element(arr, arr + size);
 }

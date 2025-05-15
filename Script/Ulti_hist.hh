@@ -140,6 +140,30 @@ void PrepareFitData(
     }
 }
 
+bool Fit1DParameter(void (*fcn)(Int_t&, Double_t*, Double_t&, Double_t*, Int_t),
+                    double init_val, double init_err,
+                    double lower_bound, double upper_bound,
+                    double& fitted_val, double& fitted_err,
+                    int print_level = -1) {
+    TMinuit minuit(1);
+    minuit.SetFCN(fcn);
+    minuit.SetPrintLevel(print_level);
+    minuit.SetErrorDef(1.0);  // standard chi²
+
+    minuit.DefineParameter(0, "param", init_val, init_err, lower_bound, upper_bound);
+
+    int status = minuit.Migrad();
+    if (status != 0) {
+        std::cerr << "WARNING: Fit did not converge! Status = " << status << std::endl;
+        return false;
+    }
+
+    minuit.GetParameter(0, fitted_val, fitted_err);
+    return true;
+}
+
+///////////////////////////////////
+
 double  Mod_Sigmoid_Percentile(double Depth2Layer, double Xmid, double Slope)
 {
     double model = 1 / (1 + exp(-(Depth2Layer - Xmid) / Slope));
@@ -170,17 +194,17 @@ void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par,
 
 double ModifiedSigmoid(Double_t *x, Double_t *par) {
     double xx = x[0];
-    double Ymin = par[0];
-    double Ymax = par[1];
-    double Xmid = par[2];
-    double Slope = par[3];
+    double Ymin   = par[0];
+    double Ymax   = par[1];
+    double Xmid   = par[2];
+    double Slope  = par[3];
     double Efirst = par[4];
-    double Elast = par[5];
+    double Elast  = par[5];
 
-    if (xx < Xmid - 5 * Slope)
-        return Ymin - Efirst * (Xmid - 5 * Slope - xx);
-    else if (xx > Xmid + 2 * Slope)
-        return Ymax + Elast * (xx - Xmid - 2 * Slope);
+    if (xx < Xmid - 3 * Slope)
+        return Ymin + Efirst * xx;
+    else if (xx > Xmid + 3 * Slope)
+        return Ymax + Elast * (xx - Xmid - 3 * Slope);
     else
         return Ymin + (Ymax - Ymin ) / (1 + exp(-(xx - Xmid) / Slope));
 }
