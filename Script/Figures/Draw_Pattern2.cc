@@ -105,7 +105,7 @@ void Draw_Pattern2()
     auto h_Ine_Reso = new TH2I("h_Ine_Reso","h_Ine_Reso",14,0,14,14,0,14);
 
     // cout  << proton_tree->GetEntries() << endl;
-    Long64_t entry  = 7;   
+    Long64_t entry  = 156978;   
     // for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
     // for (Long64_t entry = 0; entry < 100; entry++)
     {        

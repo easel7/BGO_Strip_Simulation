@@ -3,6 +3,8 @@
 void Draw_Pattern()
 {
     vector<double>* p_EnergyVec = nullptr;
+    vector<double>* p_L_EnergyVec = nullptr;
+
     vector<double>* p_RMSVec = nullptr;
     double p_FH_Dep;
     int p_FH_Type;
@@ -17,6 +19,7 @@ void Draw_Pattern()
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("BarEnergyVector", &p_EnergyVec);
+    proton_tree->SetBranchAddress("LayerEnergyVector", &p_L_EnergyVec);
     proton_tree->SetBranchAddress("RMS"            , &p_RMSVec);
     proton_tree->SetBranchAddress("First_Had_Depth", &p_FH_Dep);
     proton_tree->SetBranchAddress("First_Had_Layer", &p_FH_Lay);
@@ -42,7 +45,7 @@ void Draw_Pattern()
     int point_counter_p = 0;
 
     // cout  << proton_tree->GetEntries() << endl;
-    Long64_t entry  = 7;   
+    Long64_t entry  = 1224;   
     int Counts = 0;
     // for (Long64_t entry = 0; entry < 100; entry++)
     {
@@ -52,7 +55,7 @@ void Draw_Pattern()
         auto hBGO1 = new TH1D("hBGO1","BGO Core Axis Energy Deposit",14,0,14); 
         auto hBGO2 = new TH1D("hBGO2","Deposit Energy Change Ratio",14,0,14); 
         auto hBGO3 = new TH1D("hBGO3","Accumulated Deposit Energy",14,0,14); 
-        auto  hResidual = new TH1D("hResidual","Accumulated Deposit Energy - Fit",14,0,14); 
+        auto hResidual = new TH1D("hResidual","Accumulated Deposit Energy - Fit",14,0,14); 
 
         auto *g_core0 = new TGraph();          auto *g_ch_0 = new TGraph();            auto *g_vert0 = new TGraph();
         auto *g_core1 = new TGraph();          auto *g_ch_1 = new TGraph();            auto *g_vert1 = new TGraph();
@@ -67,11 +70,11 @@ void Draw_Pattern()
         double bar_Change_info[14] = {0};
         double bar_Accumu_info[14] = {0};
         double bar_Accumu_error[14] = {0};
-        double rate_sum      = 0;
-        int    rate_len      = 0;
-        int    rate_poi      = 0;
-        double max_rate      = 0;
-        int max_rate_index   = 0;
+        double seg_sum      = 0;
+        int    seg_len      = 0;
+        int    seg_start_idx      = 0;
+        double seg_peak_value      = 0;
+        int seg_peak_idx   = 0;
 
         proton_tree->GetEntry(entry);
         // if (p_Nhits < 10 ) continue;
@@ -103,9 +106,12 @@ void Draw_Pattern()
         const double RMS_threshold = 15.0;  
         bool bar_info_assigned = false;  
         // cout << " Layer " << layer_start << " , RMS = " <<  (*p_RMSVec)[layer_start] << " , Next Layer RMS = " << (*p_RMSVec)[layer_start+1] << endl;
-        for (int k = layer_start; k <= 12; k ++) // two layer as a search window
+        for (int k = layer_start; k <= 10; k ++) // two layer as a search window
         {  
-            if((*p_RMSVec)[k]<=RMS_threshold && (*p_RMSVec)[k+1]<=RMS_threshold)
+            if((*p_RMSVec)[k]<=RMS_threshold    && 
+                (*p_RMSVec)[k+1]<=RMS_threshold && 
+                (*p_RMSVec)[k+2]<=RMS_threshold &&
+                (*p_RMSVec)[k+3]<=RMS_threshold )
             {
                 int max_index1 = FindMaxMiddleIndex(p_EnergyVec, k);
                 int bar1 = max_index1 % 22;
@@ -121,7 +127,7 @@ void Draw_Pattern()
                 // cout << "Directly determined bar_info: " 
                 // << "bar1 = " << bar_info[0] << ", bar2 = " << bar_info[1] << endl;
 
-                bar_info_assigned = true;
+                bar_info_assigned = true; cout << "bar_info assigned" << endl;
                 break;  
             }
         }
@@ -180,22 +186,22 @@ void Draw_Pattern()
             hBGO3->SetBinError(layer+1, 0.3 * bar_Accumu_info[layer]);
         }
 
-        FindMaxPositiveBinSegment(hBGO2,rate_sum,rate_len,rate_poi);
-        FindMaxValueInPositiveSegment(hBGO2,rate_poi,rate_len,max_rate,max_rate_index);
+        FindMaxPositiveBinSegment(hBGO2,seg_sum,seg_len,seg_start_idx);
+        FindMaxValueInPositiveSegment(hBGO2,seg_start_idx,seg_len,seg_peak_value,seg_peak_idx);
 
-        cout << "Begin to increase bin = " << rate_poi << endl;
-        cout << "Max Positive Bin Length = " << rate_len << endl;
-        cout << "Max Increase Rate = " <<  max_rate << endl;
-        cout << "Max Increase Rate Bin = " << max_rate_index << endl;
+        cout << "Begin to increase bin = " << seg_start_idx << endl;
+        cout << "Max Positive Bin Length = " << seg_len << endl;
+        cout << "Max Increase Rate = " <<  seg_peak_value << endl;
+        cout << "Max Increase Rate Bin = " << seg_peak_idx << endl;
 
         auto *line1 = new TLine(-11,14 - p_FH_Lay,11,14 - p_FH_Lay);
         auto *line2 = new TLine(p_FH_Lay,hBGO1->GetMinimum(),p_FH_Lay,hBGO1->GetMaximum());
         auto *line3 = new TLine(p_FH_Lay,hBGO2->GetMinimum(),p_FH_Lay,hBGO2->GetMaximum());
         auto *line4 = new TLine(0,0,14,0);
-        g_core0->SetPoint(0, bar_info[0] - 10.5, 15 - rate_poi );                       g_ch_0->SetPoint(0, bar_info[0] - 10.5, 15 - max_rate_index );              
-        g_core1->SetPoint(0, bar_info[1] - 10.5, 15 - rate_poi );                       g_ch_1->SetPoint(0, bar_info[1] - 10.5, 15 - max_rate_index );              
-        g_core2->SetPoint(0, rate_poi - 0.5, hBGO1->GetBinContent(rate_poi) );          g_ch_2->SetPoint(0, max_rate_index - 0.5, hBGO1->GetBinContent(max_rate_index) );
-        g_core3->SetPoint(0, rate_poi - 0.5, hBGO2->GetBinContent(rate_poi) );          g_ch_3->SetPoint(0, max_rate_index - 0.5, hBGO2->GetBinContent(max_rate_index) );
+        g_core0->SetPoint(0, bar_info[0] - 10.5, 15 - seg_start_idx );                       g_ch_0->SetPoint(0, bar_info[0] - 10.5, 15 - seg_peak_idx );              
+        g_core1->SetPoint(0, bar_info[1] - 10.5, 15 - seg_start_idx );                       g_ch_1->SetPoint(0, bar_info[1] - 10.5, 15 - seg_peak_idx );              
+        g_core2->SetPoint(0, seg_start_idx - 0.5, hBGO1->GetBinContent(seg_start_idx) );          g_ch_2->SetPoint(0, seg_peak_idx - 0.5, hBGO1->GetBinContent(seg_peak_idx) );
+        g_core3->SetPoint(0, seg_start_idx - 0.5, hBGO2->GetBinContent(seg_start_idx) );          g_ch_3->SetPoint(0, seg_peak_idx - 0.5, hBGO2->GetBinContent(seg_peak_idx) );
         line4->SetLineColor(kBlack);
         line4->SetLineWidth(2);
         line4->SetLineStyle(9);
@@ -209,10 +215,10 @@ void Draw_Pattern()
         g_vert3->SetPoint(0, vert_layer, hBGO2->GetBinContent(p_FI_Lay+1) );
 
         h_max_min0->Fill(log10(MaxMinRatio(hBGO1)));
-        g_sum_len0->SetPoint(point_counter++,rate_sum,rate_len);
-        if(p_FH_Type == 1)       {  h_max_min1->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len1->SetPoint(point_counter_i++,rate_sum,rate_len+0.1);}
-        else if (p_FH_Type == 2) {  h_max_min2->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len2->SetPoint(point_counter_e++,rate_sum,rate_len);    }
-        else                     {  h_max_min3->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len3->SetPoint(point_counter_p++,rate_sum,rate_len-0.1);}
+        g_sum_len0->SetPoint(point_counter++,seg_sum,seg_len);
+        if(p_FH_Type == 1)       {  h_max_min1->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len1->SetPoint(point_counter_i++,seg_sum,seg_len+0.1);}
+        else if (p_FH_Type == 2) {  h_max_min2->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len2->SetPoint(point_counter_e++,seg_sum,seg_len);    }
+        else                     {  h_max_min3->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len3->SetPoint(point_counter_p++,seg_sum,seg_len-0.1);}
 
         if(p_FH_Type == 1)       {  string1 = "Inelastic";  g_core0->SetMarkerColor(kRed);    g_core1->SetMarkerColor(kRed);    g_core2->SetMarkerColor(kRed);    g_core3->SetMarkerColor(kRed);      g_ch_0->SetMarkerColor(kRed);      g_ch_1->SetMarkerColor(kRed);      g_ch_2->SetMarkerColor(kRed);      g_ch_3->SetMarkerColor(kRed);     box0->SetLineColor(kRed);     box1->SetLineColor(kRed);       line1->SetLineColor(kRed);     line2->SetLineColor(kRed);     line3->SetLineColor(kRed);     }
         else if (p_FH_Type == 2) {  string1 = "Elastic";    g_core0->SetMarkerColor(kMagenta);g_core1->SetMarkerColor(kMagenta);g_core2->SetMarkerColor(kMagenta);g_core3->SetMarkerColor(kMagenta);  g_ch_0->SetMarkerColor(kMagenta);  g_ch_1->SetMarkerColor(kMagenta);  g_ch_2->SetMarkerColor(kMagenta);  g_ch_3->SetMarkerColor(kMagenta); box0->SetLineColor(kMagenta); box1->SetLineColor(kMagenta);   line1->SetLineColor(kMagenta); line2->SetLineColor(kMagenta); line3->SetLineColor(kMagenta); }
@@ -340,14 +346,14 @@ void Draw_Pattern()
         TF1 *sigmoid = new TF1("sigmoid", "[0]+ [4]*x + ([1]-[0] - [4]*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
         sigmoid->SetParameters(hBGO1->GetBinContent(1), 
                                hBGO3->GetBinContent(14), 
-                               max_rate_index - 1, 
+                               seg_peak_idx - 1, 
                                1 , 
                                hBGO1->GetBinContent(1)); 
-        sigmoid->SetParLimits(0, 0                            , hBGO1->GetMaximum()         );   // [0] Ymin
-        sigmoid->SetParLimits(1, hBGO1->GetMaximum()          , 1e6                         );   // [1] Ymax
-        sigmoid->SetParLimits(2, max(max_rate_index -3, -1)   , min(max_rate_index + 2, 14) );   // [2] Xmid
-        sigmoid->SetParLimits(3, 0.1                          , 10                          );   // [3] Slope，避免除0
-        sigmoid->SetParLimits(4, hBGO1->GetBinContent(1) *0.1 , hBGO1->GetBinContent(1) * 10);   // [4] linear bias
+        sigmoid->SetParLimits(0, 0                                     , hBGO1->GetMaximum()         );   // [0] Ymin
+        sigmoid->SetParLimits(1, hBGO1->GetMaximum()                   , 1e6                         );   // [1] Ymax
+        sigmoid->SetParLimits(2, max(seg_peak_idx -3, -1)            , min(seg_peak_idx + 2, 14) );   // [2] Xmid
+        sigmoid->SetParLimits(3, 0.1                                   , 10                          );   // [3] Slope，避免除0
+        sigmoid->SetParLimits(4, max(hBGO1->GetBinContent(1)*0.1,0.01) , hBGO1->GetBinContent(1) * 10);   // [4] linear bias
         TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RS");  // R: fit range, S: return TFitResultPtr
         if (fitResult.Get() && fitResult->IsValid()) {
             double chi2  = sigmoid->GetChisquare();

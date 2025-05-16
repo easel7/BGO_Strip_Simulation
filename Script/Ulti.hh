@@ -162,8 +162,7 @@ bool Fit1DParameter(void (*fcn)(Int_t&, Double_t*, Double_t&, Double_t*, Int_t),
     TMinuit minuit(1);
     minuit.SetFCN(fcn);
     minuit.SetPrintLevel(print_level);
-    minuit.SetErrorDef(1.0);  // standard chi²
-
+    minuit.SetErrorDef(1.0);  // standard chi2
     minuit.DefineParameter(0, "param", init_val, init_err, lower_bound, upper_bound);
 
     int status = minuit.Migrad();
@@ -259,22 +258,22 @@ double RunSigmoidFit(Long64_t entry, double E_L0, double Amax, int seg_peak_idx,
     minuit_out->SetErrorDef(1.0);
 
     minuit_out->DefineParameter(0, "Ymin" , E_L0         , E_L0 * 0.1   , 0                        , maxE                    );
-    minuit_out->DefineParameter(1, "Ymax" , Amax         , Amax * 0.01  , maxE                     , 1e6                      );
+    minuit_out->DefineParameter(1, "Ymax" , Amax         , Amax * 0.02  , maxE                     , 1e6                      );
     minuit_out->DefineParameter(2, "Xmid" , seg_peak_idx , 0.5          , max(seg_peak_idx-3.,-1.) , min(seg_peak_idx+3.,14.) );
     minuit_out->DefineParameter(3, "Slope", 1.0          , 0.1          , 0.1                      , 10                       );
     minuit_out->DefineParameter(4, "E0"   , E_L0         , E_L0 * 0.1   , 0.1 * E_L0               , 10. * E_L0               );
-    minuit_out->Migrad();
     int fit_status = minuit_out->Migrad();
     double edm,  chi2, errdef;
     int nvpar, nparx, istat;
+    minuit_out->mnstat(chi2, edm, errdef, nvpar, nparx, istat);
+    if (fit_status != 0 && edm > 1e-3) {fit_status = minuit_out->Migrad();}
+    if (fit_status != 0 && edm > 1e-2) cerr << "ERROR: Fit did not converge! Status: " << fit_status << " entry : " << entry << " edm : " << edm << endl; 
     minuit_out->mnstat(chi2, edm, errdef, nvpar, nparx, istat);
     // std::cout << "Edm = " << edm << std::endl;
     // std::cout << "chi2 = " << chi2 << std::endl;
     // std::cout << "nvpar = " << nvpar << std::endl;
     // std::cout << "nvpax = " << nparx << std::endl;
-    if (fit_status != 0 && edm>0.01) cerr << "ERROR: Fit did not converge! Status: " << fit_status << " entry : " << entry << " edm : " << edm << endl; 
     int ndf = 14 - nvpar;
-
     if (ndf > 0) {
         return chi2 / ndf;
     } else {

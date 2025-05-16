@@ -82,6 +82,9 @@ void Percentile()
         double bar_Change_info[14] = {0};
         double bar_Accumu_info[14] = {0};
         double bar_Accumu_error[14] = {0};
+        // auto hBGO1 = new TH1D("hBGO1","BGO Core Axis Energy Deposit",14,0,14); 
+        // auto hBGO2 = new TH1D("hBGO2","Deposit Energy Change Ratio",14,0,14); 
+        auto hBGO3 = new TH1D("hBGO3","Accumulated Deposit Energy",14,0,14); 
         double rate_max_min      = 0;
         double seg_sum           = 0;   // 总增长和
         int    seg_len           = 0;   // 连续正增长长度
@@ -155,6 +158,12 @@ void Percentile()
         seg_sum_to_peak = AccumIncreaseToPeak(bar_Change_info,seg_start_idx,seg_peak_idx);
         seg_len_to_peak = seg_peak_idx - seg_start_idx;
 
+        for(int layer =0 ; layer<14 ; layer++)
+        {
+            hBGO3->SetBinContent(layer+1, bar_Accumu_info[layer]);
+            hBGO3->SetBinError(layer+1, 0.3 * bar_Accumu_info[layer]);
+        }
+
         double E_L0 = bar_Energy_info[0];
         double maxE = FindMaxValue(bar_Energy_info, 14);
         double Amax = bar_Accumu_info[13];
@@ -173,7 +182,8 @@ void Percentile()
         double percentile = Mod_Sigmoid_Percentile(p_FI_Dep/25.5,Xmid,Slope);
 
         h1_p[p_energy_index][p_FI_Lay]->Fill(log10(percentile));
-        h1_p_inter[p_energy_index]->Fill(log10(percentile)) ;
+        h1_p_inter[p_energy_index]->Fill(log10(percentile));
+        delete myMinuit;
     }
 
     for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
@@ -281,6 +291,7 @@ void Percentile()
 
         h1_d[d_energy_index][d_FI_Lay]->Fill(log10(percentile));
         h1_d_inter[d_energy_index]->Fill(log10(percentile)) ;
+        delete myMinuit;
     }
 
     for (int i = 9; i < 10; i++) // Deposit Energy Bin

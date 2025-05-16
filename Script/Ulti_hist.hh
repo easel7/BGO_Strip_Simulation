@@ -41,7 +41,6 @@ void FindMaxPositiveBinSegment(TH1D* hist, double& out_sum, int& out_len, int& o
             curr_start_bin = -1;
         }
     }
-
     out_sum = max_sum;
     out_len = max_len;
     out_start_bin = max_start_bin;
