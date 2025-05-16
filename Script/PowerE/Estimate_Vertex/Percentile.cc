@@ -77,11 +77,15 @@ void Percentile()
         if(p_FI_Dep < 0) continue;
         if (p_Nhits < 10 ) continue;
         double sum_p = 0;
-        double bar_info[2] = {0};
+        int bar_info[2] = {0};
         double bar_Energy_info[14] = {0};
         double bar_Change_info[14] = {0};
         double bar_Accumu_info[14] = {0};
         double bar_Accumu_error[14] = {0};
+        if (gDirectory->FindObject("hBGO1")) delete gDirectory->FindObject("hBGO1");
+        if (gDirectory->FindObject("hBGO2")) delete gDirectory->FindObject("hBGO2");
+        if (gDirectory->FindObject("hBGO3")) delete gDirectory->FindObject("hBGO3");
+        if (gDirectory->FindObject("sigmoid")) delete gDirectory->FindObject("sigmoid");
         // auto hBGO1 = new TH1D("hBGO1","BGO Core Axis Energy Deposit",14,0,14); 
         // auto hBGO2 = new TH1D("hBGO2","Deposit Energy Change Ratio",14,0,14); 
         auto hBGO3 = new TH1D("hBGO3","Accumulated Deposit Energy",14,0,14); 
@@ -94,29 +98,8 @@ void Percentile()
         double seg_sum_to_peak   = 0;   // 从起点到增长最大值的增长和
         int    seg_len_to_peak   = 0;   // 从起点到增长最大值的索引
         int layer_start = 4;
-        const double RMS_threshold = 15.0;  // 自定义阈值，越小越“直”，你可以调整
-        bool bar_info_assigned = false;     // 标志变量，判断是否已赋值
-        for (int k = layer_start; k <= 12; k ++) 
-        {  // 每次两层作为一个窗口
-            if((*p_RMSVec)[k]<=RMS_threshold && (*p_RMSVec)[k+1]<=RMS_threshold)
-            {
-                int max_index1 = FindMaxMiddleIndex(p_EnergyVec, k);
-                int bar1 = max_index1 % 22;
-                int max_index2 = FindMaxMiddleIndex(p_EnergyVec, k+1);
-                int bar2 = max_index2 % 22;
-                if (k % 2 == 0) {
-                    bar_info[0] = bar1; // odd
-                    bar_info[1] = bar2; // even
-                } else {
-                    bar_info[0] = bar2; // odd
-                    bar_info[1] = bar1; // even
-                }
-                // cout << "Directly determined bar_info: " 
-                // << "bar1 = " << bar_info[0] << ", bar2 = " << bar_info[1] << endl;
-                bar_info_assigned = true;
-                break;  // 一旦赋值，跳出循环
-            }
-        }
+        const double RMS_threshold = 15.0;  
+        bool bar_info_assigned = AssignBarInfoFromRMS(p_RMSVec, p_EnergyVec, p_L_EnergyVec, bar_info, layer_start, RMS_threshold);
         
         if (!bar_info_assigned) {
             // cout << "No bar_info assigned, starting fit to determine cluster trajectory." << endl;
@@ -133,25 +116,7 @@ void Percentile()
             else std::cerr << "Failed to fit bar_odd." << std::endl;
         }
 
-        for(int layer = 0 ; layer<14 ; layer++)
-        {   
-            int center_bar = (layer % 2 == 0) ? bar_info[0] : bar_info[1];  // select center bar
-            for (int k = center_bar - 1; k <= center_bar + 1; k++)
-            {
-                bar_Energy_info[layer] += (*p_EnergyVec)[layer * 22 + k];
-            }
-        }
-        bar_Change_info[0] = log10(bar_Energy_info[0] / 0.023);
-        bar_Accumu_info[0] = bar_Energy_info[0];
-        bar_Accumu_error[0] = 0.3 * bar_Accumu_info[0];
-        for(int layer = 1 ; layer<14 ; layer++)
-        {
-            if( bar_Energy_info[layer-1] == 0 || bar_Energy_info[layer] == 0) { bar_Change_info[layer-1] = -5 ;  }//  cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
-            else {bar_Change_info[layer] = log10(bar_Energy_info[layer]/bar_Energy_info[layer-1]); }// cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
-            bar_Accumu_info[layer]  += bar_Accumu_info[layer-1] + bar_Energy_info[layer];
-            bar_Accumu_error[layer] = 0.3 * bar_Accumu_info[layer];
-        }
-
+        ComputeBarEnergyInfo(p_EnergyVec, bar_info, bar_Energy_info, bar_Change_info, bar_Accumu_info, bar_Accumu_error);
         FindMaxPositiveSegment(bar_Change_info,14,seg_sum,seg_len,seg_start_idx);
         FindMaxValueInPositiveSegment(bar_Change_info,seg_start_idx,seg_len,seg_peak_value,seg_peak_idx);
         rate_max_min = MaxMinRatio(bar_Energy_info,14);
@@ -194,7 +159,7 @@ void Percentile()
         if(d_FI_Dep < 0) continue;
         if (d_Nhits < 10 ) continue;
         double sum_d = 0;
-        double bar_info[2] = {0};
+        int bar_info[2] = {0};
         double bar_Energy_info[14] = {0};
         double bar_Change_info[14] = {0};
         double bar_Accumu_info[14] = {0};
@@ -208,29 +173,8 @@ void Percentile()
         double seg_sum_to_peak   = 0;   // 从起点到增长最大值的增长和
         int    seg_len_to_peak   = 0;   // 从起点到增长最大值的索引
         int layer_start = 4;
-        const double RMS_threshold = 15.0;  // 自定义阈值，越小越“直”，你可以调整
-        bool bar_info_assigned = false;     // 标志变量，判断是否已赋值
-        for (int k = layer_start; k <= 12; k ++) 
-        {  // 每次两层作为一个窗口
-            if((*d_RMSVec)[k]<=RMS_threshold && (*d_RMSVec)[k+1]<=RMS_threshold)
-            {
-                int max_index1 = FindMaxMiddleIndex(d_EnergyVec, k);
-                int bar1 = max_index1 % 22;
-                int max_index2 = FindMaxMiddleIndex(d_EnergyVec, k+1);
-                int bar2 = max_index2 % 22;
-                if (k % 2 == 0) {
-                    bar_info[0] = bar1; // odd
-                    bar_info[1] = bar2; // even
-                } else {
-                    bar_info[0] = bar2; // odd
-                    bar_info[1] = bar1; // even
-                }
-                // cout << "Directly determined bar_info: " 
-                // << "bar1 = " << bar_info[0] << ", bar2 = " << bar_info[1] << endl;
-                bar_info_assigned = true;
-                break;  // 一旦赋值，跳出循环
-            }
-        }
+        const double RMS_threshold = 15.0;  
+        bool bar_info_assigned = AssignBarInfoFromRMS(p_RMSVec, p_EnergyVec, p_L_EnergyVec, bar_info, layer_start, RMS_threshold);
         
         if (!bar_info_assigned) {
             // cout << "No bar_info assigned, starting fit to determine cluster trajectory." << endl;
@@ -247,25 +191,7 @@ void Percentile()
             else std::cerr << "Failed to fit bar_odd." << std::endl;
         }
 
-        for(int layer = 0 ; layer<14 ; layer++)
-        {   
-            int center_bar = (layer % 2 == 0) ? bar_info[0] : bar_info[1];  // select center bar
-            for (int k = center_bar - 1; k <= center_bar + 1; k++)
-            {
-                bar_Energy_info[layer] += (*d_EnergyVec)[layer * 22 + k];
-            }
-        }
-        bar_Change_info[0] = log10(bar_Energy_info[0] / 0.023);
-        bar_Accumu_info[0] = bar_Energy_info[0];
-        bar_Accumu_error[0] = 0.3 * bar_Accumu_info[0];
-        for(int layer = 1 ; layer<14 ; layer++)
-        {
-            if( bar_Energy_info[layer-1] == 0 || bar_Energy_info[layer] == 0) { bar_Change_info[layer-1] = -5 ;  }
-            else {bar_Change_info[layer] = log10(bar_Energy_info[layer]/bar_Energy_info[layer-1]); }
-            bar_Accumu_info[layer]  += bar_Accumu_info[layer-1] + bar_Energy_info[layer];
-            bar_Accumu_error[layer] = 0.3 * bar_Accumu_info[layer];
-        }
-
+        ComputeBarEnergyInfo(p_EnergyVec, bar_info, bar_Energy_info, bar_Change_info, bar_Accumu_info, bar_Accumu_error);
         FindMaxPositiveSegment(bar_Change_info,14,seg_sum,seg_len,seg_start_idx);
         FindMaxValueInPositiveSegment(bar_Change_info,seg_start_idx,seg_len,seg_peak_value,seg_peak_idx);
         rate_max_min = MaxMinRatio(bar_Energy_info,14);

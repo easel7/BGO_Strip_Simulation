@@ -4,7 +4,6 @@ void Draw_Pattern()
 {
     vector<double>* p_EnergyVec = nullptr;
     vector<double>* p_L_EnergyVec = nullptr;
-
     vector<double>* p_RMSVec = nullptr;
     double p_FH_Dep;
     int p_FH_Type;
@@ -14,20 +13,20 @@ void Draw_Pattern()
     int p_FI_Lay;
     double p_Total_E;
     const char* string1;
-    const char* string2 = "Proton_PowerLaw";
+    const char* string2 = "Deuteron_PowerLaw";
 
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     auto proton_tree = (TTree*)proton_file->Get("B4");
-    proton_tree->SetBranchAddress("BarEnergyVector", &p_EnergyVec);
+    proton_tree->SetBranchAddress("BarEnergyVector"  , &p_EnergyVec);
     proton_tree->SetBranchAddress("LayerEnergyVector", &p_L_EnergyVec);
-    proton_tree->SetBranchAddress("RMS"            , &p_RMSVec);
-    proton_tree->SetBranchAddress("First_Had_Depth", &p_FH_Dep);
-    proton_tree->SetBranchAddress("First_Had_Layer", &p_FH_Lay);
-    proton_tree->SetBranchAddress("First_Had_Type" , &p_FH_Type);
-    proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
-    proton_tree->SetBranchAddress("First_Ine_Depth", &p_FI_Dep);
-    proton_tree->SetBranchAddress("First_Ine_Layer", &p_FI_Lay);
-    proton_tree->SetBranchAddress("Total_E"         ,&p_Total_E);
+    proton_tree->SetBranchAddress("RMS"              , &p_RMSVec);
+    proton_tree->SetBranchAddress("First_Had_Depth"  , &p_FH_Dep);
+    proton_tree->SetBranchAddress("First_Had_Layer"  , &p_FH_Lay);
+    proton_tree->SetBranchAddress("First_Had_Type"   , &p_FH_Type);
+    proton_tree->SetBranchAddress("Nhits"            , &p_Nhits);
+    proton_tree->SetBranchAddress("First_Ine_Depth"  , &p_FI_Dep);
+    proton_tree->SetBranchAddress("First_Ine_Layer"  , &p_FI_Lay);
+    proton_tree->SetBranchAddress("Total_E"          ,&p_Total_E);
 
     auto h_max_min0 = new TH1D("h_max_min0","h_max_min0",60,-1,5); 
     auto h_max_min1 = new TH1D("h_max_min1","h_max_min1",60,-1,5); // Inelastic
@@ -45,7 +44,7 @@ void Draw_Pattern()
     int point_counter_p = 0;
 
     // cout  << proton_tree->GetEntries() << endl;
-    Long64_t entry  = 1224;   
+    Long64_t entry  = 232491;   
     int Counts = 0;
     // for (Long64_t entry = 0; entry < 100; entry++)
     {
@@ -65,7 +64,7 @@ void Draw_Pattern()
         auto    *box0 = new TBox();
         auto    *box1 = new TBox();
         
-        double bar_info[2] = {0};
+        int bar_info[2] = {0};
         double bar_Energy_info[14] = {0};
         double bar_Change_info[14] = {0};
         double bar_Accumu_info[14] = {0};
@@ -104,33 +103,7 @@ void Draw_Pattern()
 
         int layer_start = 4;
         const double RMS_threshold = 15.0;  
-        bool bar_info_assigned = false;  
-        // cout << " Layer " << layer_start << " , RMS = " <<  (*p_RMSVec)[layer_start] << " , Next Layer RMS = " << (*p_RMSVec)[layer_start+1] << endl;
-        for (int k = layer_start; k <= 10; k ++) // two layer as a search window
-        {  
-            if((*p_RMSVec)[k]<=RMS_threshold    && 
-                (*p_RMSVec)[k+1]<=RMS_threshold && 
-                (*p_RMSVec)[k+2]<=RMS_threshold &&
-                (*p_RMSVec)[k+3]<=RMS_threshold )
-            {
-                int max_index1 = FindMaxMiddleIndex(p_EnergyVec, k);
-                int bar1 = max_index1 % 22;
-                int max_index2 = FindMaxMiddleIndex(p_EnergyVec, k+1);
-                int bar2 = max_index2 % 22;
-                if (k % 2 == 0) {
-                    bar_info[0] = bar1; // odd
-                    bar_info[1] = bar2; // even
-                } else {
-                    bar_info[0] = bar2; // odd
-                    bar_info[1] = bar1; // even
-                }
-                // cout << "Directly determined bar_info: " 
-                // << "bar1 = " << bar_info[0] << ", bar2 = " << bar_info[1] << endl;
-
-                bar_info_assigned = true; cout << "bar_info assigned" << endl;
-                break;  
-            }
-        }
+        bool bar_info_assigned = AssignBarInfoFromRMS(p_RMSVec, p_EnergyVec, p_L_EnergyVec, bar_info, layer_start, RMS_threshold);
         
         if (!bar_info_assigned) {
             cout << "No bar_info assigned, starting fit to determine cluster trajectory." << endl;
@@ -157,27 +130,7 @@ void Draw_Pattern()
         box1->SetX2(bar_info[1] - 12);
         box1->SetY2(14 - layer_start);
 
-        for(int layer = 0 ; layer<14 ; layer++)
-        {   
-            cout << "RMS " << layer << " , " << (*p_RMSVec)[layer] << endl;
-            int center_bar = (layer % 2 == 0) ? bar_info[0] : bar_info[1];  // select center bar
-            for (int k = center_bar - 1; k <= center_bar + 1; k++)
-            {
-                bar_Energy_info[layer] += (*p_EnergyVec)[layer * 22 + k];
-            }
-        }
-
-        bar_Change_info[0] = log10(bar_Energy_info[0] / 0.023);
-        bar_Accumu_info[0] = bar_Energy_info[0];
-        bar_Accumu_error[0] = 0.3 * bar_Accumu_info[0];
-        for(int layer = 1 ; layer<14 ; layer++)
-        {
-            if( bar_Energy_info[layer-1] == 0 || bar_Energy_info[layer] == 0) { bar_Change_info[layer-1] = -5 ;    cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
-            else {bar_Change_info[layer] = log10(bar_Energy_info[layer]/bar_Energy_info[layer-1]);                 cout << "entry = " << entry << " , layer "<< layer-1 << " , rate " << bar_Change_info[layer-1] << endl;}
-            bar_Accumu_info[layer]  += bar_Accumu_info[layer-1] + bar_Energy_info[layer];
-            bar_Accumu_error[layer] = 0.3 * bar_Accumu_info[layer];
-        }
-
+        ComputeBarEnergyInfo(p_EnergyVec, bar_info, bar_Energy_info, bar_Change_info, bar_Accumu_info, bar_Accumu_error);
         for(int layer =0 ; layer<14 ; layer++)
         {
             hBGO1->SetBinContent(layer+1, bar_Energy_info[layer]);
@@ -343,15 +296,15 @@ void Draw_Pattern()
         hBGO3->Draw("hist");
         
         cout << "Max Value of Energy Info " << hBGO1->GetMaximum() << endl;
-        TF1 *sigmoid = new TF1("sigmoid", "[0]+ [4]*x + ([1]-[0] - [4]*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
+        TF1 *sigmoid = new TF1("sigmoid", "[0]+ [4]*x + ([1]-[0] -  [4]*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
         sigmoid->SetParameters(hBGO1->GetBinContent(1), 
                                hBGO3->GetBinContent(14), 
                                seg_peak_idx - 1, 
                                1 , 
-                               hBGO1->GetBinContent(1)); 
+                               max(hBGO1->GetBinContent(1)*0.1,0.01)); 
         sigmoid->SetParLimits(0, 0                                     , hBGO1->GetMaximum()         );   // [0] Ymin
         sigmoid->SetParLimits(1, hBGO1->GetMaximum()                   , 1e6                         );   // [1] Ymax
-        sigmoid->SetParLimits(2, max(seg_peak_idx -3, -1)            , min(seg_peak_idx + 2, 14) );   // [2] Xmid
+        sigmoid->SetParLimits(2, max(seg_peak_idx -3, -1)              , min(seg_peak_idx + 2, 14) );   // [2] Xmid
         sigmoid->SetParLimits(3, 0.1                                   , 10                          );   // [3] Slope，避免除0
         sigmoid->SetParLimits(4, max(hBGO1->GetBinContent(1)*0.1,0.01) , hBGO1->GetBinContent(1) * 10);   // [4] linear bias
         TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RS");  // R: fit range, S: return TFitResultPtr
