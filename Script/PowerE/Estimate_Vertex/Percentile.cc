@@ -159,31 +159,17 @@ void Percentile()
         double maxE = FindMaxValue(bar_Energy_info, 14);
         double Amax = bar_Accumu_info[13];
         PrepareSigmoidData(bar_Accumu_info,bar_Accumu_error);
-        TMinuit minuit(5);
-        minuit.SetFCN(SigmoidFCN);
-        minuit.SetPrintLevel(-1); // 静默输出
-        minuit.SetErrorDef(1.0);  // Δχ² = 1 规则
-        minuit.DefineParameter(0, "Ymin" , E_L0        , E_L0 * 0.1   , 0   , maxE );
-        minuit.DefineParameter(1, "Ymax" , Amax        , Amax * 0.05  , maxE, 1e6 );
-        minuit.DefineParameter(2, "Xmid" , seg_peak_idx, 0.1          , -1  , seg_peak_idx +  3 );
-        minuit.DefineParameter(3, "Slope", 1.0         , 0.1          , 0.1 , 10 );
-        minuit.DefineParameter(4, "E0"   , E_L0        , E_L0 * 0.1   , 0.1 * E_L0, 10. * E_L0);
-        minuit.Migrad();
-        int fit_status = minuit.Migrad();
-        if (fit_status != 0) {
-            std::cerr << "WARNING: Fit did not converge! Status: " << fit_status << " particle = " << p_particle << " entry : " << entry << std::endl;
-        }
-        double reduced_chi2 = ComputeReducedChi2(minuit, SigmoidFCN, 14, 5);
-        // cout << "Reduced Chi2 = " << reduced_chi2 << endl;
+        TMinuit* myMinuit = nullptr;
+        double reducedChi2 = RunSigmoidFit(entry, E_L0, Amax, seg_peak_idx, maxE, myMinuit);
 
         double Ymin, Ymin_err, Ymax, Ymax_err;
         double Slope, Slope_err, Xmid, Xmid_err;
         double E0, E0_err;
-        minuit.GetParameter(0, Ymin, Ymin_err);
-        minuit.GetParameter(1, Ymax, Ymax_err);
-        minuit.GetParameter(2, Xmid, Xmid_err);
-        minuit.GetParameter(3, Slope, Slope_err);
-        minuit.GetParameter(4, E0, E0_err);
+        myMinuit->GetParameter(0, Ymin, Ymin_err);
+        myMinuit->GetParameter(1, Ymax, Ymax_err);
+        myMinuit->GetParameter(2, Xmid, Xmid_err);
+        myMinuit->GetParameter(3, Slope, Slope_err);
+        myMinuit->GetParameter(4, E0, E0_err);
         double percentile = Mod_Sigmoid_Percentile(p_FI_Dep/25.5,Xmid,Slope);
 
         h1_p[p_energy_index][p_FI_Lay]->Fill(log10(percentile));
@@ -280,31 +266,17 @@ void Percentile()
         double maxE = FindMaxValue(bar_Energy_info, 14);
         double Amax = bar_Accumu_info[13];
         PrepareSigmoidData(bar_Accumu_info,bar_Accumu_error);
-        TMinuit minuit(5);
-        minuit.SetFCN(SigmoidFCN);
-        minuit.SetPrintLevel(-1); // 静默输出
-        minuit.SetErrorDef(1.0);  // Δχ² = 1 规则
-        minuit.DefineParameter(0, "Ymin" , E_L0        , E_L0 * 0.1   , 0   , maxE );
-        minuit.DefineParameter(1, "Ymax" , Amax        , Amax * 0.05  , maxE, 1e6 );
-        minuit.DefineParameter(2, "Xmid" , seg_peak_idx, 0.1          , -1  , seg_peak_idx +  3 );
-        minuit.DefineParameter(3, "Slope", 1.0         , 0.1          , 0.1 , 10 );
-        minuit.DefineParameter(4, "E0"   , E_L0        , E_L0 * 0.1   , 0.1 * E_L0, 10. * E_L0);
-        minuit.Migrad();
-        int fit_status = minuit.Migrad();
-        if (fit_status != 0) {
-            std::cerr << "WARNING: Fit did not converge! Status: " << fit_status << " particle = " << p_particle << " entry : " << entry << std::endl;
-        }
-        double reduced_chi2 = ComputeReducedChi2(minuit, SigmoidFCN, 14, 5);
-        // cout << "Reduced Chi2 = " << reduced_chi2 << endl;
+        TMinuit* myMinuit = nullptr;
+        double reducedChi2 = RunSigmoidFit(entry, E_L0, Amax, seg_peak_idx, maxE, myMinuit);
 
         double Ymin, Ymin_err, Ymax, Ymax_err;
         double Slope, Slope_err, Xmid, Xmid_err;
         double E0, E0_err;
-        minuit.GetParameter(0, Ymin, Ymin_err);
-        minuit.GetParameter(1, Ymax, Ymax_err);
-        minuit.GetParameter(2, Xmid, Xmid_err);
-        minuit.GetParameter(3, Slope, Slope_err);
-        minuit.GetParameter(4, E0, E0_err);
+        myMinuit->GetParameter(0, Ymin, Ymin_err);
+        myMinuit->GetParameter(1, Ymax, Ymax_err);
+        myMinuit->GetParameter(2, Xmid, Xmid_err);
+        myMinuit->GetParameter(3, Slope, Slope_err);
+        myMinuit->GetParameter(4, E0, E0_err);
         double percentile = Mod_Sigmoid_Percentile(d_FI_Dep/25.5,Xmid,Slope);
 
         h1_d[d_energy_index][d_FI_Lay]->Fill(log10(percentile));

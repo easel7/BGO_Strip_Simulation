@@ -42,7 +42,7 @@ void Draw_Pattern()
     int point_counter_p = 0;
 
     // cout  << proton_tree->GetEntries() << endl;
-    Long64_t entry  = 1981;   
+    Long64_t entry  = 7;   
     int Counts = 0;
     // for (Long64_t entry = 0; entry < 100; entry++)
     {

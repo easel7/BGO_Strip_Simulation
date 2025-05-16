@@ -226,7 +226,7 @@ int Inverse_Mod_sigmoid(double percentile,double Xmid, double Slope)
 
 double ComputeReducedChi2(TMinuit& minuit, void (*fcn)(Int_t&, Double_t*, Double_t&, Double_t*, Int_t), int n_points, int npar) {
     double chi2 = 0;
-    double params[10]; // 足够容纳参数数量（可根据需要扩展）
+    double params[5]; // 足够容纳参数数量（可根据需要扩展）
     double* dummy_grad = nullptr;
     int iflag = 0;
 
@@ -252,7 +252,38 @@ double ComputeReducedChi2(TMinuit& minuit, void (*fcn)(Int_t&, Double_t*, Double
     }
 }
 
+double RunSigmoidFit(Long64_t entry, double E_L0, double Amax, int seg_peak_idx, double maxE, TMinuit*& minuit_out) {
+    minuit_out = new TMinuit(5);
+    minuit_out->SetFCN(SigmoidFCN);
+    minuit_out->SetPrintLevel(-1);
+    minuit_out->SetErrorDef(1.0);
 
+    minuit_out->DefineParameter(0, "Ymin" , E_L0         , E_L0 * 0.1   , 0                        , maxE                    );
+    minuit_out->DefineParameter(1, "Ymax" , Amax         , Amax * 0.01  , maxE                     , 1e6                      );
+    minuit_out->DefineParameter(2, "Xmid" , seg_peak_idx , 0.5          , max(seg_peak_idx-3.,-1.) , min(seg_peak_idx+3.,14.) );
+    minuit_out->DefineParameter(3, "Slope", 1.0          , 0.1          , 0.1                      , 10                       );
+    minuit_out->DefineParameter(4, "E0"   , E_L0         , E_L0 * 0.1   , 0.1 * E_L0               , 10. * E_L0               );
+    minuit_out->Migrad();
+    int fit_status = minuit_out->Migrad();
+    double edm,  chi2, errdef;
+    int nvpar, nparx, istat;
+    minuit_out->mnstat(chi2, edm, errdef, nvpar, nparx, istat);
+    // std::cout << "Edm = " << edm << std::endl;
+    // std::cout << "chi2 = " << chi2 << std::endl;
+    // std::cout << "nvpar = " << nvpar << std::endl;
+    // std::cout << "nvpax = " << nparx << std::endl;
+    if (fit_status != 0 && edm>0.01) cerr << "ERROR: Fit did not converge! Status: " << fit_status << " entry : " << entry << " edm : " << edm << endl; 
+    int ndf = 14 - nvpar;
+
+    if (ndf > 0) {
+        return chi2 / ndf;
+    } else {
+        std::cerr << "WARNING: NDF <= 0, cannot compute reduced chi2" << std::endl;
+        return -1.0;
+    }
+}
+
+//------------------------------- Array Tools --------------------------------------------------//
 
 double AccumIncreaseToPeak(const double array[], int start_idx, int end_idx) 
 {
@@ -266,3 +297,4 @@ double AccumIncreaseToPeak(const double array[], int start_idx, int end_idx)
 double FindMaxValue(const double* arr, int size) {
     return *std::max_element(arr, arr + size);
 }
+
