@@ -35,6 +35,29 @@ bool AssignBarInfoFromRMS(const std::vector<double>* p_RMSVec,
     const std::vector<double>* p_L_EnergyVec,
 
     int bar_info[2],
+    int layer_start = 4,
+    double RMS_threshold = 15.0) 
+{
+    for (int k = layer_start; k <= 10; ++k) 
+    {
+        if ((*p_RMSVec)[k] <= RMS_threshold && (*p_L_EnergyVec)[k]     > 0 && 
+        (*p_RMSVec)[k + 1] <= RMS_threshold && (*p_L_EnergyVec)[k + 1] > 0 && 
+        (*p_RMSVec)[k + 2] <= RMS_threshold && (*p_L_EnergyVec)[k + 2] > 0 && 
+        (*p_RMSVec)[k + 3] <= RMS_threshold && (*p_L_EnergyVec)[k + 3] > 0) 
+        {
+            int max_index1 = FindMaxMiddleIndex(p_EnergyVec, k);
+            int bar1 = max_index1 % 22;
+            int max_index2 = FindMaxMiddleIndex(p_EnergyVec, k + 1);
+            int bar2 = max_index2 % 22;
+            // cout << "RMS at Layer "<< k << " , " << (*p_RMSVec)[k] << endl;
+            if (k % 2 == 0) {bar_info[0] = bar1; bar_info[1] = bar2; } 
+            else            {bar_info[0] = bar2; bar_info[1] = bar1; }
+            // std::cout << "bar_info assigned" << std::endl;
+            return true;
+        }
+    }
+    return false;
+}
 
 void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par, Int_t flag)
 {
@@ -42,6 +65,12 @@ void FitAxisFunction(Int_t &npar, Double_t *grad, Double_t &fval, Double_t *par,
     double cost = 0;
     for (size_t i = 0; i < g_fit_bars.size(); ++i) 
     {
+        double diff = g_fit_bars[i] - bar0;
+        cost += diff * diff * g_fit_energies[i] / g_fit_total_energy;
+    }
+    fval = cost;
+}
+
 void PrepareFitData(
     std::vector<double>* p_EnergyVec,
     int layer_start,
@@ -57,13 +86,13 @@ void PrepareFitData(
     {
         int max_index = FindMaxMiddleIndex(p_EnergyVec, layer);
         int base = layer * 22;
-        // cout << "layer = " << layer << " max_index = " << max_index << endl;
-        for (int offset = -2; offset <= 2; ++offset) {
+        cout << "layer = " << layer << " max_index = " << max_index << endl;
+        for (int offset = -5; offset <= 5; ++offset) {
             int idx = max_index + offset;
             if (idx >= base && idx < base + 22) {
                 int bar = idx % 22;
                 double energy = (*p_EnergyVec)[idx];
-                // cout << " bar " << bar << " , energy = " << energy << endl;
+                cout << " bar " << bar << " , energy = " << energy << endl;
                 bars.push_back(bar);
                 energies.push_back(energy);
                 total_energy += energy;
