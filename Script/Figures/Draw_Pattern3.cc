@@ -14,6 +14,7 @@ void Draw_Pattern3()
     double p_Total_E;
     const char* string1;
     const char* string2 = "Deuteron_PowerLaw";
+    // const char* string2 = "Proton_PowerLaw";
 
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     auto proton_tree = (TTree*)proton_file->Get("B4");
@@ -35,7 +36,10 @@ void Draw_Pattern3()
     int Counts = 0;
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
     {
-
+        proton_tree->GetEntry(entry);
+        if (p_Nhits < 10 ) continue;
+        int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
+        if(p_energy_index < 0 || p_energy_index > 14) continue;
         if (gDirectory->FindObject("hBGO1")) delete gDirectory->FindObject("hBGO1");
         if (gDirectory->FindObject("hBGO2")) delete gDirectory->FindObject("hBGO2");
         if (gDirectory->FindObject("hBGO3")) delete gDirectory->FindObject("hBGO3");
@@ -53,12 +57,6 @@ void Draw_Pattern3()
         int    seg_start_idx      = 0;
         double seg_peak_value      = 0;
         int    seg_peak_idx   = 0;
-
-        proton_tree->GetEntry(entry);
-        if (p_Nhits < 10 ) continue;
-        int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
-        if(p_energy_index < 0 || p_energy_index > 14) continue;
-
         int layer_start = 4;
         const double RMS_threshold = 15.0;  
         bool bar_info_assigned = AssignBarInfoFromRMS(p_RMSVec, p_EnergyVec, p_L_EnergyVec, bar_info, layer_start, RMS_threshold);
@@ -69,15 +67,15 @@ void Draw_Pattern3()
             PrepareFitData(p_EnergyVec, layer_start, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
             bool success_odd = Fit1DParameter(FitAxisFunction, g_fit_bars[1], 0.01, 2, 19,  bar_odd, bar_odd_err);
             if (success_odd) bar_info[0] = std::round(bar_odd);
-            else std::cerr << "Failed to fit bar_odd." << std::endl;
+            else std::cerr << "Failed to fit bar_odd. Check " << entry << std::endl;
 
             PrepareFitData(p_EnergyVec, layer_start+1, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
             bool success_even = Fit1DParameter(FitAxisFunction, g_fit_bars[1], 0.01, 2, 19,  bar_even, bar_even_err);
             if (success_even) bar_info[1] = std::round(bar_even);
-            else std::cerr << "Failed to fit bar_odd." << std::endl;
+            else std::cerr << "Failed to fit bar_odd. Check " << entry << std::endl;
         }
 
-        ComputeBarEnergyInfo(p_EnergyVec, bar_info, bar_Energy_info, bar_Change_info, bar_Accumu_info, bar_Accumu_error);
+        ComputeBarEnergyInfo(p_EnergyVec, bar_info, bar_Energy_info, bar_Change_info, bar_Accumu_info);
         FillBGOHistograms(hBGO1, hBGO2, hBGO3, bar_Energy_info, bar_Change_info, bar_Accumu_info,0.3);
         FindMaxPositiveBinSegment(hBGO2,seg_sum,seg_len,seg_start_idx);
         FindMaxValueInPositiveSegment(hBGO2,seg_start_idx,seg_len,seg_peak_value,seg_peak_idx);

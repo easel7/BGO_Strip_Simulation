@@ -86,13 +86,13 @@ void PrepareFitData(
     {
         int max_index = FindMaxMiddleIndex(p_EnergyVec, layer);
         int base = layer * 22;
-        cout << "layer = " << layer << " max_index = " << max_index << endl;
-        for (int offset = -5; offset <= 5; ++offset) {
+        // cout << "layer = " << layer << " max_index = " << max_index << endl;
+        for (int offset = -4; offset <= 4; ++offset) {
             int idx = max_index + offset;
             if (idx >= base && idx < base + 22) {
                 int bar = idx % 22;
                 double energy = (*p_EnergyVec)[idx];
-                cout << " bar " << bar << " , energy = " << energy << endl;
+                // cout << " bar " << bar << " , energy = " << energy << endl;
                 bars.push_back(bar);
                 energies.push_back(energy);
                 total_energy += energy;
@@ -140,7 +140,6 @@ void ComputeBarEnergyInfo(const std::vector<double>* p_EnergyVec,
     // Step 2: 初始化第一层
     bar_Change_info[0] = log10(bar_Energy_info[0] / 0.023);
     bar_Accumu_info[0] = bar_Energy_info[0];
-    bar_Accumu_error[0] = 0.3 * bar_Accumu_info[0];
 
     // Step 3: 累积能量和变化率
     for (int layer = 1; layer < 14; ++layer) {
@@ -242,7 +241,7 @@ double AccumIncreaseToPeak(TH1D* hist, int start_idx, int end_idx)
 {
     double sum = 0;
     for (int i = start_idx; i <= end_idx; ++i) {
-        sum += array[i];
+        sum += hist->GetBinContent(i);
     }
     return sum;
 }

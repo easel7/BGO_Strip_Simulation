@@ -142,7 +142,6 @@ void ComputeBarEnergyInfo(const std::vector<double>* p_EnergyVec,
     // Step 2: 初始化第一层
     bar_Change_info[0] = log10(bar_Energy_info[0] / 0.023);
     bar_Accumu_info[0] = bar_Energy_info[0];
-    bar_Accumu_error[0] = 0.3 * bar_Accumu_info[0];
 
     // Step 3: 累积能量和变化率
     for (int layer = 1; layer < 14; ++layer) {

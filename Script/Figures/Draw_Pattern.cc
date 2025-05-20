@@ -117,7 +117,7 @@ void Draw_Pattern()
             PrepareFitData(p_EnergyVec, layer_start+1, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
             bool success_even = Fit1DParameter(FitAxisFunction, g_fit_bars[1], 0.01, 2, 19,  bar_even, bar_even_err);
             if (success_even) bar_info[1] = std::round(bar_even);
-            else std::cerr << "Failed to fit bar_odd." << std::endl;
+            else std::cerr << "Failed to fit bar_odd. Check" << entry <<std::endl;
         }
 
         box0->SetX1(bar_info[0] - 9);
@@ -130,7 +130,7 @@ void Draw_Pattern()
         box1->SetX2(bar_info[1] - 12);
         box1->SetY2(14 - layer_start);
 
-        ComputeBarEnergyInfo(p_EnergyVec, bar_info, bar_Energy_info, bar_Change_info, bar_Accumu_info, bar_Accumu_error);
+        ComputeBarEnergyInfo(p_EnergyVec, bar_info, bar_Energy_info, bar_Change_info, bar_Accumu_info);
         for(int layer =0 ; layer<14 ; layer++)
         {
             hBGO1->SetBinContent(layer+1, bar_Energy_info[layer]);

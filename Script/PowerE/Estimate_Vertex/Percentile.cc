@@ -1,4 +1,4 @@
-#include "/Users/xiongzheng/software/B4/B4e/Script/Ulti.hh"
+#include "/Users/xiongzheng/software/B4/B4e/Script/Ulti_hist.hh"
 
 void Percentile()
 {
@@ -81,13 +81,12 @@ void Percentile()
         double bar_Energy_info[14] = {0};
         double bar_Change_info[14] = {0};
         double bar_Accumu_info[14] = {0};
-        double bar_Accumu_error[14] = {0};
         if (gDirectory->FindObject("hBGO1")) delete gDirectory->FindObject("hBGO1");
         if (gDirectory->FindObject("hBGO2")) delete gDirectory->FindObject("hBGO2");
         if (gDirectory->FindObject("hBGO3")) delete gDirectory->FindObject("hBGO3");
         if (gDirectory->FindObject("sigmoid")) delete gDirectory->FindObject("sigmoid");
-        // auto hBGO1 = new TH1D("hBGO1","BGO Core Axis Energy Deposit",14,0,14); 
-        // auto hBGO2 = new TH1D("hBGO2","Deposit Energy Change Ratio",14,0,14); 
+        auto hBGO1 = new TH1D("hBGO1","BGO Core Axis Energy Deposit",14,0,14); 
+        auto hBGO2 = new TH1D("hBGO2","Deposit Energy Change Ratio",14,0,14); 
         auto hBGO3 = new TH1D("hBGO3","Accumulated Deposit Energy",14,0,14); 
         double rate_max_min      = 0;
         double seg_sum           = 0;   // 总增长和
@@ -116,39 +115,29 @@ void Percentile()
             else std::cerr << "Failed to fit bar_odd." << std::endl;
         }
 
-        ComputeBarEnergyInfo(p_EnergyVec, bar_info, bar_Energy_info, bar_Change_info, bar_Accumu_info, bar_Accumu_error);
-        FindMaxPositiveSegment(bar_Change_info,14,seg_sum,seg_len,seg_start_idx);
-        FindMaxValueInPositiveSegment(bar_Change_info,seg_start_idx,seg_len,seg_peak_value,seg_peak_idx);
-        rate_max_min = MaxMinRatio(bar_Energy_info,14);
-        seg_sum_to_peak = AccumIncreaseToPeak(bar_Change_info,seg_start_idx,seg_peak_idx);
+        ComputeBarEnergyInfo(p_EnergyVec, bar_info, bar_Energy_info, bar_Change_info, bar_Accumu_info);
+        FillBGOHistograms(hBGO1, hBGO2, hBGO3, bar_Energy_info, bar_Change_info, bar_Accumu_info,0.3);
+        FindMaxPositiveBinSegment(hBGO2,seg_sum,seg_len,seg_start_idx);
+        FindMaxValueInPositiveSegment(hBGO2,seg_start_idx,seg_len,seg_peak_value,seg_peak_idx);
+        seg_sum_to_peak = AccumIncreaseToPeak(hBGO1,seg_start_idx,seg_peak_idx);
         seg_len_to_peak = seg_peak_idx - seg_start_idx;
 
-        for(int layer =0 ; layer<14 ; layer++)
-        {
-            hBGO3->SetBinContent(layer+1, bar_Accumu_info[layer]);
-            hBGO3->SetBinError(layer+1, 0.3 * bar_Accumu_info[layer]);
-        }
-
-        double E_L0 = bar_Energy_info[0];
-        double maxE = FindMaxValue(bar_Energy_info, 14);
-        double Amax = bar_Accumu_info[13];
-        PrepareSigmoidData(bar_Accumu_info,bar_Accumu_error);
-        TMinuit* myMinuit = nullptr;
-        double reducedChi2 = RunSigmoidFit(entry, E_L0, Amax, seg_peak_idx, maxE, myMinuit);
-
-        double Ymin, Ymin_err, Ymax, Ymax_err;
-        double Slope, Slope_err, Xmid, Xmid_err;
-        double E0, E0_err;
-        myMinuit->GetParameter(0, Ymin, Ymin_err);
-        myMinuit->GetParameter(1, Ymax, Ymax_err);
-        myMinuit->GetParameter(2, Xmid, Xmid_err);
-        myMinuit->GetParameter(3, Slope, Slope_err);
-        myMinuit->GetParameter(4, E0, E0_err);
-        double percentile = Mod_Sigmoid_Percentile(p_FI_Dep/25.5,Xmid,Slope);
+        TF1* sigmoid = new TF1("sigmoid", "[0]+ [4]*x + ([1]-[0] - [4]*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
+        sigmoid->SetParameters(hBGO1->GetBinContent(1), 
+                               hBGO3->GetBinContent(14), 
+                               seg_peak_idx, 
+                               1 , 
+                               max(hBGO1->GetBinContent(1)*0.1,0.01)); 
+        sigmoid->SetParLimits(0, 0                                     , hBGO1->GetMaximum()         );   // [0] Ymin
+        sigmoid->SetParLimits(1, hBGO1->GetMaximum()                   , 1e6                         );   // [1] Ymax
+        sigmoid->SetParLimits(2, max(seg_peak_idx-3, -1)               , min(seg_peak_idx + 2, 14)   );   // [2] Xmid
+        sigmoid->SetParLimits(3, 0.1                                   , 10                          );   // [3] Slope，避免除0
+        sigmoid->SetParLimits(4, max(hBGO1->GetBinContent(1)*0.1,0.01) , hBGO1->GetBinContent(1) * 10);   // [4] linear bias
+        TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RSQ");  // R: fit range, S: return TFitResultPtr
+        double percentile = Mod_Sigmoid_Percentile(p_FI_Dep/25.5,sigmoid->GetParameter(2),sigmoid->GetParameter(3));
 
         h1_p[p_energy_index][p_FI_Lay]->Fill(log10(percentile));
         h1_p_inter[p_energy_index]->Fill(log10(percentile));
-        delete myMinuit;
     }
 
     for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
@@ -163,7 +152,13 @@ void Percentile()
         double bar_Energy_info[14] = {0};
         double bar_Change_info[14] = {0};
         double bar_Accumu_info[14] = {0};
-        double bar_Accumu_error[14] = {0};
+        if (gDirectory->FindObject("hBGO1")) delete gDirectory->FindObject("hBGO1");
+        if (gDirectory->FindObject("hBGO2")) delete gDirectory->FindObject("hBGO2");
+        if (gDirectory->FindObject("hBGO3")) delete gDirectory->FindObject("hBGO3");
+        if (gDirectory->FindObject("sigmoid")) delete gDirectory->FindObject("sigmoid");
+        TH1D *hBGO1     = new TH1D("hBGO1","BGO Core Axis Energy Deposit",14,0,14); 
+        TH1D *hBGO2     = new TH1D("hBGO2","Deposit Energy Change Ratio",14,0,14); 
+        TH1D *hBGO3     = new TH1D("hBGO3","Accumulated Deposit Energy",14,0,14); 
         double rate_max_min      = 0;
         double seg_sum           = 0;   // 总增长和
         int    seg_len           = 0;   // 连续正增长长度
@@ -172,52 +167,48 @@ void Percentile()
         int    seg_peak_idx      = 0;   // 正段增长最大值的索引
         double seg_sum_to_peak   = 0;   // 从起点到增长最大值的增长和
         int    seg_len_to_peak   = 0;   // 从起点到增长最大值的索引
-        int layer_start = 4;
+        int    layer_start = 4;
         const double RMS_threshold = 15.0;  
-        bool bar_info_assigned = AssignBarInfoFromRMS(p_RMSVec, p_EnergyVec, p_L_EnergyVec, bar_info, layer_start, RMS_threshold);
+        bool bar_info_assigned = AssignBarInfoFromRMS(d_RMSVec, d_EnergyVec, d_L_EnergyVec, bar_info, layer_start, RMS_threshold);
         
         if (!bar_info_assigned) {
             // cout << "No bar_info assigned, starting fit to determine cluster trajectory." << endl;
             double bar_odd, bar_odd_err;
             double bar_even, bar_even_err;
-            PrepareFitData(p_EnergyVec, layer_start, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
+            PrepareFitData(d_EnergyVec, layer_start, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
             bool success_odd = Fit1DParameter(FitAxisFunction, g_fit_bars[1], 0.01, 2, 19,  bar_odd, bar_odd_err);
             if (success_odd)              bar_info[0] = std::round(bar_odd);
             else                std::cerr << "Failed to fit bar_odd." << std::endl;
 
-            PrepareFitData(p_EnergyVec, layer_start+1, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
+            PrepareFitData(d_EnergyVec, layer_start+1, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
             bool success_even = Fit1DParameter(FitAxisFunction, g_fit_bars[1], 0.01, 2, 19,  bar_even, bar_even_err);
             if (success_even) bar_info[1] = std::round(bar_even);
             else std::cerr << "Failed to fit bar_odd." << std::endl;
         }
 
-        ComputeBarEnergyInfo(p_EnergyVec, bar_info, bar_Energy_info, bar_Change_info, bar_Accumu_info, bar_Accumu_error);
-        FindMaxPositiveSegment(bar_Change_info,14,seg_sum,seg_len,seg_start_idx);
-        FindMaxValueInPositiveSegment(bar_Change_info,seg_start_idx,seg_len,seg_peak_value,seg_peak_idx);
-        rate_max_min = MaxMinRatio(bar_Energy_info,14);
-        seg_sum_to_peak = AccumIncreaseToPeak(bar_Change_info,seg_start_idx,seg_peak_idx);
+        ComputeBarEnergyInfo(d_EnergyVec, bar_info, bar_Energy_info, bar_Change_info, bar_Accumu_info);
+        FillBGOHistograms(hBGO1, hBGO2, hBGO3, bar_Energy_info, bar_Change_info, bar_Accumu_info,0.3);
+        FindMaxPositiveBinSegment(hBGO2,seg_sum,seg_len,seg_start_idx);
+        FindMaxValueInPositiveSegment(hBGO2,seg_start_idx,seg_len,seg_peak_value,seg_peak_idx);
+        seg_sum_to_peak = AccumIncreaseToPeak(hBGO1,seg_start_idx,seg_peak_idx);
         seg_len_to_peak = seg_peak_idx - seg_start_idx;
 
-        double E_L0 = bar_Energy_info[0];
-        double maxE = FindMaxValue(bar_Energy_info, 14);
-        double Amax = bar_Accumu_info[13];
-        PrepareSigmoidData(bar_Accumu_info,bar_Accumu_error);
-        TMinuit* myMinuit = nullptr;
-        double reducedChi2 = RunSigmoidFit(entry, E_L0, Amax, seg_peak_idx, maxE, myMinuit);
-
-        double Ymin, Ymin_err, Ymax, Ymax_err;
-        double Slope, Slope_err, Xmid, Xmid_err;
-        double E0, E0_err;
-        myMinuit->GetParameter(0, Ymin, Ymin_err);
-        myMinuit->GetParameter(1, Ymax, Ymax_err);
-        myMinuit->GetParameter(2, Xmid, Xmid_err);
-        myMinuit->GetParameter(3, Slope, Slope_err);
-        myMinuit->GetParameter(4, E0, E0_err);
-        double percentile = Mod_Sigmoid_Percentile(d_FI_Dep/25.5,Xmid,Slope);
+        TF1* sigmoid = new TF1("sigmoid", "[0]+ [4]*x + ([1]-[0] - [4]*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
+        sigmoid->SetParameters(hBGO1->GetBinContent(1), 
+                               hBGO3->GetBinContent(14), 
+                               seg_peak_idx, 
+                               1 , 
+                               max(hBGO1->GetBinContent(1)*0.1,0.01)); 
+        sigmoid->SetParLimits(0, 0                                     , hBGO1->GetMaximum()         );   // [0] Ymin
+        sigmoid->SetParLimits(1, hBGO1->GetMaximum()                   , 1e6                         );   // [1] Ymax
+        sigmoid->SetParLimits(2, max(seg_peak_idx-3, -1)               , min(seg_peak_idx + 2, 14)   );   // [2] Xmid
+        sigmoid->SetParLimits(3, 0.1                                   , 10                          );   // [3] Slope，避免除0
+        sigmoid->SetParLimits(4, max(hBGO1->GetBinContent(1)*0.1,0.01) , hBGO1->GetBinContent(1) * 10);   // [4] linear bias
+        TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RSQ");  // R: fit range, S: return TFitResultPtr
+        double percentile = Mod_Sigmoid_Percentile(d_FI_Dep/25.5,sigmoid->GetParameter(2),sigmoid->GetParameter(3));
 
         h1_d[d_energy_index][d_FI_Lay]->Fill(log10(percentile));
         h1_d_inter[d_energy_index]->Fill(log10(percentile)) ;
-        delete myMinuit;
     }
 
     for (int i = 9; i < 10; i++) // Deposit Energy Bin
