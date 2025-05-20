@@ -51,7 +51,6 @@ void Draw_Pattern3()
         double bar_Energy_info[14] = {0};
         double bar_Change_info[14] = {0};
         double bar_Accumu_info[14] = {0};
-        double bar_Accumu_error[14] = {0};
         double seg_sum      = 0;
         int    seg_len      = 0;
         int    seg_start_idx      = 0;

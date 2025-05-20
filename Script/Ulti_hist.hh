@@ -33,7 +33,6 @@ int FindMaxMiddleIndex(const std::vector<double>* p_EnergyVec, int layer)
 bool AssignBarInfoFromRMS(const std::vector<double>* p_RMSVec,
     const std::vector<double>* p_EnergyVec,
     const std::vector<double>* p_L_EnergyVec,
-
     int bar_info[2],
     int layer_start = 4,
     double RMS_threshold = 15.0) 
@@ -86,13 +85,14 @@ void PrepareFitData(
     {
         int max_index = FindMaxMiddleIndex(p_EnergyVec, layer);
         int base = layer * 22;
-        // cout << "layer = " << layer << " max_index = " << max_index << endl;
+        // cout << "layer = " << layer << " max_index = " << max_index << " max_bar = " <<  max_index % 22 << endl;
         for (int offset = -4; offset <= 4; ++offset) {
             int idx = max_index + offset;
             if (idx >= base && idx < base + 22) {
                 int bar = idx % 22;
                 double energy = (*p_EnergyVec)[idx];
-                // cout << " bar " << bar << " , energy = " << energy << endl;
+                if (energy < 1e-2) continue;
+                // cout << "layer " << layer << " bar " << bar << " , energy = " << energy << endl;
                 bars.push_back(bar);
                 energies.push_back(energy);
                 total_energy += energy;
@@ -116,7 +116,6 @@ bool Fit1DParameter(void (*fcn)(Int_t&, Double_t*, Double_t&, Double_t*, Int_t),
         std::cerr << "WARNING: Fit did not converge! Status = " << status << std::endl;
         return false;
     }
-
     minuit.GetParameter(0, fitted_val, fitted_err);
     return true;
 }
@@ -229,11 +228,11 @@ void FindMaxValueInPositiveSegment(TH1D* hist, int start_bin, int len, double& o
     }
 }
 
-double MaxMinRatio(TH1D* hist) 
+double MaxMinRatio(TH1D* hist, Long64_t entry) 
 {
     double max_val = hist->GetMaximum();
     double min_val = hist->GetMinimum();
-    if (min_val == 0) throw std::runtime_error("最小值为 0，无法计算比值");
+    if (min_val == 0) {min_val = 0.01;}
     return max_val / min_val;
 }
 

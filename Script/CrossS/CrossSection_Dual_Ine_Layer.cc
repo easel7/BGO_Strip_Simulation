@@ -8,7 +8,7 @@ void CrossSection_Dual_Ine_Layer()
     auto h1_0 = new TH1D("h1_0","h1_0",14,0,14);
     auto h1 = new TH1D("h1","h1",14,0,14);
     auto hC1 = new TH1D("hC1","hC1",14,0,14);
-    tree1->Draw("First_Ine_Layer>>h1_0","","");
+    tree1->Draw("First_Ine_Layer>>h1_0",HI,"");
     tree1->Draw("First_Ine_Layer>>h1",HI,"");
     hC1->SetTitle("1000 GeV Inelastic Hadronic Layer Distribution;Layer;N_{survive}");
 
@@ -17,27 +17,34 @@ void CrossSection_Dual_Ine_Layer()
     auto h2_0 = new TH1D("h2_0","h2_0",14,0,14);
     auto h2 = new TH1D("h2","h2",14,0,14);
     auto hC2 = new TH1D("hC2","hC2",14,0,14);
-    tree2->Draw("First_Ine_Layer>>h2_0","","");
+    tree2->Draw("First_Ine_Layer>>h2_0",HI,"");
     tree2->Draw("First_Ine_Layer>>h2",HI,"");
     for(int ii = 1 ; ii <= 14 ; ii++)
     {
-        hC1->SetBinContent(ii, ( 1e4 -h1->Integral(0,ii) ) * 0.5 );
-        hC2->SetBinContent(ii, ( 1e4 -h2->Integral(0,ii) ) * 0.5 );
+        hC1->SetBinContent(ii, ( 1e4 -h1->Integral(0,ii) ) * 0.7 );
+        hC2->SetBinContent(ii, ( 1e4 -h2->Integral(0,ii) ) * 0.7 );
         // cout << h2->GetBinContent(ii) << endl;
     }
 
     TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-x/[1])", 0, 14); fitFunc1->SetParameters(100, 10); fitFunc1->SetLineColor(kRed);
     TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-x/[1])", 0, 14); fitFunc2->SetParameters(100, 10); fitFunc2->SetLineColor(kBlue);
     TF1 *fitFunc3 = new TF1("fitFunc3", "[0]*exp(-x/[1])", 0, 14); fitFunc3->SetParameters(100, 10); fitFunc3->SetLineColor(kBlack);
-    TF1 *fitFunc4 = new TF1("fitFunc4", "[0]*(1-[1])*exp(-x/8.75)+ [0]*[1]*exp(-x/6.73)", 0, 14); fitFunc4->SetParameters(1e4, 0.5); fitFunc4->SetLineColor(kBlack);
-    TF1 *fitFunc5 = new TF1("fitFunc5", "[0]/8.75*exp(-x/8.75)+ [1]/6.73*exp(-x/6.73)", 0, 14); fitFunc5->SetParameters(1e4, 1e4); fitFunc5->SetLineColor(kBlack);
+
+// Fit for Interaction 
+    // TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/8.75*exp(-x/8.75)+[1]/6.73*exp(-x/6.73)", 0, 14); fitFunc4->SetParameters(1e4, 1e4); fitFunc4->SetLineColor(kBlack);
+    TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/8.75*exp(-x/8.75)", 0, 14); fitFunc4->SetParameters(1e4); fitFunc4->SetLineColor(kBlack);
+    // TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/6.73*exp(-x/6.73)", 0, 14); fitFunc4->SetParameters(1e4); fitFunc4->SetLineColor(kBlack);
+
+
+// Fit for Survive
+    TF1 *fitFunc5 = new TF1("fitFunc5", "[0]*(1-[1])*exp(-x/8.75)+ [0]*[1]*exp(-x/6.73)", 0, 14); fitFunc5->SetParameters(1e4, 0.5); fitFunc5->SetLineColor(kBlack);
 
     auto c0 = new TCanvas("c0","c0",1200,1200);
     h1_0->SetTitle("N_{interaction};BGO Layer;Counts");
     h1_0->SetLineColor(kRed);   // Proton in red
     h2_0->SetLineColor(kBlue);  // Deuteron in blue
-    h1_0->Scale(0.5);
-    h2_0->Scale(0.5);
+    h1_0->Scale(0.3);
+    h2_0->Scale(0.7);
     auto h3_0 = (TH1D*)h2_0->Clone();
     h3_0->Add(h1_0);
     h3_0->SetLineColor(kBlack);  // Deuteron in blue
@@ -46,16 +53,21 @@ void CrossSection_Dual_Ine_Layer()
     h1_0->Draw("hist");
     h2_0->Draw("histsame");
     h3_0->Draw("histsame");
-    h3_0->Fit(fitFunc5, "R"); // 进行拟合
-    fitFunc5->Draw("same");
+    h1_0->Fit(fitFunc4, "R"); // 进行拟合
+    fitFunc4->Draw("same");
     TLatex latex;
     latex.SetTextSize(0.04);
     latex.SetTextFont(72);
     latex.SetTextAlign(13);  //align at top
-    double proton_num   = fitFunc5->GetParameter(0);
-    double proton_num_err = fitFunc5->GetParError(0);
-    double deuteron_num = fitFunc5->GetParameter(1);
-    double deuteron_num_err = fitFunc5->GetParError(1);
+    double proton_num   = fitFunc4->GetParameter(0);
+    double proton_num_err = fitFunc4->GetParError(0);
+    double deuteron_num = fitFunc4->GetParameter(1);
+    double deuteron_num_err = fitFunc4->GetParError(1);
+    latex.DrawLatex(0,1400,"Fitting Function: N_{int} = N_{p}/#lambda_{p} *exp(-x/#lambda_{p}) + N_{d}/#lambda_{d} *exp(-x/#lambda_{d})");
+    latex.DrawLatex(5,1300,Form("Fitting Proton Number: %.1f",proton_num));
+    latex.DrawLatex(5,1200,Form("Fitting Deuteron Number: %.1f",deuteron_num));
+    latex.DrawLatex(5,1100,Form("N_{deuteron}/(N_{proton}+N_{deuteron}): %.2f #pm %.2f",deuteron_num / (proton_num + deuteron_num), deuteron_num_err / sqrt(pow(proton_num_err,2)+pow(deuteron_num_err,2))));
+
     cout << "Proton Num: " << proton_num  << " ± " << proton_num_err << " " << endl;
     cout << "Deuteron Num: " << deuteron_num  << " ± " << deuteron_num_err << " " << endl;
 
@@ -90,27 +102,24 @@ void CrossSection_Dual_Ine_Layer()
     hC3->SetLineColor(kBlack);  // Deuteron in blue
     hC3->SetLineWidth(2);
     hC3->Draw("histsame");
-    hC3->Fit(fitFunc4, "R"); // 进行拟合
-    fitFunc4->Draw("same");
+    hC3->Fit(fitFunc5, "R"); // 进行拟合
+    fitFunc5->Draw("same");
     cout << hC3->Integral(0,1) << endl;
 
-    double proton_ratio   = fitFunc4->GetParameter(0);
-    double proton_ratio_err = fitFunc4->GetParError(0);
-    double deuteron_ratio = fitFunc4->GetParameter(1);
-    double deuteron_ratio_err = fitFunc4->GetParError(1);
+    double proton_ratio   = fitFunc5->GetParameter(0);
+    double proton_ratio_err = fitFunc5->GetParError(0);
+    double deuteron_ratio = fitFunc5->GetParameter(1);
+    double deuteron_ratio_err = fitFunc5->GetParError(1);
 
     double n_BGO = TMath::Na()*7.13/ (1245.8344/19.); // cm-3
     double hd_section = 1 / (lambda1*25) / n_BGO * 1e25; // barn, mm = 1e-1 cm, 1e24 barn = 1 cm^2
     double hd_section_err = hd_section * lambda1_err/lambda1; // barn
     double hi_section = 1 / (lambda2*25) / n_BGO * 1e25; // barn, mm = 1e-1 cm, 1e24 barn = 1 cm^2
     double hi_section_err = hi_section * lambda2_err/lambda2; // barn
-
-
     latex.DrawLatex(0,pow(10,3.3),"Fitting Function: N_{leave} =N_{total} *exp(-x/#lambda)");
     latex.DrawLatex(0,pow(10,3.0),Form("Proton Fitting #lambda: %.2f mm",lambda1*25));
     latex.DrawLatex(0,pow(10,2.7),Form("Deuteron Fitting #lambda: %.2f mm",lambda2*25));
     latex.DrawLatex(5,pow(10,2.4),Form("N_{deuteron}/(N_{proton}+N_{deuteron}): %.2f #pm %.2f",deuteron_ratio, deuteron_ratio_err));
-
 
     cout << "Proton Ratio: " << proton_ratio  << " ± " << proton_ratio_err << " " << endl;
     cout << "Deuteron Ratio: " << deuteron_ratio  << " ± " << deuteron_ratio_err << " " << endl;
@@ -119,5 +128,5 @@ void CrossSection_Dual_Ine_Layer()
     cout << "Proton Nuclear Interaction Section : " << hd_section << " ± " << hd_section_err << " barn" << endl;
     cout << "Deuteron Nuclear Interaction Section : " << hi_section << " ± " << hi_section_err << " barn" << endl;
 
-    c1->SaveAs("/Users/xiongzheng/software/B4/B4e/Script/CrossS/CrossSection_Dual_1000GeV.pdf");
+    // c1->SaveAs("/Users/xiongzheng/software/B4/B4e/Script/CrossS/CrossSection_Dual_1000GeV.pdf");
 }

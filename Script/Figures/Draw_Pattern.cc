@@ -13,7 +13,7 @@ void Draw_Pattern()
     int p_FI_Lay;
     double p_Total_E;
     const char* string1;
-    const char* string2 = "Deuteron_PowerLaw";
+    const char* string2 = "Proton_1000GeV";
 
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     auto proton_tree = (TTree*)proton_file->Get("B4");
@@ -44,7 +44,7 @@ void Draw_Pattern()
     int point_counter_p = 0;
 
     // cout  << proton_tree->GetEntries() << endl;
-    Long64_t entry  = 232491;   
+    Long64_t entry  = 162;   
     int Counts = 0;
     // for (Long64_t entry = 0; entry < 100; entry++)
     {
@@ -60,7 +60,7 @@ void Draw_Pattern()
         auto *g_core1 = new TGraph();          auto *g_ch_1 = new TGraph();            auto *g_vert1 = new TGraph();
         auto *g_core2 = new TGraph();          auto *g_ch_2 = new TGraph();            auto *g_vert2 = new TGraph();
         auto *g_core3 = new TGraph();          auto *g_ch_3 = new TGraph();            auto *g_vert3 = new TGraph();
-
+                                                                                       auto *g_vert4 = new TGraph();
         auto    *box0 = new TBox();
         auto    *box1 = new TBox();
         
@@ -68,7 +68,6 @@ void Draw_Pattern()
         double bar_Energy_info[14] = {0};
         double bar_Change_info[14] = {0};
         double bar_Accumu_info[14] = {0};
-        double bar_Accumu_error[14] = {0};
         double seg_sum      = 0;
         int    seg_len      = 0;
         int    seg_start_idx      = 0;
@@ -111,7 +110,7 @@ void Draw_Pattern()
             double bar_even, bar_even_err;
             PrepareFitData(p_EnergyVec, layer_start, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
             bool success_odd = Fit1DParameter(FitAxisFunction, g_fit_bars[1], 0.01, 2, 19,  bar_odd, bar_odd_err);
-            if (success_odd)              bar_info[0] = std::round(bar_odd);
+            if (success_odd)          {   bar_info[0] = std::round(bar_odd); cout << bar_info[0] << endl; }
             else                std::cerr << "Failed to fit bar_odd." << std::endl;
 
             PrepareFitData(p_EnergyVec, layer_start+1, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
@@ -167,7 +166,7 @@ void Draw_Pattern()
         g_vert2->SetPoint(0, vert_layer, hBGO1->GetBinContent(p_FI_Lay+1) );
         g_vert3->SetPoint(0, vert_layer, hBGO2->GetBinContent(p_FI_Lay+1) );
 
-        h_max_min0->Fill(log10(MaxMinRatio(hBGO1)));
+        // h_max_min0->Fill(log10(MaxMinRatio(hBGO1,entry)));
         g_sum_len0->SetPoint(point_counter++,seg_sum,seg_len);
         if(p_FH_Type == 1)       {  h_max_min1->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len1->SetPoint(point_counter_i++,seg_sum,seg_len+0.1);}
         else if (p_FH_Type == 2) {  h_max_min2->Fill(log10(hBGO1->GetMaximum()/hBGO1->GetMinimum()));  g_sum_len2->SetPoint(point_counter_e++,seg_sum,seg_len);    }
@@ -325,6 +324,10 @@ void Draw_Pattern()
         latex.DrawLatexNDC(0.12, 0.82, Form("Ine Vertex Sigmoid Percentile:%.2f %%", percentile2*100));
         int Percent2Layer = Inverse_Mod_sigmoid(percentile2, sigmoid->GetParameter(2), sigmoid->GetParameter(3));
         cout << "Percent2Layer : " << Percent2Layer << endl;
+        g_vert4->SetMarkerStyle(3);   
+        g_vert4->SetMarkerColor(3);
+        g_vert4->SetPoint(0, vert_layer, sigmoid->Eval(vert_layer) );
+        g_vert4->Draw("psame");
 
         c1->cd(6);
         TPad *pad2 = new TPad("pad2", "pad2", 0, 0.0, 1, 0.35);
