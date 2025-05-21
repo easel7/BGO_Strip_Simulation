@@ -6,7 +6,8 @@ void Percentile()
     int d_FH_Lay; int d_FH_Type; double d_Total_E;      int d_Nhits;std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_L_EnergyVec = nullptr;   std::vector<double>* d_EnergyVec = nullptr;   std::vector<double>* d_Efrac = nullptr; double d_weight;
     int p_FI_Lay;    double p_FI_Dep;    int p_particle;
     int d_FI_Lay;    double d_FI_Dep;    int d_particle;
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
+    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_10000GeV.root");
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("Particle"         ,&p_particle);
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
@@ -18,11 +19,11 @@ void Percentile()
     proton_tree->SetBranchAddress("First_Ine_Depth", &p_FI_Dep);
     proton_tree->SetBranchAddress("First_Ine_Layer", &p_FI_Lay);
     proton_tree->SetBranchAddress("Total_E"         ,&p_Total_E);
-    proton_tree->SetBranchAddress("weight"          ,&p_weight);
+    // proton_tree->SetBranchAddress("weight"          ,&p_weight);
     proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
 
-
-    auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
+    // auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
+    auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_10000GeV.root");
     auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
     deuteron_tree->SetBranchAddress("Particle"         ,&d_particle);
     deuteron_tree->SetBranchAddress("RMS"              ,&d_RMSVec);
@@ -34,7 +35,7 @@ void Percentile()
     deuteron_tree->SetBranchAddress("First_Ine_Depth", &d_FI_Dep);
     deuteron_tree->SetBranchAddress("First_Ine_Layer", &d_FI_Lay);
     deuteron_tree->SetBranchAddress("Total_E"          ,&d_Total_E);
-    deuteron_tree->SetBranchAddress("weight"           ,&d_weight);
+    // deuteron_tree->SetBranchAddress("weight"           ,&d_weight);
     deuteron_tree->SetBranchAddress("Nhits"          , &d_Nhits);
 
     double Energy[15]={0};
@@ -45,12 +46,11 @@ void Percentile()
     double Layer_Err[14]={0};
 
     // Depsit and Layer
-    TH1D *h1_p[15][14];
-    TH1D *h1_d[15][14];
+    TH1D *h1_p[15][14];     TH1D *h1_p_inter[15];  TH1D *h1_p_Lay[14];
+    TH1D *h1_d[15][14];     TH1D *h1_d_inter[15];  TH1D *h1_d_Lay[14];
 
-    TH1D *h1_p_inter[15];
-    TH1D *h1_d_inter[15];
-
+    auto h1_p_int = new TH1D("h1_p_int","h1_p_int",40,-4,0);   
+    auto h1_d_int = new TH1D("h1_d_int","h1_d_int",40,-4,0);   
 
     for(int i =0 ; i<15 ; i++)  // Deposit Energy Bin
     {
@@ -58,14 +58,20 @@ void Percentile()
         Energy_LL[i] = 1.0 + 0.2 * i;
         Energy_UL[i] = 1.2 + 0.2 * i;
 
-        h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i),100,-10,0);  
-        h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i),100,-10,0);  
+        h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i),40,-4,0);  
+        h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i),40,-4,0);  
         for( int j= 0; j<14 ;j++)
         {
-            h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j),100,-10,0);  
-            h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j),100,-10,0);  
+            h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j),40,-4,0);  
+            h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j),40,-4,0);  
             Layer[j] = 0.5 + j;
             Layer_Err[j] = 0.5;
+
+        }
+        if (i<14)
+        {
+            h1_p_Lay[i] =new TH1D(Form("h1_p_Lay[%d]",i),Form("h1_p_Lay[%d]",i),40,-4,0);   
+            h1_d_Lay[i] =new TH1D(Form("h1_d_Lay[%d]",i),Form("h1_d_Lay[%d]",i),40,-4,0);   
         }
     }
   
@@ -73,7 +79,7 @@ void Percentile()
     {        
         proton_tree->GetEntry(entry);
         int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
-        if(p_energy_index < 0 || p_energy_index > 14) continue;
+        // if(p_energy_index < 0 || p_energy_index > 14) continue;
         if(p_FI_Dep < 0) continue;
         if (p_Nhits < 10 ) continue;
         double sum_p = 0;
@@ -122,29 +128,33 @@ void Percentile()
         seg_sum_to_peak = AccumIncreaseToPeak(hBGO1,seg_start_idx,seg_peak_idx);
         seg_len_to_peak = seg_peak_idx - seg_start_idx;
 
-        TF1* sigmoid = new TF1("sigmoid", "[0]+ [4]*x + ([1]-[0] - [4]*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
+        double upper_bound = std::min(seg_peak_idx+7, 14 );
+        double lower_bound = std::max(seg_peak_idx-7, -1 );
+        TF1 *sigmoid = new TF1("sigmoid", "[0]+ [4]*x + ([1]-[0] -  [4]*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
         sigmoid->SetParameters(hBGO1->GetBinContent(1), 
                                hBGO3->GetBinContent(14), 
-                               seg_peak_idx, 
+                               seg_peak_idx - 0.5, 
                                1 , 
                                max(hBGO1->GetBinContent(1)*0.1,0.01)); 
         sigmoid->SetParLimits(0, 0                                     , hBGO1->GetMaximum()         );   // [0] Ymin
         sigmoid->SetParLimits(1, hBGO1->GetMaximum()                   , 1e6                         );   // [1] Ymax
-        sigmoid->SetParLimits(2, max(seg_peak_idx-3, -1)               , min(seg_peak_idx + 2, 14)   );   // [2] Xmid
-        sigmoid->SetParLimits(3, 0.1                                   , 10                          );   // [3] Slope，避免除0
+        sigmoid->SetParLimits(2, lower_bound                           , upper_bound                 );   // [2] Xmid
+        sigmoid->SetParLimits(3, 0.01                                  , 10                          );   // [3] Slope，避免除0
         sigmoid->SetParLimits(4, max(hBGO1->GetBinContent(1)*0.1,0.01) , hBGO1->GetBinContent(1) * 10);   // [4] linear bias
         TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RSQ");  // R: fit range, S: return TFitResultPtr
         double percentile = Mod_Sigmoid_Percentile(p_FI_Dep/25.5,sigmoid->GetParameter(2),sigmoid->GetParameter(3));
 
-        h1_p[p_energy_index][p_FI_Lay]->Fill(log10(percentile));
-        h1_p_inter[p_energy_index]->Fill(log10(percentile));
+        // h1_p[p_energy_index][p_FI_Lay]->Fill(log10(percentile));
+        // h1_p_inter[p_energy_index]->Fill(log10(percentile));
+        h1_p_int->Fill(log10(percentile));
+        h1_p_Lay[p_FI_Lay]->Fill(log10(percentile));
     }
 
     for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
     {
         deuteron_tree->GetEntry(entry);
         int d_energy_index = int(floor((log10(d_Total_E) - 1) / 0.2));
-        if(d_energy_index < 0 || d_energy_index > 14) continue;
+        // if(d_energy_index < 0 || d_energy_index > 14) continue;
         if(d_FI_Dep < 0) continue;
         if (d_Nhits < 10 ) continue;
         double sum_d = 0;
@@ -193,22 +203,26 @@ void Percentile()
         seg_sum_to_peak = AccumIncreaseToPeak(hBGO1,seg_start_idx,seg_peak_idx);
         seg_len_to_peak = seg_peak_idx - seg_start_idx;
 
-        TF1* sigmoid = new TF1("sigmoid", "[0]+ [4]*x + ([1]-[0] - [4]*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
+        double upper_bound = std::min(seg_peak_idx+7, 14 );
+        double lower_bound = std::max(seg_peak_idx-7, -1 );
+        TF1 *sigmoid = new TF1("sigmoid", "[0]+ [4]*x + ([1]-[0] -  [4]*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
         sigmoid->SetParameters(hBGO1->GetBinContent(1), 
                                hBGO3->GetBinContent(14), 
-                               seg_peak_idx, 
+                               seg_peak_idx - 0.5, 
                                1 , 
                                max(hBGO1->GetBinContent(1)*0.1,0.01)); 
         sigmoid->SetParLimits(0, 0                                     , hBGO1->GetMaximum()         );   // [0] Ymin
         sigmoid->SetParLimits(1, hBGO1->GetMaximum()                   , 1e6                         );   // [1] Ymax
-        sigmoid->SetParLimits(2, max(seg_peak_idx-3, -1)               , min(seg_peak_idx + 2, 14)   );   // [2] Xmid
-        sigmoid->SetParLimits(3, 0.1                                   , 10                          );   // [3] Slope，避免除0
+        sigmoid->SetParLimits(2, lower_bound                           , upper_bound                 );   // [2] Xmid
+        sigmoid->SetParLimits(3, 0.01                                  , 10                          );   // [3] Slope，避免除0
         sigmoid->SetParLimits(4, max(hBGO1->GetBinContent(1)*0.1,0.01) , hBGO1->GetBinContent(1) * 10);   // [4] linear bias
         TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RSQ");  // R: fit range, S: return TFitResultPtr
         double percentile = Mod_Sigmoid_Percentile(d_FI_Dep/25.5,sigmoid->GetParameter(2),sigmoid->GetParameter(3));
 
-        h1_d[d_energy_index][d_FI_Lay]->Fill(log10(percentile));
-        h1_d_inter[d_energy_index]->Fill(log10(percentile)) ;
+        // h1_d[d_energy_index][d_FI_Lay]->Fill(log10(percentile));
+        // h1_d_inter[d_energy_index]->Fill(log10(percentile)) ;
+        h1_d_int->Fill(log10(percentile));
+        h1_d_Lay[d_FI_Lay]->Fill(log10(percentile));
     }
 
     for (int i = 9; i < 10; i++) // Deposit Energy Bin
@@ -257,4 +271,34 @@ void Percentile()
         h1_d_inter[i]->Draw("histsame");
 
     }
+    auto c3 = new TCanvas("c3","c3",1000,1000);
+    c3->cd();
+    h1_p_int->SetLineColor(kRed);   h1_p_int->SetMarkerColor(kRed);  h1_p_int->SetLineWidth(2);   h1_p_int->Sumw2();
+    h1_d_int->SetLineColor(kBlue);  h1_d_int->SetMarkerColor(kBlue); h1_d_int->SetLineWidth(2);   h1_d_int->Sumw2();
+    h1_p_int->Scale(1.0/h1_p_int->Integral()); 
+    h1_d_int->Scale(1.0/h1_d_int->Integral()); 
+    h1_p_int->GetYaxis()->SetRangeUser(0,h1_p_int->GetMaximum()*1.2);
+    h1_p_int->SetTitle(" Stack Multi Layer;log10(Inelastic Percentile);Normalized Count");
+    h1_p_int->Draw("hist");
+    h1_d_int->Draw("histsame");
+
+
+    auto c4 = new TCanvas("c4","c4",1000,1000);
+    c4->cd();
+    c4->Clear();
+    c4->Divide(5,3);
+    gStyle->SetOptStat(0);
+    for (int j = 0; j < 14; j++) // layer
+    {
+        c4->cd(j + 1);
+        h1_p_Lay[j]->SetLineColor(kRed);   h1_p_Lay[j]->SetMarkerColor(kRed);  h1_p_Lay[j]->SetLineWidth(2);   h1_p_Lay[j]->Sumw2();
+        h1_d_Lay[j]->SetLineColor(kBlue);  h1_d_Lay[j]->SetMarkerColor(kBlue); h1_d_Lay[j]->SetLineWidth(2);   h1_d_Lay[j]->Sumw2();
+        h1_p_Lay[j]->Scale(1.0/h1_p_Lay[j]->Integral()); 
+        h1_d_Lay[j]->Scale(1.0/h1_d_Lay[j]->Integral()); 
+        h1_p_Lay[j]->GetYaxis()->SetRangeUser(0,h1_p_Lay[j]->GetMaximum()*1.2);
+        h1_p_Lay[j]->SetTitle(" Stack Multi Layer;log10(Inelastic Percentile);Normalized Count");
+        h1_p_Lay[j]->Draw("hist");
+        h1_d_Lay[j]->Draw("histsame");
+    }
+
 }

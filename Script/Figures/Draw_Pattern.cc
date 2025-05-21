@@ -44,13 +44,18 @@ void Draw_Pattern()
     int point_counter_p = 0;
 
     // cout  << proton_tree->GetEntries() << endl;
-    Long64_t entry  = 162;   
+    Long64_t entry  = 0;   
     int Counts = 0;
     // for (Long64_t entry = 0; entry < 100; entry++)
     {
         auto c1    = new TCanvas("c1","c1",2100,1400);
         auto hXZ   = new TH2D("hXZ","BGO X-Z Plane",22,-11,11,14,0,14);
         auto hYZ   = new TH2D("hYZ","BGO Y-Z Plane",22,-11,11,14,0,14);
+        if (gDirectory->FindObject("hBGO1")) delete gDirectory->FindObject("hBGO1");
+        if (gDirectory->FindObject("hBGO2")) delete gDirectory->FindObject("hBGO2");
+        if (gDirectory->FindObject("hBGO3")) delete gDirectory->FindObject("hBGO3");
+        if (gDirectory->FindObject("hResidual")) delete gDirectory->FindObject("hResidual");
+        if (gDirectory->FindObject("sigmoid")) delete gDirectory->FindObject("sigmoid");
         auto hBGO1 = new TH1D("hBGO1","BGO Core Axis Energy Deposit",14,0,14); 
         auto hBGO2 = new TH1D("hBGO2","Deposit Energy Change Ratio",14,0,14); 
         auto hBGO3 = new TH1D("hBGO3","Accumulated Deposit Energy",14,0,14); 
@@ -295,16 +300,18 @@ void Draw_Pattern()
         hBGO3->Draw("hist");
         
         cout << "Max Value of Energy Info " << hBGO1->GetMaximum() << endl;
+        double upper_bound = std::min(seg_peak_idx+7, 14 );
+        double lower_bound = std::max(seg_peak_idx-7, -1 );
         TF1 *sigmoid = new TF1("sigmoid", "[0]+ [4]*x + ([1]-[0] -  [4]*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
         sigmoid->SetParameters(hBGO1->GetBinContent(1), 
                                hBGO3->GetBinContent(14), 
-                               seg_peak_idx - 1, 
+                               seg_peak_idx - 0.5, 
                                1 , 
                                max(hBGO1->GetBinContent(1)*0.1,0.01)); 
         sigmoid->SetParLimits(0, 0                                     , hBGO1->GetMaximum()         );   // [0] Ymin
         sigmoid->SetParLimits(1, hBGO1->GetMaximum()                   , 1e6                         );   // [1] Ymax
-        sigmoid->SetParLimits(2, max(seg_peak_idx -3, -1)              , min(seg_peak_idx + 2, 14) );   // [2] Xmid
-        sigmoid->SetParLimits(3, 0.1                                   , 10                          );   // [3] Slope，避免除0
+        sigmoid->SetParLimits(2, lower_bound                           , upper_bound                 );   // [2] Xmid
+        sigmoid->SetParLimits(3, 0.01                                  , 10                          );   // [3] Slope，避免除0
         sigmoid->SetParLimits(4, max(hBGO1->GetBinContent(1)*0.1,0.01) , hBGO1->GetBinContent(1) * 10);   // [4] linear bias
         TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RS");  // R: fit range, S: return TFitResultPtr
         if (fitResult.Get() && fitResult->IsValid()) {
