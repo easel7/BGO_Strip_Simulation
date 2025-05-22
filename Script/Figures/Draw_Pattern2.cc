@@ -99,8 +99,8 @@ void Draw_Pattern2()
     auto h_sp_bin2 = new TH1D("h_sp_bin2","h_sp_bin2",14,0,14); // Elastic
     auto h_sp_bin3 = new TH1D("h_sp_bin3","h_sp_bin3",14,0,14); // Pass
 
-    auto h_int      = new TH1D("h_int","h_int",14,0,14);
-    auto h_sur      = new TH1D("h_sur","h_sur",14,0,14);
+    auto h_int      = new TH1D("h_int","h_int",14,0,350);
+    auto h_sur      = new TH1D("h_sur","h_sur",14,0,350);
 
     auto h_peak_Ine = new TH2I("h_peak_Ine","h_peak_Ine",14,0,14,14,0,14);
     auto h_Ine_Reso = new TH2I("h_Ine_Reso","h_Ine_Reso",14,0,14,14,0,14);
@@ -113,7 +113,7 @@ void Draw_Pattern2()
         proton_tree->GetEntry(entry);
         if (p_Nhits < 10 ) continue;
         int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
-        if(p_energy_index < 0 || p_energy_index > 14) continue;
+        // if(p_energy_index < 0 || p_energy_index > 14) continue;
         if (gDirectory->FindObject("hBGO1")) delete gDirectory->FindObject("hBGO1");
         if (gDirectory->FindObject("hBGO2")) delete gDirectory->FindObject("hBGO2");
         if (gDirectory->FindObject("hBGO3")) delete gDirectory->FindObject("hBGO3");
@@ -160,7 +160,7 @@ void Draw_Pattern2()
         seg_len_to_peak = seg_peak_idx - seg_start_idx;
 
         g_sum_len0->SetPoint(point_counter++,seg_sum,seg_len); 
-        h_int->Fill(seg_peak_idx-1);
+        h_int->Fill((seg_peak_idx-1)*25);
         if (rate_max_min >  1e2 )
         {
             h_peak_Ine->Fill(seg_peak_idx-1,p_FI_Lay);
@@ -428,29 +428,34 @@ void Draw_Pattern2()
     latex.SetTextSize(0.04);
     latex.SetTextFont(72);
     latex.SetTextAlign(13);  //align at top
-    TF1 *fitFunc0 = new TF1("fitFunc0", "[0]*exp(-x/[1])", 5, 10); fitFunc0->SetParameters(100, 10); fitFunc0->SetLineColor(kBlue);
+    TF1 *fitFunc0 = new TF1("fitFunc0", "[0]*exp(-x/[1])", 100, 200); fitFunc0->SetParameters(1000,100); fitFunc0->SetLineColor(kBlue);
+    TF1 *fitFunc1 = new TF1("fitFunc1", "[0]/[1]*25*exp(-x/[1])", 100, 200); fitFunc1->SetParameters(1000,100); fitFunc1->SetLineColor(kBlue);
+
 
     auto c2 = new TCanvas("c2","c2",1200,600);
     c2->Divide(2,1);
     c2->cd(1);
-    h_int->SetTitle(";Layer;N_{interact} (Bin of Maximum Change Ratio)");
+    h_int->SetTitle(";Layer 2 Depth (mm);N_{interact} (Bin of Maximum Change Ratio)");
     h_int->Draw("");
+    h_int->Fit(fitFunc1, "R"); // 进行拟合
+    latex.DrawLatex(0,pow(10,3.3),"Fitting Function: N_{int} =N_{total}/#lambda *exp(-x/#lambda)");
+    latex.DrawLatex(0,pow(10,3.0),Form("Fitting #lambda: %.2f mm",fitFunc1->GetParameter(1)));
     c2->cd(2);
     gPad->SetLogy();
     gStyle->SetOptFit(1);
     gStyle->SetOptStat(0);
     h_sur->GetYaxis()->SetRangeUser(1e2,2e4);
-    h_sur->SetTitle(";Layer;N_{survive}");
+    h_sur->SetTitle(";Layer 2 Depth (mm);N_{survive}");
     h_sur->Draw("");
     h_sur->Fit(fitFunc0, "R"); // 进行拟合
     double constant2   = fitFunc0->GetParameter(0);
     double lambda2     = fitFunc0->GetParameter(1);
     double lambda2_err = fitFunc0->GetParError(1);
     double n_BGO = TMath::Na()*7.13/ (1245.8344/19.); // cm-3
-    double hi_section = 1 / (lambda2*25) / n_BGO * 1e25; // barn, mm = 1e-1 cm, 1e24 barn = 1 cm^2
+    double hi_section = 1 / (lambda2) / n_BGO * 1e25; // barn, mm = 1e-1 cm, 1e24 barn = 1 cm^2
     double hi_section_err = hi_section * lambda2_err/lambda2; // barn
-    latex.DrawLatex(0,pow(10,3.3),"Fitting Function: N_{leave} =N_{total} *exp(-x/#lambda)");
-    latex.DrawLatex(0,pow(10,3.0),Form("Fitting #lambda: %.2f mm",lambda2*25));
+    latex.DrawLatex(0,pow(10,3.3),"Fitting Function: N_{sur} =N_{total} *exp(-x/#lambda)");
+    latex.DrawLatex(0,pow(10,3.0),Form("Fitting #lambda: %.2f mm",lambda2));
 
     //////////////////////////////////////////////
 

@@ -1,7 +1,7 @@
 #include "/Users/xiongzheng/software/B4/B4e/Script/Ulti_hist.hh"
+// 比较拟合程度的好坏reduce Chi2 // 
 
-
-void Percentile2Change()
+void Percentile2Chi2()
 {
     int p_FH_Lay; int p_FH_Type; double p_Total_E;      int p_Nhits;std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_L_EnergyVec = nullptr;   std::vector<double>* p_EnergyVec = nullptr;   std::vector<double>* p_Efrac = nullptr; double p_weight;
     int d_FH_Lay; int d_FH_Type; double d_Total_E;      int d_Nhits;std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_L_EnergyVec = nullptr;   std::vector<double>* d_EnergyVec = nullptr;   std::vector<double>* d_Efrac = nullptr; double d_weight;

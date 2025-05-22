@@ -6,8 +6,8 @@ void Percentile()
     int d_FH_Lay; int d_FH_Type; double d_Total_E;      int d_Nhits;std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_L_EnergyVec = nullptr;   std::vector<double>* d_EnergyVec = nullptr;   std::vector<double>* d_Efrac = nullptr; double d_weight;
     int p_FI_Lay;    double p_FI_Dep;    int p_particle;
     int d_FI_Lay;    double d_FI_Dep;    int d_particle;
-    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
+    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("Particle"         ,&p_particle);
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
@@ -22,8 +22,8 @@ void Percentile()
     // proton_tree->SetBranchAddress("weight"          ,&p_weight);
     proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
 
-    // auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
-    auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_2000GeV.root");
+    auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
+    // auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
     auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
     deuteron_tree->SetBranchAddress("Particle"         ,&d_particle);
     deuteron_tree->SetBranchAddress("RMS"              ,&d_RMSVec);
@@ -79,7 +79,7 @@ void Percentile()
     {        
         proton_tree->GetEntry(entry);
         int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
-        // if(p_energy_index < 0 || p_energy_index > 14) continue;
+        if(p_energy_index < 0 || p_energy_index > 14) continue;
         if(p_FI_Dep < 0) continue;
         if (p_Nhits < 10 ) continue;
         double sum_p = 0;
@@ -144,8 +144,8 @@ void Percentile()
         TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RSQ");  // R: fit range, S: return TFitResultPtr
         double percentile = Mod_Sigmoid_Percentile(p_FI_Dep/25.5,sigmoid->GetParameter(2),sigmoid->GetParameter(3));
 
-        // h1_p[p_energy_index][p_FI_Lay]->Fill(log10(percentile));
-        // h1_p_inter[p_energy_index]->Fill(log10(percentile));
+        h1_p[p_energy_index][p_FI_Lay]->Fill(log10(percentile));
+        h1_p_inter[p_energy_index]->Fill(log10(percentile));
         h1_p_int->Fill(log10(percentile));
         h1_p_Lay[p_FI_Lay]->Fill(log10(percentile));
     }
@@ -154,7 +154,7 @@ void Percentile()
     {
         deuteron_tree->GetEntry(entry);
         int d_energy_index = int(floor((log10(d_Total_E) - 1) / 0.2));
-        // if(d_energy_index < 0 || d_energy_index > 14) continue;
+        if(d_energy_index < 0 || d_energy_index > 14) continue;
         if(d_FI_Dep < 0) continue;
         if (d_Nhits < 10 ) continue;
         double sum_d = 0;
@@ -219,8 +219,8 @@ void Percentile()
         TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RSQ");  // R: fit range, S: return TFitResultPtr
         double percentile = Mod_Sigmoid_Percentile(d_FI_Dep/25.5,sigmoid->GetParameter(2),sigmoid->GetParameter(3));
 
-        // h1_d[d_energy_index][d_FI_Lay]->Fill(log10(percentile));
-        // h1_d_inter[d_energy_index]->Fill(log10(percentile)) ;
+        h1_d[d_energy_index][d_FI_Lay]->Fill(log10(percentile));
+        h1_d_inter[d_energy_index]->Fill(log10(percentile)) ;
         h1_d_int->Fill(log10(percentile));
         h1_d_Lay[d_FI_Lay]->Fill(log10(percentile));
     }
