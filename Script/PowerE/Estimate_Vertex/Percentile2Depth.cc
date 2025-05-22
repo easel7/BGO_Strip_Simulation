@@ -1,4 +1,4 @@
-#include "/Users/xiongzheng/software/B4/B4e/Script/Ulti.hh"
+#include "/Users/xiongzheng/software/B4/B4e/Script/Ulti_hist.hh"
 
 void Percentile2Depth()
 {
@@ -6,7 +6,8 @@ void Percentile2Depth()
     int d_FH_Lay; int d_FH_Type; double d_Total_E;      int d_Nhits;std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_L_EnergyVec = nullptr;   std::vector<double>* d_EnergyVec = nullptr;   std::vector<double>* d_Efrac = nullptr; double d_weight;
     int p_FI_Lay;    double p_FI_Dep;    int p_particle;
     int d_FI_Lay;    double d_FI_Dep;    int d_particle;
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
+    // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_10000GeV.root");
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("Particle"         ,&p_particle);
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
@@ -18,11 +19,11 @@ void Percentile2Depth()
     proton_tree->SetBranchAddress("First_Ine_Depth", &p_FI_Dep);
     proton_tree->SetBranchAddress("First_Ine_Layer", &p_FI_Lay);
     proton_tree->SetBranchAddress("Total_E"         ,&p_Total_E);
-    proton_tree->SetBranchAddress("weight"          ,&p_weight);
+    // proton_tree->SetBranchAddress("weight"          ,&p_weight);
     proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
 
-
-    auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
+    // auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
+    auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_10000GeV.root");
     auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
     deuteron_tree->SetBranchAddress("Particle"         ,&d_particle);
     deuteron_tree->SetBranchAddress("RMS"              ,&d_RMSVec);
@@ -34,7 +35,7 @@ void Percentile2Depth()
     deuteron_tree->SetBranchAddress("First_Ine_Depth", &d_FI_Dep);
     deuteron_tree->SetBranchAddress("First_Ine_Layer", &d_FI_Lay);
     deuteron_tree->SetBranchAddress("Total_E"          ,&d_Total_E);
-    deuteron_tree->SetBranchAddress("weight"           ,&d_weight);
+    // deuteron_tree->SetBranchAddress("weight"           ,&d_weight);
     deuteron_tree->SetBranchAddress("Nhits"          , &d_Nhits);
 
     double Energy[15]={0};
@@ -45,11 +46,11 @@ void Percentile2Depth()
     double Layer_Err[14]={0};
 
     // Depsit and Layer
-    TH1D *h1_p[15][14];
-    TH1D *h1_d[15][14];
+    TH1D *h1_p[15][14];     TH1D *h1_p_inter[15];  TH1D *h1_p_Lay[14];
+    TH1D *h1_d[15][14];     TH1D *h1_d_inter[15];  TH1D *h1_d_Lay[14];
 
-    TH1D *h1_p_inter[15];
-    TH1D *h1_d_inter[15];
+    auto h1_p_int = new TH1D("h1_p_int","h1_p_int",70,0,350);  
+    auto h1_d_int = new TH1D("h1_d_int","h1_d_int",70,0,350);  
 
 
     for(int i =0 ; i<15 ; i++)  // Deposit Energy Bin
@@ -66,6 +67,11 @@ void Percentile2Depth()
             h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j),70,0,350);  
             Layer[j] = 0.5 + j;
             Layer_Err[j] = 0.5;
+        }
+        if (i<14)
+        {
+            h1_p_Lay[i] =new TH1D(Form("h1_p_Lay[%d]",i),Form("h1_p_Lay[%d]",i),70,0,350);  
+            h1_d_Lay[i] =new TH1D(Form("h1_d_Lay[%d]",i),Form("h1_d_Lay[%d]",i),70,0,350);  
         }
     }
   

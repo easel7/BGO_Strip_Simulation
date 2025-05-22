@@ -13,7 +13,7 @@ void Draw_Pattern()
     int p_FI_Lay;
     double p_Total_E;
     const char* string1;
-    const char* string2 = "Proton_1000GeV";
+    const char* string2 = "Helium4_1000GeV";
 
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     auto proton_tree = (TTree*)proton_file->Get("B4");
@@ -46,7 +46,7 @@ void Draw_Pattern()
     // cout  << proton_tree->GetEntries() << endl;
     Long64_t entry  = 0;   
     int Counts = 0;
-    // for (Long64_t entry = 0; entry < 100; entry++)
+    for (Long64_t entry = 0; entry < 10; entry++)
     {
         auto c1    = new TCanvas("c1","c1",2100,1400);
         auto hXZ   = new TH2D("hXZ","BGO X-Z Plane",22,-11,11,14,0,14);

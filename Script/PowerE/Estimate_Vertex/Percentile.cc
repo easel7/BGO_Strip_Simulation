@@ -7,7 +7,7 @@ void Percentile()
     int p_FI_Lay;    double p_FI_Dep;    int p_particle;
     int d_FI_Lay;    double d_FI_Dep;    int d_particle;
     // auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
-    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_10000GeV.root");
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("Particle"         ,&p_particle);
     proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
@@ -23,7 +23,7 @@ void Percentile()
     proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
 
     // auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
-    auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_10000GeV.root");
+    auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_2000GeV.root");
     auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
     deuteron_tree->SetBranchAddress("Particle"         ,&d_particle);
     deuteron_tree->SetBranchAddress("RMS"              ,&d_RMSVec);

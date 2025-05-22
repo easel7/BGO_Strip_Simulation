@@ -48,14 +48,11 @@ void Percentile2Change()
     double Layer_Err[14]={0};
 
     // Depsit and Layer
-    TH1D *h1_p[15][14];
-    TH1D *h1_d[15][14];
+    TH1D *h1_p[15][14];     TH1D *h1_p_inter[15];  TH1D *h1_p_Lay[14];
+    TH1D *h1_d[15][14];     TH1D *h1_d_inter[15];  TH1D *h1_d_Lay[14];
 
-    TH1D *h1_p_inter[15];
-    TH1D *h1_d_inter[15];
-
-    auto h1_p_int = new TH1D("h1_p_int","h1_p_int",40,-1.5,2.5);  
-    auto h1_d_int = new TH1D("h1_d_int","h1_d_int",40,-1.5,2.5);  
+    auto h1_p_int = new TH1D("h1_p_int","h1_p_int",40,-2,2);   
+    auto h1_d_int = new TH1D("h1_d_int","h1_d_int",40,-2,2);   
 
 
     for(int i =0 ; i<15 ; i++)  // Deposit Energy Bin
@@ -64,14 +61,19 @@ void Percentile2Change()
         Energy_LL[i] = 1.0 + 0.2 * i;
         Energy_UL[i] = 1.2 + 0.2 * i;
 
-        h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i),40,-1.5,2.5);  
-        h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i),40,-1.5,2.5);  
+        h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i),40,-2,2);  
+        h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i),40,-2,2);  
         for( int j= 0; j<14 ;j++)
         {
-            h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j),40,-1.5,2.5);  
-            h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j),40,-1.5,2.5);  
+            h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j),40,-2,2);  
+            h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j),40,-2,2);  
             Layer[j] = 0.5 + j;
             Layer_Err[j] = 0.5;
+        }        
+        if (i<14)
+        {
+            h1_p_Lay[i] =new TH1D(Form("h1_p_Lay[%d]",i),Form("h1_p_Lay[%d]",i),40,-2,2);   
+            h1_d_Lay[i] =new TH1D(Form("h1_d_Lay[%d]",i),Form("h1_d_Lay[%d]",i),40,-2,2);   
         }
     }
   
@@ -79,7 +81,7 @@ void Percentile2Change()
     {        
         proton_tree->GetEntry(entry);
         int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
-        if(p_energy_index < 0 || p_energy_index > 14) continue;
+        // if(p_energy_index < 0 || p_energy_index > 14) continue;
         if(p_FI_Dep < 0) continue;
         if (p_Nhits < 10 ) continue;
         double sum_p = 0;
@@ -128,30 +130,35 @@ void Percentile2Change()
         seg_sum_to_peak = AccumIncreaseToPeak(hBGO1,seg_start_idx,seg_peak_idx);
         seg_len_to_peak = seg_peak_idx - seg_start_idx;
 
-        TF1* sigmoid = new TF1("sigmoid", "[0]+ [4]*x + ([1]-[0] - [4]*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
+        double upper_bound = std::min(seg_peak_idx+7, 14 );
+        double lower_bound = std::max(seg_peak_idx-7, -1 );
+        TF1 *sigmoid = new TF1("sigmoid", "[0]+ [4]*x + ([1]-[0] -  [4]*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
         sigmoid->SetParameters(hBGO1->GetBinContent(1), 
                                hBGO3->GetBinContent(14), 
-                               seg_peak_idx, 
+                               seg_peak_idx - 0.5, 
                                1 , 
                                max(hBGO1->GetBinContent(1)*0.1,0.01)); 
         sigmoid->SetParLimits(0, 0                                     , hBGO1->GetMaximum()         );   // [0] Ymin
         sigmoid->SetParLimits(1, hBGO1->GetMaximum()                   , 1e6                         );   // [1] Ymax
-        sigmoid->SetParLimits(2, max(seg_peak_idx-3, -1)               , min(seg_peak_idx + 2, 14)   );   // [2] Xmid
-        sigmoid->SetParLimits(3, 0.1                                   , 10                          );   // [3] Slope，避免除0
+        sigmoid->SetParLimits(2, lower_bound                           , upper_bound                 );   // [2] Xmid
+        sigmoid->SetParLimits(3, 0.01                                  , 10                          );   // [3] Slope，避免除0
         sigmoid->SetParLimits(4, max(hBGO1->GetBinContent(1)*0.1,0.01) , hBGO1->GetBinContent(1) * 10);   // [4] linear bias
         TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RSQ");  // R: fit range, S: return TFitResultPtr
-        double percentile = Mod_Sigmoid_Percentile(p_FI_Dep/25.5,sigmoid->GetParameter(2),sigmoid->GetParameter(3));
-        int Percent2Layer = Inverse_Mod_sigmoid(50, Xmid,Slope);
+        double chi2 = fitResult->Chi2();       // 总卡方
+        int ndf = fitResult->Ndf();            // 自由度
+        double chi2_reduced = log10(chi2 / ndf);      // Reduced Chi2
 
-        h1_p[p_energy_index][p_FI_Lay]->Fill(bar_Change_info[Percent2Layer]);
-        h1_p_inter[p_energy_index]->Fill(bar_Change_info[Percent2Layer]) ;
+        // h1_p[d_energy_index][d_FI_Lay]->Fill(chi2_reduced);
+        // h1_p_inter[d_energy_index]->Fill(chi2_reduced) ;
+        h1_p_int->Fill(chi2_reduced) ;
+        h1_p_Lay[p_FI_Lay]->Fill(chi2_reduced) ;
     }
 
     for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
     {
         deuteron_tree->GetEntry(entry);
         int d_energy_index = int(floor((log10(d_Total_E) - 1) / 0.2));
-        if(d_energy_index < 0 || d_energy_index > 14) continue;
+        // if(d_energy_index < 0 || d_energy_index > 14) continue;
         if(d_FI_Dep < 0) continue;
         if (d_Nhits < 10 ) continue;
         double sum_d = 0;
@@ -200,23 +207,28 @@ void Percentile2Change()
         seg_sum_to_peak = AccumIncreaseToPeak(hBGO1,seg_start_idx,seg_peak_idx);
         seg_len_to_peak = seg_peak_idx - seg_start_idx;
 
-        TF1* sigmoid = new TF1("sigmoid", "[0]+ [4]*x + ([1]-[0] - [4]*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
+        double upper_bound = std::min(seg_peak_idx+7, 14 );
+        double lower_bound = std::max(seg_peak_idx-7, -1 );
+        TF1 *sigmoid = new TF1("sigmoid", "[0]+ [4]*x + ([1]-[0] -  [4]*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
         sigmoid->SetParameters(hBGO1->GetBinContent(1), 
                                hBGO3->GetBinContent(14), 
-                               seg_peak_idx, 
+                               seg_peak_idx - 0.5, 
                                1 , 
                                max(hBGO1->GetBinContent(1)*0.1,0.01)); 
         sigmoid->SetParLimits(0, 0                                     , hBGO1->GetMaximum()         );   // [0] Ymin
         sigmoid->SetParLimits(1, hBGO1->GetMaximum()                   , 1e6                         );   // [1] Ymax
-        sigmoid->SetParLimits(2, max(seg_peak_idx-3, -1)               , min(seg_peak_idx + 2, 14)   );   // [2] Xmid
-        sigmoid->SetParLimits(3, 0.1                                   , 10                          );   // [3] Slope，避免除0
+        sigmoid->SetParLimits(2, lower_bound                           , upper_bound                 );   // [2] Xmid
+        sigmoid->SetParLimits(3, 0.01                                  , 10                          );   // [3] Slope，避免除0
         sigmoid->SetParLimits(4, max(hBGO1->GetBinContent(1)*0.1,0.01) , hBGO1->GetBinContent(1) * 10);   // [4] linear bias
         TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RSQ");  // R: fit range, S: return TFitResultPtr
-        double percentile = Mod_Sigmoid_Percentile(d_FI_Dep/25.5,sigmoid->GetParameter(2),sigmoid->GetParameter(3));
-        int Percent2Layer = Inverse_Mod_sigmoid(50, Xmid,Slope);
+        double chi2 = fitResult->Chi2();       // 总卡方
+        int ndf = fitResult->Ndf();            // 自由度
+        double chi2_reduced = log10(chi2 / ndf);      // Reduced Chi2
 
-        h1_d[d_energy_index][d_FI_Lay]->Fill(bar_Change_info[Percent2Layer]);
-        h1_d_inter[d_energy_index]->Fill(bar_Change_info[Percent2Layer]) ;
+        // h1_d[d_energy_index][d_FI_Lay]->Fill(chi2_reduced);
+        // h1_d_inter[d_energy_index]->Fill(chi2_reduced) ;
+        h1_d_int->Fill(chi2_reduced) ;
+        h1_d_Lay[d_FI_Lay]->Fill(chi2_reduced) ;
     }
 
     for (int i = 9; i < 10; i++) // Deposit Energy Bin
@@ -240,7 +252,7 @@ void Percentile2Change()
             // h1_d[i][j]->Scale(1.0/h1_d[i][j]->Integral());
             // h1_p[i][j]->GetYaxis()->SetRangeUser(0,h1_p[i][j]->GetMaximum()*1.2);
 
-            h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV]Interaction happened in L%d;log10(^{}E^{}_{i}/^{}E^{}_{i-1});Normalized Count", pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j ));
+            h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV]Interaction happened in L%d;log10(Reduced Chi2);Normalized Count", pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j ));
             h1_p[i][j]->Draw("hist");
             h1_d[i][j]->Draw("histsame");
 
@@ -260,21 +272,39 @@ void Percentile2Change()
         // h1_p_inter[i]->Scale(1.0/h1_p_inter[i]->Integral()); 
         // h1_d_inter[i]->Scale(1.0/h1_d_inter[i]->Integral()); 
         // h1_p_inter[i]->GetYaxis()->SetRangeUser(0,h1_p_inter[i]->GetMaximum()*1.2);
-        h1_p_inter[i]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] Stack Multi Layer;log10(^{}E^{}_{i}/^{}E^{}_{i-1});Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
+        h1_p_inter[i]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] Stack Multi Layer;log10(Reduced Chi2);Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
         h1_p_inter[i]->Draw("hist");
         h1_d_inter[i]->Draw("histsame");
 
-
-        auto c3 = new TCanvas("c3","c3",1000,1000);
-        c3->cd();
-        h1_p_int->SetLineColor(kRed);   h1_p_int->SetMarkerColor(kRed);  h1_p_int->SetLineWidth(2);   h1_p_int->Sumw2();
-        h1_d_int->SetLineColor(kBlue);  h1_d_int->SetMarkerColor(kBlue); h1_d_int->SetLineWidth(2);   h1_d_int->Sumw2();
-        h1_p_int->Scale(1.0/h1_p_int->Integral()); 
-        h1_d_int->Scale(1.0/h1_d_int->Integral()); 
-        h1_p_int->GetYaxis()->SetRangeUser(0,h1_p_int->GetMaximum()*1.2);
-        h1_p_int->SetTitle(" Stack Multi Layer;log10(Inelastic Percentile);Normalized Count");
-        h1_p_int->Draw("hist");
-        h1_d_int->Draw("histsame");
-
     }
+    auto c3 = new TCanvas("c3","c3",1000,1000);
+    c3->cd();
+    h1_p_int->SetLineColor(kRed);   h1_p_int->SetMarkerColor(kRed);  h1_p_int->SetLineWidth(2);   h1_p_int->Sumw2();
+    h1_d_int->SetLineColor(kBlue);  h1_d_int->SetMarkerColor(kBlue); h1_d_int->SetLineWidth(2);   h1_d_int->Sumw2();
+    h1_p_int->Scale(1.0/h1_p_int->Integral()); 
+    h1_d_int->Scale(1.0/h1_d_int->Integral()); 
+    h1_p_int->GetYaxis()->SetRangeUser(0,h1_p_int->GetMaximum()*1.2);
+    h1_p_int->SetTitle(" Stack Multi Layer;log10(Reduced Chi2);Normalized Count");
+    h1_p_int->Draw("hist");
+    h1_d_int->Draw("histsame");
+
+
+    auto c4 = new TCanvas("c4","c4",1000,1000);
+    c4->cd();
+    c4->Clear();
+    c4->Divide(5,3);
+    gStyle->SetOptStat(0);
+    for (int j = 0; j < 14; j++) // layer
+    {
+        c4->cd(j + 1);
+        h1_p_Lay[j]->SetLineColor(kRed);   h1_p_Lay[j]->SetMarkerColor(kRed);  h1_p_Lay[j]->SetLineWidth(2);   h1_p_Lay[j]->Sumw2();
+        h1_d_Lay[j]->SetLineColor(kBlue);  h1_d_Lay[j]->SetMarkerColor(kBlue); h1_d_Lay[j]->SetLineWidth(2);   h1_d_Lay[j]->Sumw2();
+        h1_p_Lay[j]->Scale(1.0/h1_p_Lay[j]->Integral()); 
+        h1_d_Lay[j]->Scale(1.0/h1_d_Lay[j]->Integral()); 
+        h1_p_Lay[j]->GetYaxis()->SetRangeUser(0,h1_p_Lay[j]->GetMaximum()*1.2);
+        h1_p_Lay[j]->SetTitle(" Stack Multi Layer;log10(Reduced Chi2);Normalized Count");
+        h1_p_Lay[j]->Draw("hist");
+        h1_d_Lay[j]->Draw("histsame");
+    }
+
 }

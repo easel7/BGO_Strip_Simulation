@@ -24,7 +24,7 @@ void Percentile2Xmid()
     proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
 
     // auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
-    auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
+    auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Carbon_1000GeV.root");
     auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
     deuteron_tree->SetBranchAddress("Particle"         ,&d_particle);
     deuteron_tree->SetBranchAddress("RMS"              ,&d_RMSVec);
