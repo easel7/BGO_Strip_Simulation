@@ -5,24 +5,28 @@ void CrossSection_Dual_Ine()
 
     auto file1 = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
     auto tree1 = (TTree*)file1->Get("B4");
-    auto h1_0 = new TH1D("h1_0","h1_0",14,0,350);
-    auto h1 = new TH1D("h1","h1",14,0,350);
-    auto hC1 = new TH1D("hC1","hC1",14,0,350);
-    tree1->Draw("First_Ine_Depth>>h1_0",HI,"");
+    auto h1_0 = new TH1D("h1_0","h1_0",38,-20,360);
+    auto h1 = new TH1D("h1","h1",36,0,360);
+    auto hC1 = new TH1D("hC1","hC1",36,0,360);
+    tree1->Draw("First_Ine_Depth>>h1_0","","");
     tree1->Draw("First_Ine_Depth>>h1",HI,"");
     hC1->SetTitle("1000 GeV Inelastic Hadronic Depth Distribution;Depth(mm);N_{survive}");
 
     auto file2 = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
     auto tree2 = (TTree*)file2->Get("B4");
-    auto h2_0 = new TH1D("h2_0","h2_0",14,0,350);
-    auto h2 = new TH1D("h2","h2",14,0,350);
-    auto hC2 = new TH1D("hC2","hC2",14,0,350);
-    tree2->Draw("First_Ine_Depth>>h2_0",HI,"");
+    auto h2_0 = new TH1D("h2_0","h2_0",38,-20,360);
+    auto h2 = new TH1D("h2","h2",36,0,360);
+    auto hC2 = new TH1D("hC2","hC2",36,0,360);
+    tree2->Draw("First_Ine_Depth>>h2_0","","");
     tree2->Draw("First_Ine_Depth>>h2",HI,"");
+    h1->Scale(0.5);    h1_0->Scale(0.5);
+    h2->Scale(0.5);    h2_0->Scale(0.5);
+    cout << h1->Integral() << endl;
+    cout << h1->Integral() << endl;
     for(int ii = 1 ; ii <= 35 ; ii++)
     {
-        hC1->SetBinContent(ii, (1e4 -h1->Integral(0,ii) )* (0.98) );
-        hC2->SetBinContent(ii, ( 1e4 -h2->Integral(0,ii) )*(0.02) );
+        hC1->SetBinContent(ii, ( h1_0->Integral() - h1->Integral(1,ii) ) );
+        hC2->SetBinContent(ii, ( h1_0->Integral() - h2->Integral(1,ii) ) );
     }
 
     // Fit for Survive
@@ -30,37 +34,36 @@ void CrossSection_Dual_Ine()
     TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-x/[1])", 0, 300); fitFunc1->SetParameters(100, 10); fitFunc1->SetLineColor(kRed);
     TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-x/[1])", 0, 300); fitFunc2->SetParameters(100, 10); fitFunc2->SetLineColor(kBlue);
 
-
     // Fit for Interaction 
 
-    TF1 *fitFunc4 = new TF1("fitFunc4", "[0]*25 *(1-[1])/208*exp(-x/208)+[0]*25 *[1]/173*exp(-x/173)", 0, 300); fitFunc4->SetParameters(1e4, 0.5); fitFunc4->SetLineColor(kBlack);
-    // TF1 *fitFunc4 = new TF1("fitFunc4", "[0]*10/208*exp(-x/208)+[1]*10/173*exp(-x/173)", 0, 300); fitFunc4->SetParameters(1e4, 0.5); fitFunc4->SetLineColor(kBlack);
-
-    TF1 *fitFunc6 = new TF1("fitFunc6", "[0]*25 /[1]*exp(-x/[1])", 0, 300); fitFunc6->SetParameters(1e3,8); fitFunc6->SetLineColor(kRed);
-    TF1 *fitFunc7 = new TF1("fitFunc7", "[0]*25 /[1]*exp(-x/[1])", 0, 300); fitFunc7->SetParameters(1e2,8); fitFunc7->SetLineColor(kBlue);
+    TF1 *fitFunc4 = new TF1("fitFunc4", "[0]*[2] *(1-[1])/208*exp(-x/208)+[0]*25 *[1]/173*exp(-x/173)", 0, 300); fitFunc4->SetParameters(1e4, 0.5); fitFunc4->SetLineColor(kBlack);
+    TF1 *fitFunc6 = new TF1("fitFunc6", "[0]*[2] /[1]*exp(-x/[1])", 0, 300); fitFunc6->SetParameters(1e3,8); fitFunc6->SetLineColor(kRed);
+    TF1 *fitFunc7 = new TF1("fitFunc7", "[0]*[2] /[1]*exp(-x/[1])", 0, 300); fitFunc7->SetParameters(1e2,8); fitFunc7->SetLineColor(kBlue);
+    fitFunc4->FixParameter(2,h1_0->GetBinWidth(1));
+    fitFunc6->FixParameter(2,h1_0->GetBinWidth(1));
+    fitFunc7->FixParameter(2,h1_0->GetBinWidth(1));
     TLatex latex;
     latex.SetTextSize(0.04);
     latex.SetTextFont(72);
     latex.SetTextAlign(13);  //align at top
 
     auto c0 = new TCanvas("c0","c0",1200,900);
-    h1_0->SetTitle("N_{interaction};Depth(mm);Counts");
-    h1_0->SetLineColor(kRed);   // Proton in red
-    h2_0->SetLineColor(kBlue);  // Deuteron in blue
-    h1_0->Scale(0.98);
-    h2_0->Scale(0.02);
-    auto h3_0 = (TH1D*)h2_0->Clone();
-    h3_0->Add(h1_0);
-    h3_0->SetLineColor(kBlack);  // Deuteron in blue
-    h3_0->SetLineWidth(2);
-    h1_0->GetYaxis()->SetRangeUser(0,1.2*h3_0->GetMaximum());
-    h1_0->Draw("hist");
-    h2_0->Draw("histsame");
-    h3_0->Draw("histsame");
-    h3_0->Fit(fitFunc4, "R"); // 进行拟合
+    h1->SetTitle("N_{interaction};Depth(mm);Counts");
+    h1->SetLineColor(kRed);   // Proton in red
+    h2->SetLineColor(kBlue);  // Deuteron in blue
+
+    auto h3 = (TH1D*)h2->Clone();
+    h3->Add(h1);
+    h3->SetLineColor(kBlack);  // Deuteron in blue
+    h3->SetLineWidth(2);
+    h1->GetYaxis()->SetRangeUser(0,1.2*h3->GetMaximum());
+    h1->Draw("hist");
+    h2->Draw("histsame");
+    h3->Draw("histsame");
+    h3->Fit(fitFunc4, "R"); // 进行拟合
+    h1->Fit(fitFunc6,"R");
+    h2->Fit(fitFunc7,"R");
     fitFunc4->Draw("same");
-    h1_0->Fit(fitFunc6,"R");
-    h2_0->Fit(fitFunc7,"R");
     fitFunc6->Draw("same");
     fitFunc7->Draw("same");
     double total_num1   = fitFunc4->GetParameter(0);

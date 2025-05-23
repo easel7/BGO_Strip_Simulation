@@ -56,8 +56,8 @@ def find_max_value_in_positive_segment(bar_info, start_bin, length):
     return max_value, max_bin
 
 # Modified Sigmoid function
-def modified_sigmoid(x, Ymin, Ymax, Xmid, Slope):
-    return Ymin + 0.02 * x + (Ymax - Ymin - 0.02 * x) / (1 + np.exp(-(x - Xmid) / Slope))
+def modified_sigmoid(x, E0, Ymin, Ymax, Xmid, Slope):
+    return Ymin + E0 * x + (Ymax - Ymin - E0 * x) / (1 + np.exp(-(x - Xmid) / Slope))
 
 def Mod_Sigmoid_Percentile(x, Xmid, Slope):
     return 1 / (1 + np.exp(-(x - Xmid) / Slope))
@@ -316,11 +316,11 @@ for entry in range(10):  # from 0 - 10
 
     # 2. Mod sigmoid function (done, above)
     # 3. Initial Value for fitting
-    p0 = [y_vals[0], y_vals[-1], 6.0, 1.0]  # Ymin, Ymax, Xmid, Slope
+    p0 = [0.02 ,y_vals[0], y_vals[-1], 6.0, 1.0]  # Ymin, Ymax, Xmid, Slope
 
     # 4. Fit
     popt, pcov = curve_fit(modified_sigmoid, x_vals, y_vals, sigma=y_errs, p0=p0, absolute_sigma=True)
-    Ymin, Ymax, Xmid, Slope = popt
+    E0, Ymin, Ymax, Xmid, Slope = popt
     fit_vals = modified_sigmoid(x_vals, *popt)
     percentile2 = Mod_Sigmoid_Percentile(FI_Dep/25.5, Xmid, Slope)
     axs[1, 2].text(

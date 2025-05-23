@@ -1,7 +1,7 @@
 #include "/Users/xiongzheng/software/B4/B4e/Script/Ulti_hist.hh"
-// 比较拟合差距 (x_ine - x_mid)
+// 比较拟合差距 \hat{x_ine} =  - 4.789 * sigma + x_mid
 
-void Percentile2Depth()
+void Percentile2DepthEst()
 {
     int p_FH_Lay; int p_FH_Type; double p_Total_E;      int p_Nhits;std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_L_EnergyVec = nullptr;   std::vector<double>* p_EnergyVec = nullptr;   std::vector<double>* p_Efrac = nullptr; double p_weight;
     int d_FH_Lay; int d_FH_Type; double d_Total_E;      int d_Nhits;std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_L_EnergyVec = nullptr;   std::vector<double>* d_EnergyVec = nullptr;   std::vector<double>* d_Efrac = nullptr; double d_weight;
@@ -50,9 +50,14 @@ void Percentile2Depth()
     TH1D *h1_p[15][14];     TH1D *h1_p_inter[15];  TH1D *h1_p_Lay[14];
     TH1D *h1_d[15][14];     TH1D *h1_d_inter[15];  TH1D *h1_d_Lay[14];
 
-    auto h1_p_int = new TH1D("h1_p_int","h1_p_int",120,-10,5);  
-    auto h1_d_int = new TH1D("h1_d_int","h1_d_int",120,-10,5);  
+    auto h2_p_int = new TH2D("h2_p_int","h2_p_int",200,-40,360,200,-40,360);  
+    auto h2_d_int = new TH2D("h2_d_int","h2_d_int",200,-40,360,200,-40,360);  
 
+    auto h1_p_int = new TH1D("h1_p_int","h1_p_int",18,0,360);  
+    auto h1_d_int = new TH1D("h1_d_int","h1_d_int",18,0,360);  
+
+    auto h1_p_sur = new TH1D("h1_p_sur","h1_p_sur",18,0,360);  
+    auto h1_d_sur = new TH1D("h1_d_sur","h1_d_sur",18,0,360);  
 
     for(int i =0 ; i<15 ; i++)  // Deposit Energy Bin
     {
@@ -71,8 +76,8 @@ void Percentile2Depth()
         }
         if (i<14)
         {
-            h1_p_Lay[i] =new TH1D(Form("h1_p_Lay[%d]",i),Form("h1_p_Lay[%d]",i),120,-10,5);  
-            h1_d_Lay[i] =new TH1D(Form("h1_d_Lay[%d]",i),Form("h1_d_Lay[%d]",i),120,-10,5);  
+            h1_p_Lay[i] =new TH1D(Form("h1_p_Lay[%d]",i),Form("h1_p_Lay[%d]",i),60,-3,3);  
+            h1_d_Lay[i] =new TH1D(Form("h1_d_Lay[%d]",i),Form("h1_d_Lay[%d]",i),60,-3,3);  
         }
     }
   
@@ -146,8 +151,10 @@ void Percentile2Depth()
 
         // h1_p[p_energy_index][p_FI_Lay]->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
         // h1_p_inter[p_energy_index]->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3)) ;
-        h1_p_int->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
-        h1_p_Lay[p_FI_Lay]->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
+        h2_p_int->Fill(p_FI_Dep, (-4.789 * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5);
+        h1_p_Lay[p_FI_Lay]->Fill( (p_FI_Dep -  (-4.789 * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5) / p_FI_Dep );
+        h1_p_int->Fill((-4.789 * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5);
+
     }
 
     for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
@@ -220,74 +227,132 @@ void Percentile2Depth()
 
         // h1_d[d_energy_index][d_FI_Lay]->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
         // h1_d_inter[d_energy_index]->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3)) ;
-        h1_d_int->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
-        h1_d_Lay[d_FI_Lay]->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
+        h2_d_int->Fill(d_FI_Dep, (-4.789 * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5);
+        h1_d_Lay[d_FI_Lay]->Fill( (d_FI_Dep -  (-4.789 * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5) / d_FI_Dep );
+        h1_d_int->Fill((-4.789 * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5);
     }
 
-    for (int i = 9; i < 10; i++) // Deposit Energy Bin
-    {
-        auto c1 = new TCanvas("c1","c1",2500,1500);
-        c1->Clear();
-        c1->Divide(5,3);
-        gStyle->SetOptStat(0);
+    // for (int i = 9; i < 10; i++) // Deposit Energy Bin
+    // {
+    //     auto c1 = new TCanvas("c1","c1",2500,1500);
+    //     c1->Clear();
+    //     c1->Divide(5,3);
+    //     gStyle->SetOptStat(0);
 
-        double Proton_Ratio[14]={0};     double Deuteron_Ratio[14]={0};     
-        double Proton_Ratio_LL[14]={0};  double Deuteron_Ratio_LL[14]={0};  
-        double Proton_Ratio_UL[14]={0};  double Deuteron_Ratio_UL[14]={0};  
-        for (int j = 0; j < 14; j++) // layer
-        {
-            h1_p[i][j]->SetLineColor(kRed);   h1_p[i][j]->SetMarkerColor(kRed);  h1_p[i][j]->SetLineWidth(2);   h1_p[i][j]->Sumw2();
-            h1_d[i][j]->SetLineColor(kBlue);  h1_d[i][j]->SetMarkerColor(kBlue); h1_d[i][j]->SetLineWidth(2);   h1_d[i][j]->Sumw2();
+    //     double Proton_Ratio[14]={0};     double Deuteron_Ratio[14]={0};     
+    //     double Proton_Ratio_LL[14]={0};  double Deuteron_Ratio_LL[14]={0};  
+    //     double Proton_Ratio_UL[14]={0};  double Deuteron_Ratio_UL[14]={0};  
+    //     for (int j = 0; j < 14; j++) // layer
+    //     {
+    //         h1_p[i][j]->SetLineColor(kRed);   h1_p[i][j]->SetMarkerColor(kRed);  h1_p[i][j]->SetLineWidth(2);   h1_p[i][j]->Sumw2();
+    //         h1_d[i][j]->SetLineColor(kBlue);  h1_d[i][j]->SetMarkerColor(kBlue); h1_d[i][j]->SetLineWidth(2);   h1_d[i][j]->Sumw2();
             
-            c1->cd(j + 1);
+    //         c1->cd(j + 1);
 
-            // h1_p[i][j]->Scale(1.0/h1_p[i][j]->Integral());
-            // h1_d[i][j]->Scale(1.0/h1_d[i][j]->Integral());
-            // h1_p[i][j]->GetYaxis()->SetRangeUser(0,h1_p[i][j]->GetMaximum()*1.2);
+    //         // h1_p[i][j]->Scale(1.0/h1_p[i][j]->Integral());
+    //         // h1_d[i][j]->Scale(1.0/h1_d[i][j]->Integral());
+    //         // h1_p[i][j]->GetYaxis()->SetRangeUser(0,h1_p[i][j]->GetMaximum()*1.2);
 
-            h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV]Interaction happened in L%d;(Xine-Xmid)/Slope;Normalized Count", pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j ));
-            h1_p[i][j]->Draw("hist");
-            h1_d[i][j]->Draw("histsame");
+    //         h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV]Interaction happened in L%d;(Xine-Xmid)/Slope;Normalized Count", pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j ));
+    //         h1_p[i][j]->Draw("hist");
+    //         h1_d[i][j]->Draw("histsame");
 
-        }
-        c1->cd(15);
-        TLatex *tex = new TLatex(0.1,0.9,Form("Deposit Energy[%.2fGeV, %.2fGeV]",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));tex->SetNDC();tex->Draw(); 
-        auto legend1 = new TLegend(0.12, 0.12, 0.88, 0.88);
-        legend1->AddEntry(h1_p[i][0], "Proton", "l");
-        legend1->AddEntry(h1_d[i][0], "Deuteron", "l");     
-        legend1->Draw();       
-        // c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Longti_PowerE/PDF/Longti_EnergyVec_%.2f_%.2f.pdf",Energy_LL[i],Energy_UL[i]));
+    //     }
+    //     c1->cd(15);
+    //     TLatex *tex = new TLatex(0.1,0.9,Form("Deposit Energy[%.2fGeV, %.2fGeV]",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));tex->SetNDC();tex->Draw(); 
+    //     auto legend1 = new TLegend(0.12, 0.12, 0.88, 0.88);
+    //     legend1->AddEntry(h1_p[i][0], "Proton", "l");
+    //     legend1->AddEntry(h1_d[i][0], "Deuteron", "l");     
+    //     legend1->Draw();       
+    //     // c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Longti_PowerE/PDF/Longti_EnergyVec_%.2f_%.2f.pdf",Energy_LL[i],Energy_UL[i]));
 
-        auto c2 = new TCanvas("c2","c2",1000,1000);
-        c2->cd();
-        h1_p_inter[i]->SetLineColor(kRed);   h1_p_inter[i]->SetMarkerColor(kRed);  h1_p_inter[i]->SetLineWidth(2);   h1_p_inter[i]->Sumw2();
-        h1_d_inter[i]->SetLineColor(kBlue);  h1_d_inter[i]->SetMarkerColor(kBlue); h1_d_inter[i]->SetLineWidth(2);   h1_d_inter[i]->Sumw2();
-        // h1_p_inter[i]->Scale(1.0/h1_p_inter[i]->Integral()); 
-        // h1_d_inter[i]->Scale(1.0/h1_d_inter[i]->Integral()); 
-        // h1_p_inter[i]->GetYaxis()->SetRangeUser(0,h1_p_inter[i]->GetMaximum()*1.2);
-        h1_p_inter[i]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] Stack Multi Layer;(Xine-Xmid)/Slope;Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
-        h1_p_inter[i]->Draw("hist");
-        h1_d_inter[i]->Draw("histsame");
+    //     auto c2 = new TCanvas("c2","c2",1000,1000);
+    //     c2->cd();
+    //     h1_p_inter[i]->SetLineColor(kRed);   h1_p_inter[i]->SetMarkerColor(kRed);  h1_p_inter[i]->SetLineWidth(2);   h1_p_inter[i]->Sumw2();
+    //     h1_d_inter[i]->SetLineColor(kBlue);  h1_d_inter[i]->SetMarkerColor(kBlue); h1_d_inter[i]->SetLineWidth(2);   h1_d_inter[i]->Sumw2();
+    //     // h1_p_inter[i]->Scale(1.0/h1_p_inter[i]->Integral()); 
+    //     // h1_d_inter[i]->Scale(1.0/h1_d_inter[i]->Integral()); 
+    //     // h1_p_inter[i]->GetYaxis()->SetRangeUser(0,h1_p_inter[i]->GetMaximum()*1.2);
+    //     h1_p_inter[i]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] Stack Multi Layer;(Xine-Xmid)/Slope;Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
+    //     h1_p_inter[i]->Draw("hist");
+    //     h1_d_inter[i]->Draw("histsame");
+    // }
 
+    h2_p_int->Sumw2();    h1_p_int->Sumw2();
+    h2_d_int->Sumw2();    h1_d_int->Sumw2();
+    TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-x/[1])", 60, 260); 
+    TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-x/[1])", 60, 260); 
+    fitFunc1->SetParameters(1e4, 200); 
+    fitFunc2->SetParameters(1e4, 170); 
+    fitFunc1->SetLineColor(kRed); 
+    fitFunc2->SetLineColor(kBlue);
+    // fitFunc1->FixParameter(0, h2_p_int->Integral());
+    // fitFunc2->FixParameter(0, h2_d_int->Integral());
+
+    TF1 *fitFunc3 = new TF1("fitFunc3", "[0]/[1]*exp(-x/[1])", 60, 260); 
+    TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/[1]*exp(-x/[1])", 60, 260); 
+    fitFunc3->SetParameters(1e3, 200); 
+    fitFunc4->SetParameters(1e3, 170); 
+    fitFunc3->SetLineColor(kRed); 
+    fitFunc4->SetLineColor(kBlue);
+    // fitFunc3->FixParameter(0, h2_p_int->Integral() / h2_p_int->GetBinWidth(1));
+    // fitFunc4->FixParameter(0, h2_d_int->Integral() / h2_d_int->GetBinWidth(1));
+    // fitFunc3->FixParameter(2, h2_p_int->GetBinWidth(1));
+    // fitFunc4->FixParameter(2, h2_d_int->GetBinWidth(1));
+
+    cout << h2_p_int->Integral() << endl;
+    // cout << h2_d_int->Integral() << endl;
+    for(int i=1 ; i<= h1_p_int->GetNbinsX(); i++)
+    {
+        h1_p_sur->SetBinContent(i, (h2_p_int->Integral() - h1_p_int->Integral(1,i) ));
+        h1_d_sur->SetBinContent(i, (h2_d_int->Integral() - h1_d_int->Integral(1,i) ));
+        cout << h1_p_int->Integral(1,i) << " , " <<  h1_p_int->GetBinContent(i) << endl;
+
+        // cout << h1_d_int->Integral(0,i) << endl;
     }
 
-    auto c3 = new TCanvas("c3","c3",1000,1000);
+    auto c3 = new TCanvas("c3","c3",2400,1600);
     c3->cd();
-    gStyle->SetOptFit(1111);
-    auto fitFunc = new TF1("fitFunc", "gaus", -10, 5); // 注意替换范围
-    fitFunc->SetLineColor(kRed);
-    fitFunc->SetLineWidth(2);
+    c3->Divide(3,2);
+    c3->cd(1);
+    h2_p_int->SetTitle("Proton Stack Multi Layer;True Inelastic Depth;Xine = Xmid - 4.879 * Slope");
+    h2_p_int->Draw("colz");
 
-    h1_p_int->SetLineColor(kRed);   h1_p_int->SetMarkerColor(kRed);  h1_p_int->SetLineWidth(2);   h1_p_int->Sumw2();
-    h1_d_int->SetLineColor(kBlue);  h1_d_int->SetMarkerColor(kBlue); h1_d_int->SetLineWidth(2);   h1_d_int->Sumw2();
-    h1_p_int->Scale(1.0/h1_p_int->Integral()); 
-    h1_d_int->Scale(1.0/h1_d_int->Integral()); 
-    h1_p_int->GetYaxis()->SetRangeUser(0,h1_p_int->GetMaximum()*1.2);
-    h1_p_int->SetTitle(" Stack Multi Layer;(Xine-Xmid)/Slope;Normalized Count");
+    c3->cd(2);
+    h1_p_int->SetLineColor(kBlack);
+    h1_p_int->SetTitle("Proton N_{inteaction};Xine = Xmid - 4.879 * Slope;Counts");
     h1_p_int->Draw("hist");
-    h1_p_int->Fit(fitFunc,"R");  
-    fitFunc->Draw("same");
-    h1_d_int->Draw("histsame");
+    h1_p_int->Fit(fitFunc3,"R");  
+    fitFunc3->Draw("same");
+
+    c3->cd(3);
+    gStyle->SetOptFit(1111);
+    h1_p_sur->SetLineColor(kBlack);
+    h1_p_sur->SetTitle("Proton N_{Survive};Xine = Xmid - 4.879 * Slope;Counts");
+    h1_p_sur->Draw("hist");
+    h1_p_sur->Fit(fitFunc1,"R");  
+    fitFunc1->Draw("same");
+
+
+    c3->cd(4);
+    h2_d_int->SetTitle("Deuteron Stack Multi Layer;True Inelastic Depth;Xine = Xmid - 4.879 * Slope;");
+    h2_d_int->Draw("colz");
+
+    c3->cd(5);
+    h1_d_int->SetLineColor(kBlack);
+    h1_d_int->SetTitle("Deuteron N_{inteaction};Xine = Xmid - 4.879 * Slope;Counts");
+    h1_d_int->Draw("hist");
+    h1_d_int->Fit(fitFunc4,"R");  
+    fitFunc4->Draw("same");
+
+    c3->cd(6);
+    gStyle->SetOptFit(1111);
+    h1_d_sur->SetLineColor(kBlack);
+    h1_d_sur->SetTitle("Deuteron N_{Survive};Xine = Xmid - 4.879 * Slope;Counts");
+    h1_d_sur->Draw("hist");
+    h1_d_sur->Fit(fitFunc2,"R");  
+    fitFunc2->Draw("same");
+
 
     auto c4 = new TCanvas("c4","c4",1000,1000);
     c4->cd();
@@ -302,8 +367,10 @@ void Percentile2Depth()
         h1_p_Lay[j]->Scale(1.0/h1_p_Lay[j]->Integral()); 
         h1_d_Lay[j]->Scale(1.0/h1_d_Lay[j]->Integral()); 
         h1_p_Lay[j]->GetYaxis()->SetRangeUser(0,h1_p_Lay[j]->GetMaximum()*1.2);
-        h1_p_Lay[j]->SetTitle(" Stack Multi Layer;(Xine-Xmid)/Slope;Normalized Count");
+        h1_p_Lay[j]->SetTitle(" Stack Multi Layer;(Xine-#hat{Xest})/Xine;Normalized Count");
         h1_p_Lay[j]->Draw("hist");
         h1_d_Lay[j]->Draw("histsame");
     }
+
+
 }
