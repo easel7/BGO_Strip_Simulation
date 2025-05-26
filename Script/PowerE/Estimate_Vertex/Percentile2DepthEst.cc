@@ -3,20 +3,22 @@
 
 void Percentile2DepthEst()
 {
-    int Energy_Name[29]={0};                 
-    for (int i =18; i < 29; i++)
+    int Energy_Name[29]={0};     
+    auto mean_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/DepthEst_Fitting.root");
+    auto hist_p = (TH1D*)mean_file->Get("hist_p");
+    for (int k =18; k < 19; k++)
     {
-        if (i < 10)      Energy_Name[i] = (i + 1) * 10;               // 10 ~ 100
-        else if (i < 19) Energy_Name[i] = (i - 9 + 1) * 100;           // 200 ~ 1000
-        else             Energy_Name[i] = (i - 18 + 1) * 1000;         // 2000 ~ 10000
-
-        cout << "Energy = " << Energy_Name[i] << " GeV !" << endl;
+        if (k < 10)      Energy_Name[k] = (k + 1) * 10;               // 10 ~ 100
+        else if (k < 19) Energy_Name[k] = (k - 9 + 1) * 100;           // 200 ~ 1000
+        else             Energy_Name[k] = (k - 18 + 1) * 1000;         // 2000 ~ 10000
+        double BEST_FIT_MEAN = hist_p->GetBinContent(k+1);
+        cout << "Energy = " << Energy_Name[k] << " GeV ! Best Fit for Proton Estimated factor = " << BEST_FIT_MEAN << endl;
         int p_FH_Lay; int p_FH_Type; double p_Total_E;      int p_Nhits;std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_L_EnergyVec = nullptr;   std::vector<double>* p_EnergyVec = nullptr;   std::vector<double>* p_Efrac = nullptr; double p_weight;
         int d_FH_Lay; int d_FH_Type; double d_Total_E;      int d_Nhits;std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_L_EnergyVec = nullptr;   std::vector<double>* d_EnergyVec = nullptr;   std::vector<double>* d_Efrac = nullptr; double d_weight;
         int p_FI_Lay;    double p_FI_Dep;    int p_particle;
         int d_FI_Lay;    double d_FI_Dep;    int d_particle;
 
-        auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Proton_%dGeV.root",Energy_Name[i]));
+        auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Proton_%dGeV.root",Energy_Name[k]));
         auto proton_tree = (TTree*)proton_file->Get("B4");
         proton_tree->SetBranchAddress("Particle"         ,&p_particle);
         proton_tree->SetBranchAddress("RMS"              ,&p_RMSVec);
@@ -28,10 +30,9 @@ void Percentile2DepthEst()
         proton_tree->SetBranchAddress("First_Ine_Depth", &p_FI_Dep);
         proton_tree->SetBranchAddress("First_Ine_Layer", &p_FI_Lay);
         proton_tree->SetBranchAddress("Total_E"         ,&p_Total_E);
-        // proton_tree->SetBranchAddress("weight"          ,&p_weight);
         proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
 
-        auto deuteron_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_%dGeV.root",Energy_Name[i]));
+        auto deuteron_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_%dGeV.root",Energy_Name[k]));
         auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
         deuteron_tree->SetBranchAddress("Particle"         ,&d_particle);
         deuteron_tree->SetBranchAddress("RMS"              ,&d_RMSVec);
@@ -43,63 +44,49 @@ void Percentile2DepthEst()
         deuteron_tree->SetBranchAddress("First_Ine_Depth", &d_FI_Dep);
         deuteron_tree->SetBranchAddress("First_Ine_Layer", &d_FI_Lay);
         deuteron_tree->SetBranchAddress("Total_E"          ,&d_Total_E);
-        // deuteron_tree->SetBranchAddress("weight"           ,&d_weight);
         deuteron_tree->SetBranchAddress("Nhits"          , &d_Nhits);
-
-        double Energy[15]={0};
-        double Energy_LL[15]={0};      
-        double Energy_UL[15]={0};
 
         double Layer[14]={0};
         double Layer_Err[14]={0};
 
         // Depsit and Layer
-        TH1D *h1_p[15][14];     TH1D *h1_p_inter[15];  TH1D *h1_p_Lay[14];
-        TH1D *h1_d[15][14];     TH1D *h1_d_inter[15];  TH1D *h1_d_Lay[14];
+        TH1D *h1_p_Lay[15]; // h1_p_Lay[14] 用来装Passthrough的事例
+        TH1D *h1_d_Lay[15]; // h1_d_Lay[14] 用来装Passthrough的事例
+        TF1 *fitFunc_p[14];  auto gre_p_reso = new TGraphErrors();  auto gre_p_bias = new TGraphErrors();
+        TF1 *fitFunc_d[14];  auto gre_d_reso = new TGraphErrors();  auto gre_d_bias = new TGraphErrors();
 
-        auto h2_p_int = new TH2D("h2_p_int","h2_p_int",200,-40,360,200,-40,360);  
-        auto h2_d_int = new TH2D("h2_d_int","h2_d_int",200,-40,360,200,-40,360);  
+        auto h2_p_int = new TH2D("h2_p_int","h2_p_int",185,-10,360,300,-240,360);  
+        auto h2_d_int = new TH2D("h2_d_int","h2_d_int",185,-10,360,300,-240,360);  
+        auto h1_p_int = new TH1D("h1_p_int","h1_p_int",12,0,360);  
+        auto h1_d_int = new TH1D("h1_d_int","h1_d_int",12,0,360);  
+        auto h1_p_inl = new TH1D("h1_p_inl","h1_p_inl",12,0,360);  
+        auto h1_d_inl = new TH1D("h1_d_inl","h1_d_inl",12,0,360);  
+        auto h1_p_sur = new TH1D("h1_p_sur","h1_p_sur",12,0,360);  
+        auto h1_d_sur = new TH1D("h1_d_sur","h1_d_sur",12,0,360);  
+        auto h1_p_lea = new TH1D("h1_p_lea","h1_p_lea",12,0,360);  
+        auto h1_d_lea = new TH1D("h1_d_lea","h1_d_lea",12,0,360);  
 
-        auto h1_p_int = new TH1D("h1_p_int","h1_p_int",18,0,360);  
-        auto h1_d_int = new TH1D("h1_d_int","h1_d_int",18,0,360);  
-
-        auto h1_p_inl = new TH1D("h1_p_inl","h1_p_inl",18,0,360);  
-        auto h1_d_inl = new TH1D("h1_d_inl","h1_d_inl",18,0,360);  
-
-        auto h1_p_sur = new TH1D("h1_p_sur","h1_p_sur",18,0,360);  
-        auto h1_d_sur = new TH1D("h1_d_sur","h1_d_sur",18,0,360);  
-
-        auto h1_p_lea = new TH1D("h1_p_lea","h1_p_lea",18,0,360);  
-        auto h1_d_lea = new TH1D("h1_d_lea","h1_d_lea",18,0,360);  
-
-        for(int i =0 ; i<15 ; i++)  // Deposit Energy Bin
+        for(int i =0 ; i<15 ; i++)  // Layer
         {
-            Energy[i]    = 1.1 + 0.2 * i;
-            Energy_LL[i] = 1.0 + 0.2 * i;
-            Energy_UL[i] = 1.2 + 0.2 * i;
-
-            h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i),120,-10,5);  
-            h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i),120,-10,5);  
-            for( int j= 0; j<14 ;j++)
-            {
-                h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j),120,-10,5);  
-                h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j),120,-10,5);  
-                Layer[j] = 0.5 + j;
-                Layer_Err[j] = 0.5;
-            }
+            h1_p_Lay[i] =new TH1D(Form("h1_p_Lay[%d]",i),Form("h1_p_Lay[%d]",i),60,-3,3);  
+            h1_d_Lay[i] =new TH1D(Form("h1_d_Lay[%d]",i),Form("h1_d_Lay[%d]",i),60,-3,3); 
             if (i<14)
             {
-                h1_p_Lay[i] =new TH1D(Form("h1_p_Lay[%d]",i),Form("h1_p_Lay[%d]",i),60,-3,3);  
-                h1_d_Lay[i] =new TH1D(Form("h1_d_Lay[%d]",i),Form("h1_d_Lay[%d]",i),60,-3,3);  
+                Layer[i] = 0.5 + i;
+                Layer_Err[i] = 0.5;
+                fitFunc_p[i] = new TF1(Form("fitFunc_p[%d]",i), "gaus", -1, 1); // 注意替换范围
+                fitFunc_d[i] = new TF1(Form("fitFunc_d[%d]",i), "gaus", -1, 1); // 注意替换范围
             }
         }
-    
+        
+
         for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
         {        
             proton_tree->GetEntry(entry);
+            if (entry%1000==0) cout << " Proton : " << entry << endl;
             int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
-            // if(p_energy_index < 0 || p_energy_index > 14) continue;
-            if(p_FI_Dep < 0) continue;
+            // if (p_energy_index < 0 || p_energy_index > 14) continue;
+            if (p_FI_Dep < 0) {p_FI_Lay = 14;}
             // if (p_Nhits < 10 ) continue;
             double sum_p = 0;
             int bar_info[2] = {0};
@@ -151,31 +138,32 @@ void Percentile2DepthEst()
             double lower_bound = std::max(seg_peak_idx-7, -1 );
             TF1 *sigmoid = new TF1("sigmoid", "[0]+ [4]*x + ([1]-[0] -  [4]*x )/(1 + exp(-(x-[2])/[3]))", 0, 14);
             sigmoid->SetParameters(hBGO1->GetBinContent(1), 
-                                hBGO3->GetBinContent(14), 
-                                seg_peak_idx - 0.5, 
-                                1 , 
-                                max(hBGO1->GetBinContent(1)*0.1,0.01)); 
+                                    hBGO3->GetBinContent(14), 
+                                    seg_peak_idx - 0.5, 
+                                    1 , 
+                                    max(hBGO1->GetBinContent(1)*0.1,0.01)); 
             sigmoid->SetParLimits(0, 0                                     , hBGO1->GetMaximum()         );   // [0] Ymin
             sigmoid->SetParLimits(1, hBGO1->GetMaximum()                   , 1e6                         );   // [1] Ymax
             sigmoid->SetParLimits(2, lower_bound                           , upper_bound                 );   // [2] Xmid
             sigmoid->SetParLimits(3, 0.01                                  , 10                          );   // [3] Slope，避免除0
             sigmoid->SetParLimits(4, max(hBGO1->GetBinContent(1)*0.1,0.01) , hBGO1->GetBinContent(1) * 10);   // [4] linear bias
             TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RSQ");  // R: fit range, S: return TFitResultPtr
-
-            // h1_p[p_energy_index][p_FI_Lay]->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
-            // h1_p_inter[p_energy_index]->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3)) ;
-            h2_p_int->Fill(p_FI_Dep, (-4.789 * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5);
-            h1_p_Lay[p_FI_Lay]->Fill( (p_FI_Dep -  (-4.789 * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5) / p_FI_Dep );
-            h1_p_int->Fill((-4.789 * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5);
+            double Est_Depth = (BEST_FIT_MEAN * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5;
+            // if ( Est_Depth < -40 ) cout << "Watch out " << entry << " Value " << Est_Depth <<endl;
+            h2_p_int->Fill(p_FI_Dep, Est_Depth);
+            h1_p_Lay[p_FI_Lay]->Fill( (p_FI_Dep -  Est_Depth) / p_FI_Dep );
+            h1_p_int->Fill(Est_Depth);
             h1_p_inl->Fill(p_FI_Dep);
         }
 
-        for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
+        // cout << " Propare Deuteron" << endl; // deuteron_tree->GetEntries()
+        for (Long64_t entry = 0; entry < deuteron_tree->GetEntries() ; ++entry)
         {
             deuteron_tree->GetEntry(entry);
+            if (entry%1000==0) cout << " Deuteron : " << entry << endl;
             int d_energy_index = int(floor((log10(d_Total_E) - 1) / 0.2));
-            // if(d_energy_index < 0 || d_energy_index > 14) continue;
-            if(d_FI_Dep < 0) continue;
+            // if (d_energy_index < 0 || d_energy_index > 14) continue;
+            if (d_FI_Dep < 0) {d_FI_Lay = 14;}
             // if (d_Nhits < 10 ) continue;
             double sum_d = 0;
             int bar_info[2] = {0};
@@ -237,82 +225,35 @@ void Percentile2DepthEst()
             sigmoid->SetParLimits(3, 0.01                                  , 10                          );   // [3] Slope，避免除0
             sigmoid->SetParLimits(4, max(hBGO1->GetBinContent(1)*0.1,0.01) , hBGO1->GetBinContent(1) * 10);   // [4] linear bias
             TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RSQ");  // R: fit range, S: return TFitResultPtr
-
-            // h1_d[d_energy_index][d_FI_Lay]->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
-            // h1_d_inter[d_energy_index]->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3)) ;
-            h2_d_int->Fill(d_FI_Dep, (-4.789 * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5);
-            h1_d_Lay[d_FI_Lay]->Fill( (d_FI_Dep -  (-4.789 * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5) / d_FI_Dep );
-            h1_d_int->Fill((-4.789 * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5);
+            double Est_Depth = (BEST_FIT_MEAN * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5;
+            h2_d_int->Fill(d_FI_Dep, Est_Depth);
+            h1_d_Lay[d_FI_Lay]->Fill( (d_FI_Dep -  Est_Depth) / d_FI_Dep );
+            h1_d_int->Fill(Est_Depth);
             h1_d_inl->Fill(d_FI_Dep);
         }
 
-        // for (int i = 9; i < 10; i++) // Deposit Energy Bin
-        // {
-        //     auto c1 = new TCanvas("c1","c1",2500,1500);
-        //     c1->Clear();
-        //     c1->Divide(5,3);
-        //     gStyle->SetOptStat(0);
-
-        //     double Proton_Ratio[14]={0};     double Deuteron_Ratio[14]={0};     
-        //     double Proton_Ratio_LL[14]={0};  double Deuteron_Ratio_LL[14]={0};  
-        //     double Proton_Ratio_UL[14]={0};  double Deuteron_Ratio_UL[14]={0};  
-        //     for (int j = 0; j < 14; j++) // layer
-        //     {
-        //         h1_p[i][j]->SetLineColor(kRed);   h1_p[i][j]->SetMarkerColor(kRed);  h1_p[i][j]->SetLineWidth(2);   h1_p[i][j]->Sumw2();
-        //         h1_d[i][j]->SetLineColor(kBlue);  h1_d[i][j]->SetMarkerColor(kBlue); h1_d[i][j]->SetLineWidth(2);   h1_d[i][j]->Sumw2();
-                
-        //         c1->cd(j + 1);
-
-        //         // h1_p[i][j]->Scale(1.0/h1_p[i][j]->Integral());
-        //         // h1_d[i][j]->Scale(1.0/h1_d[i][j]->Integral());
-        //         // h1_p[i][j]->GetYaxis()->SetRangeUser(0,h1_p[i][j]->GetMaximum()*1.2);
-
-        //         h1_p[i][j]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV]Interaction happened in L%d;(Xine-Xmid)/Slope;Normalized Count", pow(10,Energy_LL[i]),pow(10,Energy_UL[i]),j ));
-        //         h1_p[i][j]->Draw("hist");
-        //         h1_d[i][j]->Draw("histsame");
-
-        //     }
-        //     c1->cd(15);
-        //     TLatex *tex = new TLatex(0.1,0.9,Form("Deposit Energy[%.2fGeV, %.2fGeV]",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));tex->SetNDC();tex->Draw(); 
-        //     auto legend1 = new TLegend(0.12, 0.12, 0.88, 0.88);
-        //     legend1->AddEntry(h1_p[i][0], "Proton", "l");
-        //     legend1->AddEntry(h1_d[i][0], "Deuteron", "l");     
-        //     legend1->Draw();       
-        //     // c1->SaveAs( Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Longti_PowerE/PDF/Longti_EnergyVec_%.2f_%.2f.pdf",Energy_LL[i],Energy_UL[i]));
-
-        //     auto c2 = new TCanvas("c2","c2",1000,1000);
-        //     c2->cd();
-        //     h1_p_inter[i]->SetLineColor(kRed);   h1_p_inter[i]->SetMarkerColor(kRed);  h1_p_inter[i]->SetLineWidth(2);   h1_p_inter[i]->Sumw2();
-        //     h1_d_inter[i]->SetLineColor(kBlue);  h1_d_inter[i]->SetMarkerColor(kBlue); h1_d_inter[i]->SetLineWidth(2);   h1_d_inter[i]->Sumw2();
-        //     // h1_p_inter[i]->Scale(1.0/h1_p_inter[i]->Integral()); 
-        //     // h1_d_inter[i]->Scale(1.0/h1_d_inter[i]->Integral()); 
-        //     // h1_p_inter[i]->GetYaxis()->SetRangeUser(0,h1_p_inter[i]->GetMaximum()*1.2);
-        //     h1_p_inter[i]->SetTitle(Form("Deposit Energy[%.2fGeV, %.2fGeV] Stack Multi Layer;(Xine-Xmid)/Slope;Normalized Count",pow(10,Energy_LL[i]),pow(10,Energy_UL[i])));
-        //     h1_p_inter[i]->Draw("hist");
-        //     h1_d_inter[i]->Draw("histsame");
-        // }
-
         h2_p_int->Sumw2();    h1_p_int->Sumw2();
         h2_d_int->Sumw2();    h1_d_int->Sumw2();
+
+        // N_sur Fitting Function
         TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-x/[1])", 60, 260); 
         TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-x/[1])", 60, 260); 
         fitFunc1->SetParameters(1e4, 200); 
         fitFunc2->SetParameters(1e4, 170); 
         fitFunc1->SetLineColor(kRed); 
         fitFunc2->SetLineColor(kBlue);
-        // fitFunc1->FixParameter(0, h2_p_int->Integral());
-        // fitFunc2->FixParameter(0, h2_d_int->Integral());
+        fitFunc1->FixParameter(0, h2_p_int->Integral());
+        fitFunc2->FixParameter(0, h2_d_int->Integral());
 
+        // N_int Fitting Function
         TF1 *fitFunc3 = new TF1("fitFunc3", "[0]/[1]*exp(-x/[1])", 60, 260); 
         TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/[1]*exp(-x/[1])", 60, 260); 
-        fitFunc3->SetParameters(1e3, 200); 
-        fitFunc4->SetParameters(1e3, 170); 
+        fitFunc3->SetParameters(h2_p_int->Integral() * h1_p_int->GetBinWidth(1), 200); 
+        fitFunc4->SetParameters(h2_d_int->Integral() * h1_d_int->GetBinWidth(1), 170); 
         fitFunc3->SetLineColor(kRed); 
         fitFunc4->SetLineColor(kBlue);
-        // fitFunc3->FixParameter(0, h2_p_int->Integral() / h2_p_int->GetBinWidth(1));
-        // fitFunc4->FixParameter(0, h2_d_int->Integral() / h2_d_int->GetBinWidth(1));
-        // fitFunc3->FixParameter(2, h2_p_int->GetBinWidth(1));
-        // fitFunc4->FixParameter(2, h2_d_int->GetBinWidth(1));
+        // fitFunc3->FixParameter(0, h2_p_int->Integral() * h1_p_int->GetBinWidth(1));
+        // fitFunc4->FixParameter(0, h2_d_int->Integral() * h1_d_int->GetBinWidth(1));
 
         cout << h2_p_int->Integral() << endl;
         cout << h2_d_int->Integral() << endl;
@@ -328,10 +269,13 @@ void Percentile2DepthEst()
         }
 
         auto c3 = new TCanvas("c3","c3",2400,1600);
+        gStyle->SetOptFit(1111);
         c3->cd();
         c3->Divide(3,2);
         c3->cd(1);
-        h2_p_int->SetTitle("Proton Stack Multi Layer;True Inelastic Depth;Depth (mm)");
+        h2_p_int->SetTitle(Form("Incident Proton %d GeV;True Inelastic Depth (mm);Estimate Depth (mm)", Energy_Name[k]));
+        h2_p_int->GetXaxis()->CenterTitle();
+        h2_p_int->GetYaxis()->CenterTitle();
         h2_p_int->Draw("colz");
 
         c3->cd(2);
@@ -346,8 +290,8 @@ void Percentile2DepthEst()
         h1_p_inl->Draw("histsame");
         
         auto lg1 = new TLegend(0.3,0.7,0.6,0.88);
-        lg1->AddEntry(h1_p_int,"Estimated","l");
-        lg1->AddEntry(h1_p_inl,"Inelastic","l");
+        lg1->AddEntry(h1_p_int,"Estimate Depth","l");
+        lg1->AddEntry(h1_p_inl,"Inelastic Depth","l");
         lg1->Draw();
 
         c3->cd(3);
@@ -356,15 +300,18 @@ void Percentile2DepthEst()
         h1_p_sur->SetLineColor(kBlack);
         h1_p_sur->SetTitle("Proton N_{Survive};Depth (mm);Counts");
         h1_p_sur->Draw("hist");
+        h1_p_sur->Fit(fitFunc1,"R");  
+        fitFunc1->Draw("same");
         h1_p_lea->SetLineColor(kRed);
         h1_p_lea->Draw("histsame");
-        h1_p_lea->Fit(fitFunc1,"R");  
-        fitFunc1->Draw("same");
+
         lg1->Draw();
 
 
         c3->cd(4);
-        h2_d_int->SetTitle("Deuteron Stack Multi Layer;True Inelastic Depth;Depth (mm);");
+        h2_d_int->SetTitle(Form("Incident Deuteron %d GeV;True Inelastic Depth (mm);Estimate Depth (mm)", Energy_Name[k]));
+        h2_d_int->GetXaxis()->CenterTitle();
+        h2_d_int->GetYaxis()->CenterTitle();
         h2_d_int->Draw("colz");
 
         c3->cd(5);
@@ -379,8 +326,8 @@ void Percentile2DepthEst()
         h1_d_inl->Draw("histsame");
 
         auto lg2 = new TLegend(0.3,0.7,0.6,0.88);
-        lg2->AddEntry(h1_d_int,"Estimated","l");
-        lg2->AddEntry(h1_d_inl,"Inelastic","l");
+        lg2->AddEntry(h1_d_int,"Estimate Depth","l");
+        lg2->AddEntry(h1_d_inl,"Inelastic Depth","l");
         lg2->Draw();
 
         c3->cd(6);
@@ -389,19 +336,20 @@ void Percentile2DepthEst()
         h1_d_sur->SetLineColor(kBlack);
         h1_d_sur->SetTitle("Deuteron N_{Survive};Depth (mm);Counts");
         h1_d_sur->Draw("hist");
+        h1_d_sur->Fit(fitFunc2,"R");  
+        fitFunc2->Draw("same");
         h1_d_lea->SetLineColor(kBlue);
         h1_d_lea->Draw("histsame");
-        h1_d_lea->Fit(fitFunc2,"R");  
-        fitFunc2->Draw("same");
+
         lg2->Draw();
 
-    // Xine = Xmid - 4.879 * Slope
-        auto c4 = new TCanvas("c4","c4",1000,1000);
+        // Xine = Xmid - 4.879 * Slope
+        auto c4 = new TCanvas("c4","c4",2500,1500);
         c4->cd();
         c4->Clear();
         c4->Divide(5,3);
         gStyle->SetOptStat(0);
-        for (int j = 0; j < 14; j++) // layer
+        for (int j = 0; j <= 14; j++) // layer
         {
             c4->cd(j + 1);
             h1_p_Lay[j]->SetLineColor(kRed);   h1_p_Lay[j]->SetMarkerColor(kRed);  h1_p_Lay[j]->SetLineWidth(2);   h1_p_Lay[j]->Sumw2();
@@ -409,13 +357,70 @@ void Percentile2DepthEst()
             h1_p_Lay[j]->Scale(1.0/h1_p_Lay[j]->Integral()); 
             h1_d_Lay[j]->Scale(1.0/h1_d_Lay[j]->Integral()); 
             h1_p_Lay[j]->GetYaxis()->SetRangeUser(0,h1_p_Lay[j]->GetMaximum()*1.2);
-            h1_p_Lay[j]->SetTitle(" Stack Multi Layer;(Xine-#hat{Xest})/Xine;Normalized Count");
+            h1_p_Lay[j]->GetXaxis()->CenterTitle();
+            h1_p_Lay[j]->GetYaxis()->CenterTitle();
             h1_p_Lay[j]->Draw("hist");
             h1_d_Lay[j]->Draw("histsame");
+            if (j<14)
+            {
+                h1_p_Lay[j]->Fit(fitFunc_p[j],"RSQ");
+                h1_d_Lay[j]->Fit(fitFunc_d[j],"RSQ");
+                gre_p_bias->SetPoint(j,Layer[j],fitFunc_p[j]->GetParameter(1));
+                gre_d_bias->SetPoint(j,Layer[j],fitFunc_d[j]->GetParameter(1));
+                gre_p_bias->SetPointError(j,Layer_Err[j],fitFunc_p[j]->GetParError(1));
+                gre_d_bias->SetPointError(j,Layer_Err[j],fitFunc_d[j]->GetParError(1));
+                gre_p_reso->SetPoint(j,Layer[j],fitFunc_p[j]->GetParameter(2));
+                gre_d_reso->SetPoint(j,Layer[j],fitFunc_d[j]->GetParameter(2));
+                gre_p_reso->SetPointError(j,Layer_Err[j],fitFunc_p[j]->GetParError(2));
+                gre_d_reso->SetPointError(j,Layer_Err[j],fitFunc_d[j]->GetParError(2));
+                h1_p_Lay[j]->SetTitle(Form("Inelastic interaction at Layer %d;(Xine-#hat{Xest})/Xine;Normalized Count",j));
+                fitFunc_p[j]->SetLineColor(kRed);
+                fitFunc_d[j]->SetLineColor(kBlue);
+                fitFunc_p[j]->Draw("same");
+                fitFunc_d[j]->Draw("same");
+            }
+            else h1_p_Lay[j]->SetTitle("No Inelastic interaction, Pass through;(Xine-#hat{Xest})/Xine;Normalized Count");
+            h1_p_Lay[j]->GetYaxis()->SetTitleSize(0.05); 
+            h1_p_Lay[j]->GetYaxis()->SetTitleOffset(0.9); 
+            h1_p_Lay[j]->GetXaxis()->SetTitleSize(0.05); 
         }
 
 
-        auto write_file = new TFile(Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/DepthEst_%dGeV.root",Energy_Name[i]), "RECREATE");
+        gre_p_bias->SetLineColor(kRed);
+        gre_d_bias->SetLineColor(kBlue);
+        gre_p_reso->SetLineColor(kRed);
+        gre_d_reso->SetLineColor(kBlue);
+        gre_p_bias->SetLineWidth(2);
+        gre_d_bias->SetLineWidth(2);
+        gre_p_reso->SetLineWidth(2);
+        gre_d_reso->SetLineWidth(2);
+
+        gre_p_bias->SetMarkerColor(kRed);
+        gre_d_bias->SetMarkerColor(kBlue);
+        gre_p_reso->SetMarkerColor(kRed);
+        gre_d_reso->SetMarkerColor(kBlue);
+        gre_p_bias->SetMarkerStyle(20);
+        gre_d_bias->SetMarkerStyle(21);
+        gre_p_reso->SetMarkerStyle(20);
+        gre_d_reso->SetMarkerStyle(21);
+
+        auto c5 = new TCanvas("c5","c5",2500,1500);
+        c5->Divide(2,1);
+        c5->cd(1);
+        gPad->SetGrid(0,1);
+        gre_p_bias->GetXaxis()->SetLimits(0,14);
+        gre_p_bias->SetTitle(";BGO Layer;Bias of (Xine-#hat{Xest})/Xine");
+        gre_p_bias->Draw("AP");
+        gre_d_bias->Draw("PSAME");
+
+        c5->cd(2);
+        gPad->SetGrid(0,1);
+        gre_p_reso->GetXaxis()->SetLimits(0,14);
+        gre_p_reso->SetTitle(";BGO Layer;Resolution of (Xine-#hat{Xest})/Xine");
+        gre_p_reso->Draw("AP");
+        gre_d_reso->Draw("PSAME");
+
+        auto write_file = new TFile(Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/DepthEst_%dGeV.root",Energy_Name[k]), "RECREATE");
         write_file->cd();
         h2_p_int->Write();
         h2_d_int->Write();
@@ -431,6 +436,7 @@ void Percentile2DepthEst()
         h1_d_lea->Write();
         c3->Write();
         c4->Write();
+        c5->Write();
         write_file->Close();
     }
 

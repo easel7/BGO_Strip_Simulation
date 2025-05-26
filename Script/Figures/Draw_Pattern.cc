@@ -13,7 +13,7 @@ void Draw_Pattern()
     int p_FI_Lay;
     double p_Total_E;
     const char* string1;
-    const char* string2 = "Proton_1000GeV";
+    const char* string2 = "Deuteron_1000GeV";
 
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     auto proton_tree = (TTree*)proton_file->Get("B4");
@@ -44,9 +44,9 @@ void Draw_Pattern()
     int point_counter_p = 0;
 
     // cout  << proton_tree->GetEntries() << endl;
-    Long64_t entry  = 162;   
+    Long64_t entry  = 3008;   
     int Counts = 0;
-    // for (Long64_t entry = 0; entry < 100; entry++)
+    // for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
     {
         auto c1    = new TCanvas("c1","c1",2100,1400);
         auto hXZ   = new TH2D("hXZ","BGO X-Z Plane",22,-11,11,14,0,14);
@@ -330,6 +330,9 @@ void Draw_Pattern()
         cout << "perenctile2: " << percentile2 << endl; 
         latex.DrawLatexNDC(0.12, 0.82, Form("Ine Vertex Sigmoid Percentile:%.2f %%", percentile2*100));
         int Percent2Layer = Inverse_Mod_sigmoid(percentile2, sigmoid->GetParameter(2), sigmoid->GetParameter(3));
+        double Est_Depth = (-4.789 * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5;
+        if ( Est_Depth < -40 ) cout << "Watch out " << entry << " Value " << Est_Depth <<endl;
+
         cout << "Percent2Layer : " << Percent2Layer << endl;
         g_vert4->SetMarkerStyle(3);   
         g_vert4->SetMarkerColor(3);
@@ -369,7 +372,7 @@ void Draw_Pattern()
         line0->SetLineStyle(2);
         line0->Draw("same");
         Counts++;
-        if (Counts < 100) { c1->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/%s/%s/%lld.pdf",string1,string2,entry)); }
+        // if (Counts < 100) { c1->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Figures/%s/%s/%lld.pdf",string1,string2,entry)); }
         // else {break;}
     }
 }

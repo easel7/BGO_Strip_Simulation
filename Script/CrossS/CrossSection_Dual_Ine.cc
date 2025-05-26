@@ -20,12 +20,14 @@ void CrossSection_Dual_Ine()
     tree2->Draw("First_Ine_Depth>>h2",HI,"");
     // h1->Scale(0.5);    h1_0->Scale(0.5);
     // h2->Scale(0.5);    h2_0->Scale(0.5);
-    cout << h1->Integral() << endl;
-    cout << h2->Integral() << endl;
+    cout << h1_0->Integral() << endl;
+    cout << h1_0->Integral() << endl;
     for(int ii = 1 ; ii <= h1->GetNbinsX() ; ii++)
     {
         hC1->SetBinContent(ii, ( h1_0->Integral() - h1->Integral(1,ii) ) );
         hC2->SetBinContent(ii, ( h1_0->Integral() - h2->Integral(1,ii) ) );
+        cout << h1->Integral(1,ii) << " , " <<  h1->GetBinContent(ii) << endl;
+
     }
 
     // Fit for Survive
@@ -76,9 +78,8 @@ void CrossSection_Dual_Ine()
     latex.DrawLatex(0,100,Form("Deuteron Fitting Num: %.2f ",fitFunc7->GetParameter(0)));
 
     auto c1 = new TCanvas("c1","c1",1200,900);
-
     c1->Clear();
-    gPad->SetLogy();
+    // gPad->SetLogy();
     gStyle->SetOptFit(0);
     gStyle->SetOptStat(0);
 
