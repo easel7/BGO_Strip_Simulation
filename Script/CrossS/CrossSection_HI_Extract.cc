@@ -1,113 +1,114 @@
 void CrossSection_HI_Extract()
 {
-    double Proton_Section[19]={0};      
-    double Proton_Section_Err[19]={0};  
-    double Deuteron_Section[19]={0};    
-    double Deuteron_Section_Err[19]={0};
-    double Electron_Section[19]={0};    
-    double Electron_Section_Err[19]={0};
-    double Helium4_Section[19]={0};     
-    double Helium4_Section_Err[19]={0}; 
-    double Helium3_Section[19]={0};     
-    double Helium3_Section_Err[19]={0}; 
-    double Carbon_Section[19]={0};      
-    double Carbon_Section_Err[19]={0};  
-    double Energy[19]={0};              
-    double Energy_Err[19]={0};          
+    double Proton_Section[29]={0};      
+    double Proton_Section_Err[29]={0};  
+    double Deuteron_Section[29]={0};    
+    double Deuteron_Section_Err[29]={0};
+    double Electron_Section[29]={0};    
+    double Electron_Section_Err[29]={0};
+    double Helium4_Section[29]={0};     
+    double Helium4_Section_Err[29]={0}; 
+    double Helium3_Section[29]={0};     
+    double Helium3_Section_Err[29]={0}; 
+    double Carbon_Section[29]={0};      
+    double Carbon_Section_Err[29]={0};  
+    double Energy[29]={0};              
+    double Energy_Err[29]={0};          
 
-    double proton_constant[19]={0};     
-    double proton_lambda[19]={0};      
-    double proton_lambda_err[19]={0};   
-    double deuteron_constant[19]={0};  
-    double deuteron_lambda[19]={0};    
-    double deuteron_lambda_err[19]={0};
-    double electron_constant[19]={0};
-    double electron_lambda[19]={0};
-    double electron_lambda_err[19]={0};
-    double helium4_constant[19]={0};
-    double helium4_lambda[19]={0};
-    double helium4_lambda_err[19]={0};
-    double helium3_constant[19]={0};
-    double helium3_lambda[19]={0};
-    double helium3_lambda_err[19]={0};
-    double carbon_constant[19]={0};
-    double carbon_lambda[19]={0};
-    double carbon_lambda_err[19]={0};
+    double proton_constant[29]={0};     
+    double proton_lambda[29]={0};      
+    double proton_lambda_err[29]={0};   
+    double deuteron_constant[29]={0};  
+    double deuteron_lambda[29]={0};    
+    double deuteron_lambda_err[29]={0};
+    double electron_constant[29]={0};
+    double electron_lambda[29]={0};
+    double electron_lambda_err[29]={0};
+    double helium4_constant[29]={0};
+    double helium4_lambda[29]={0};
+    double helium4_lambda_err[29]={0};
+    double helium3_constant[29]={0};
+    double helium3_lambda[29]={0};
+    double helium3_lambda_err[29]={0};
+    double carbon_constant[29]={0};
+    double carbon_lambda[29]={0};
+    double carbon_lambda_err[29]={0};
 
-    double n_BGO = TMath::Na()*7.13/ (1245.8344/19.); // cm-3
-    TH1D *h1_p[19]; TH1D *hC_p[19]; TF1  *fitFunc_p[19];
-    TH1D *h1_d[19]; TH1D *hC_d[19]; TF1  *fitFunc_d[19];
-    TH1D *h1_e[19]; TH1D *hC_e[19]; TF1  *fitFunc_e[19];
-    TH1D *h1_h[19]; TH1D *hC_h[19]; TF1  *fitFunc_h[19];
-    TH1D *h1_H[19]; TH1D *hC_H[19]; TF1  *fitFunc_H[19];
-    TH1D *h1_c[19]; TH1D *hC_c[19]; TF1  *fitFunc_c[19];
+    double n_BGO = TMath::Na()*7.13/ (1245.8344/29.); // cm-3
+    TH1D *h1_p[29]; TH1D *hC_p[29]; TF1  *fitFunc_p[29];
+    TH1D *h1_d[29]; TH1D *hC_d[29]; TF1  *fitFunc_d[29];
+    TH1D *h1_e[29]; TH1D *hC_e[29]; TF1  *fitFunc_e[29];
+    TH1D *h1_h[29]; TH1D *hC_h[29]; TF1  *fitFunc_h[29];
+    TH1D *h1_H[29]; TH1D *hC_H[29]; TF1  *fitFunc_H[29];
+    TH1D *h1_c[29]; TH1D *hC_c[29]; TF1  *fitFunc_c[29];
 
     TCut EM = "First_Type==0";
-    TCut HD = "First_Had_Depth>=0";
-    TCut HI = "First_Had_Depth>=0 && First_Had_Type==1";
+    TCut HD = "First_Ine_Depth>=0";
+    TCut HI = "First_Ine_Depth>=0";
 
-    for (int i =0; i < 19; i++)
+    for (int i =0; i < 29; i++)
     {
-        if(i<9)  {Energy[i] =  (i+1)*10;}
-        else   {Energy[i] =  i*100-800;}
+        if (i < 10)      Energy[i] = (i + 1) * 10;               // 10 ~ 100
+        else if (i < 29) Energy[i] = (i - 9 + 1) * 100;           // 200 ~ 1000
+        else             Energy[i] = (i - 18 + 1) * 1000;         // 2000 ~ 10000
         cout << "Energy = " << int(Energy[i]) << " GeV !" << endl;
 
         auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Proton_%dGeV.root",int(Energy[i])));
         auto proton_tree = (TTree*)proton_file->Get("B4");
-        h1_p[i] = new TH1D(Form("h1_p[%d]",i),Form("h1_p[%d]",i),50,0,50);
-        hC_p[i] = new TH1D(Form("hC_p[%d]",i),Form("hC_p[%d]",i),50,0,50);
-        proton_tree->Draw(Form("First_Had_Depth>>h1_p[%d]",i),HI,"");
-        fitFunc_p[i] = new TF1(Form("fitFunc_p[%d]",i), "[0]*exp(-x/[1])", 0,27);
+        h1_p[i] = new TH1D(Form("h1_p[%d]",i),Form("h1_p[%d]",i),18,0,360);
+        hC_p[i] = new TH1D(Form("hC_p[%d]",i),Form("hC_p[%d]",i),18,0,360);
+        proton_tree->Draw(Form("First_Ine_Depth>>h1_p[%d]",i),HI,"");
+        fitFunc_p[i] = new TF1(Form("fitFunc_p[%d]",i), "[0]*exp(-x/[1])", 0,250);
         fitFunc_p[i]->SetParameters(1e4, 15); 
 
         auto deuteron_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_%dGeV.root",int(Energy[i])));
         auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
-        h1_d[i] = new TH1D(Form("h1_d[%d]",i),Form("h1_d[%d]",i),50,0,50);
-        hC_d[i] = new TH1D(Form("hC_d[%d]",i),Form("hC_d[%d]",i),50,0,50);
-        deuteron_tree->Draw(Form("First_Had_Depth>>h1_d[%d]",i),HI, "");
-        fitFunc_d[i] = new TF1(Form("fitFunc_d[%d]",i), "[0]*exp(-x/[1])", 0,27);
+        h1_d[i] = new TH1D(Form("h1_d[%d]",i),Form("h1_d[%d]",i),18,0,360);
+        hC_d[i] = new TH1D(Form("hC_d[%d]",i),Form("hC_d[%d]",i),18,0,360);
+        deuteron_tree->Draw(Form("First_Ine_Depth>>h1_d[%d]",i),HI, "");
+        fitFunc_d[i] = new TF1(Form("fitFunc_d[%d]",i), "[0]*exp(-x/[1])", 0,250);
         fitFunc_d[i]->SetParameters(1e4, 15); 
 
         auto electron_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Electron_%dGeV.root",int(Energy[i])));
         auto electron_tree = (TTree*)electron_file->Get("B4");
-        h1_e[i] = new TH1D(Form("h1_e[%d]",i),Form("h1_e[%d]",i),50,0,50);
-        hC_e[i] = new TH1D(Form("hC_e[%d]",i),Form("hC_e[%d]",i),50,0,50);
-        fitFunc_e[i] = new TF1(Form("fitFunc_e[%d]",i), "[0]*exp(-x/[1])", 0,27);
+        h1_e[i] = new TH1D(Form("h1_e[%d]",i),Form("h1_e[%d]",i),18,0,360);
+        hC_e[i] = new TH1D(Form("hC_e[%d]",i),Form("hC_e[%d]",i),18,0,360);
+        fitFunc_e[i] = new TF1(Form("fitFunc_e[%d]",i), "[0]*exp(-x/[1])", 0,250);
         fitFunc_e[i]->SetParameters(1e4, 15); 
-        electron_tree->Draw(Form("First_Had_Depth>>h1_e[%d]",i),HI, "");
+        electron_tree->Draw(Form("First_Ine_Depth>>h1_e[%d]",i),HI, "");
 
         auto helium4_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Helium4_%dGeV.root",int(Energy[i])));
         auto helium4_tree = (TTree*)helium4_file->Get("B4");
-        h1_h[i] = new TH1D(Form("h1_h[%d]",i),Form("h1_h[%d]",i),50,0,50);
-        hC_h[i] = new TH1D(Form("hC_h[%d]",i),Form("hC_h[%d]",i),50,0,50);
-        helium4_tree->Draw(Form("First_Had_Depth>>h1_h[%d]",i),HI, "");
-        fitFunc_h[i] = new TF1(Form("fitFunc_h[%d]",i), "[0]*exp(-x/[1])", 0,27);
+        h1_h[i] = new TH1D(Form("h1_h[%d]",i),Form("h1_h[%d]",i),18,0,360);
+        hC_h[i] = new TH1D(Form("hC_h[%d]",i),Form("hC_h[%d]",i),18,0,360);
+        helium4_tree->Draw(Form("First_Ine_Depth>>h1_h[%d]",i),HI, "");
+        fitFunc_h[i] = new TF1(Form("fitFunc_h[%d]",i), "[0]*exp(-x/[1])", 0,250);
         fitFunc_h[i]->SetParameters(1e4, 15); 
 
         auto helium3_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Helium3_%dGeV.root",int(Energy[i])));
         auto helium3_tree = (TTree*)helium3_file->Get("B4");
-        h1_H[i] = new TH1D(Form("h1_H[%d]",i),Form("h1_H[%d]",i),50,0,50);
-        hC_H[i] = new TH1D(Form("hC_H[%d]",i),Form("hC_H[%d]",i),50,0,50);
-        helium3_tree->Draw(Form("First_Had_Depth>>h1_H[%d]",i),HI, "");
-        fitFunc_H[i] = new TF1(Form("fitFunc_H[%d]",i), "[0]*exp(-x/[1])", 0,27);
+        h1_H[i] = new TH1D(Form("h1_H[%d]",i),Form("h1_H[%d]",i),18,0,360);
+        hC_H[i] = new TH1D(Form("hC_H[%d]",i),Form("hC_H[%d]",i),18,0,360);
+        helium3_tree->Draw(Form("First_Ine_Depth>>h1_H[%d]",i),HI, "");
+        fitFunc_H[i] = new TF1(Form("fitFunc_H[%d]",i), "[0]*exp(-x/[1])", 0,250);
         fitFunc_H[i]->SetParameters(1e4, 15); 
 
         auto carbon_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Carbon_%dGeV.root",int(Energy[i])));
         auto carbon_tree = (TTree*)carbon_file->Get("B4");
-        h1_c[i] = new TH1D(Form("h1_c[%d]",i),Form("h1_c[%d]",i),50,0,50);
-        hC_c[i] = new TH1D(Form("hC_c[%d]",i),Form("hC_c[%d]",i),50,0,50);
-        carbon_tree->Draw(Form("First_Had_Depth>>h1_c[%d]",i),HI, "");
-        fitFunc_c[i] = new TF1(Form("fitFunc_c[%d]",i), "[0]*exp(-x/[1])", 0,27);
+        h1_c[i] = new TH1D(Form("h1_c[%d]",i),Form("h1_c[%d]",i),18,0,360);
+        hC_c[i] = new TH1D(Form("hC_c[%d]",i),Form("hC_c[%d]",i),18,0,360);
+        carbon_tree->Draw(Form("First_Ine_Depth>>h1_c[%d]",i),HI, "");
+        fitFunc_c[i] = new TF1(Form("fitFunc_c[%d]",i), "[0]*exp(-x/[1])", 0,250);
         fitFunc_c[i]->SetParameters(1e4, 1); 
 
         for (int jj=1 ; jj<=50 ;jj++)
         {
-            hC_p[i]->SetBinContent(jj,1e4-h1_p[i]->Integral(0,jj));hC_p[i]->GetYaxis()->CenterTitle();hC_p[i]->GetXaxis()->CenterTitle();
-            hC_d[i]->SetBinContent(jj,1e4-h1_d[i]->Integral(0,jj));hC_d[i]->GetYaxis()->CenterTitle();hC_d[i]->GetXaxis()->CenterTitle();
-            hC_e[i]->SetBinContent(jj,1e4-h1_e[i]->Integral(0,jj));hC_e[i]->GetYaxis()->CenterTitle();hC_e[i]->GetXaxis()->CenterTitle();
-            hC_h[i]->SetBinContent(jj,1e4-h1_h[i]->Integral(0,jj));hC_h[i]->GetYaxis()->CenterTitle();hC_h[i]->GetXaxis()->CenterTitle();
-            hC_H[i]->SetBinContent(jj,1e4-h1_H[i]->Integral(0,jj));hC_H[i]->GetYaxis()->CenterTitle();hC_H[i]->GetXaxis()->CenterTitle();
-            hC_c[i]->SetBinContent(jj,1e4-h1_c[i]->Integral(0,jj));hC_c[i]->GetYaxis()->CenterTitle();hC_c[i]->GetXaxis()->CenterTitle();
+            hC_p[i]->SetBinContent(jj,1e4-h1_p[i]->Integral(1,jj));hC_p[i]->GetYaxis()->CenterTitle();hC_p[i]->GetXaxis()->CenterTitle();
+            hC_d[i]->SetBinContent(jj,1e4-h1_d[i]->Integral(1,jj));hC_d[i]->GetYaxis()->CenterTitle();hC_d[i]->GetXaxis()->CenterTitle();
+            hC_e[i]->SetBinContent(jj,1e4-h1_e[i]->Integral(1,jj));hC_e[i]->GetYaxis()->CenterTitle();hC_e[i]->GetXaxis()->CenterTitle();
+            hC_h[i]->SetBinContent(jj,1e4-h1_h[i]->Integral(1,jj));hC_h[i]->GetYaxis()->CenterTitle();hC_h[i]->GetXaxis()->CenterTitle();
+            hC_H[i]->SetBinContent(jj,1e4-h1_H[i]->Integral(1,jj));hC_H[i]->GetYaxis()->CenterTitle();hC_H[i]->GetXaxis()->CenterTitle();
+            hC_c[i]->SetBinContent(jj,1e4-h1_c[i]->Integral(1,jj));hC_c[i]->GetYaxis()->CenterTitle();hC_c[i]->GetXaxis()->CenterTitle();
         }
 
         auto c1 = new TCanvas("c1","c1",2000,1500);
@@ -281,43 +282,43 @@ void CrossSection_HI_Extract()
     gre9->SetLineStyle(2);
     gre0->SetLineColor(kMagenta);
 
-    auto gr_p = new TGraphErrors(19, Energy, proton_lambda, Energy_Err, proton_lambda_err);        gr_p->SetMarkerStyle(20);gr_p->SetMarkerColor(kRed);gr_p->SetLineColor(kRed);
-    auto gr_d = new TGraphErrors(19, Energy, deuteron_lambda, Energy_Err, deuteron_lambda_err);    gr_d->SetMarkerStyle(21);gr_d->SetMarkerColor(kBlue);gr_d->SetLineColor(kBlue);
-    auto gr_h = new TGraphErrors(19, Energy, helium4_lambda, Energy_Err, helium4_lambda_err);      gr_h->SetMarkerStyle(23);gr_h->SetMarkerColor(kGreen-3);gr_h->SetLineColor(kGreen-3);
-    auto gr_H = new TGraphErrors(19, Energy, helium3_lambda, Energy_Err, helium3_lambda_err);      gr_H->SetMarkerStyle(32);gr_H->SetMarkerColor(kGreen-3);gr_H->SetLineColor(kGreen-3);
-    auto gr_c = new TGraphErrors(19, Energy, carbon_lambda, Energy_Err, carbon_lambda_err);        gr_c->SetMarkerStyle(33);gr_c->SetMarkerColor(kMagenta);gr_c->SetLineColor(kMagenta);
+    auto gr_p = new TGraphErrors(29, Energy, proton_lambda, Energy_Err, proton_lambda_err);        gr_p->SetMarkerStyle(20);gr_p->SetMarkerColor(kRed);gr_p->SetLineColor(kRed);
+    auto gr_d = new TGraphErrors(29, Energy, deuteron_lambda, Energy_Err, deuteron_lambda_err);    gr_d->SetMarkerStyle(21);gr_d->SetMarkerColor(kBlue);gr_d->SetLineColor(kBlue);
+    auto gr_h = new TGraphErrors(29, Energy, helium4_lambda, Energy_Err, helium4_lambda_err);      gr_h->SetMarkerStyle(23);gr_h->SetMarkerColor(kGreen-3);gr_h->SetLineColor(kGreen-3);
+    auto gr_H = new TGraphErrors(29, Energy, helium3_lambda, Energy_Err, helium3_lambda_err);      gr_H->SetMarkerStyle(32);gr_H->SetMarkerColor(kGreen-3);gr_H->SetLineColor(kGreen-3);
+    auto gr_c = new TGraphErrors(29, Energy, carbon_lambda, Energy_Err, carbon_lambda_err);        gr_c->SetMarkerStyle(33);gr_c->SetMarkerColor(kMagenta);gr_c->SetLineColor(kMagenta);
  
     gr_p->SetTitle("Fitted Hadronic Interaction Length vs Energy; Kinetic Energy (GeV); Length (mm)");
 
 
-    auto gre_p = new TGraphErrors(19, Energy, Proton_Section, Energy_Err, Proton_Section_Err);
+    auto gre_p = new TGraphErrors(29, Energy, Proton_Section, Energy_Err, Proton_Section_Err);
     gre_p->SetTitle("Fitted Hadronic Interaction Cross Section vs Energy; Kinetic Energy (GeV); Cross Section per Atom (barn)");
     gre_p->SetMarkerStyle(20);
     gre_p->SetMarkerColor(kRed);
     gre_p->SetLineColor(kRed);
 
-    auto gre_d = new TGraphErrors(19, Energy, Deuteron_Section, Energy_Err, Deuteron_Section_Err);
+    auto gre_d = new TGraphErrors(29, Energy, Deuteron_Section, Energy_Err, Deuteron_Section_Err);
     gre_d->SetTitle("; Kinetic Energy (GeV); Cross Section per Atom (barn)");
     gre_d->SetMarkerStyle(21);
     gre_d->SetMarkerColor(kBlue);
     gre_d->SetLineColor(kBlue);
 
-    auto gre_e = new TGraphErrors(19, Energy, Electron_Section, Energy_Err, Electron_Section_Err);
+    auto gre_e = new TGraphErrors(29, Energy, Electron_Section, Energy_Err, Electron_Section_Err);
     gre_e->SetMarkerStyle(22);
     gre_e->SetMarkerColor(kOrange-3);
     gre_e->SetLineColor(kOrange-3);
 
-    auto gre_h = new TGraphErrors(19, Energy, Helium4_Section, Energy_Err, Helium4_Section_Err);
+    auto gre_h = new TGraphErrors(29, Energy, Helium4_Section, Energy_Err, Helium4_Section_Err);
     gre_h->SetMarkerStyle(23);
     gre_h->SetMarkerColor(kGreen-3);
     gre_h->SetLineColor(kGreen-3);
 
-    auto gre_H = new TGraphErrors(19, Energy, Helium3_Section, Energy_Err, Helium3_Section_Err);
+    auto gre_H = new TGraphErrors(29, Energy, Helium3_Section, Energy_Err, Helium3_Section_Err);
     gre_H->SetMarkerStyle(32);
     gre_H->SetMarkerColor(kGreen-3);
     gre_H->SetLineColor(kGreen-3);
 
-    auto gre_c = new TGraphErrors(19, Energy, Carbon_Section, Energy_Err, Carbon_Section_Err);
+    auto gre_c = new TGraphErrors(29, Energy, Carbon_Section, Energy_Err, Carbon_Section_Err);
     gre_c->SetMarkerStyle(33);
     gre_c->SetMarkerColor(kMagenta);
     gre_c->SetLineColor(kMagenta);

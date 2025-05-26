@@ -2,28 +2,27 @@ void CrossSection_Dual_Ine()
 {
 
     TCut HI  = "First_Ine_Depth>=0";
-
     auto file1 = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
     auto tree1 = (TTree*)file1->Get("B4");
-    auto h1_0 = new TH1D("h1_0","h1_0",38,-20,360);
-    auto h1 = new TH1D("h1","h1",36,0,360);
-    auto hC1 = new TH1D("hC1","hC1",36,0,360);
+    auto h1_0 = new TH1D("h1_0","h1_0",20,-40,360);
+    auto h1 = new TH1D("h1","h1",18,0,360);
+    auto hC1 = new TH1D("hC1","hC1",18,0,360);
     tree1->Draw("First_Ine_Depth>>h1_0","","");
     tree1->Draw("First_Ine_Depth>>h1",HI,"");
     hC1->SetTitle("1000 GeV Inelastic Hadronic Depth Distribution;Depth(mm);N_{survive}");
 
     auto file2 = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
     auto tree2 = (TTree*)file2->Get("B4");
-    auto h2_0 = new TH1D("h2_0","h2_0",38,-20,360);
-    auto h2 = new TH1D("h2","h2",36,0,360);
-    auto hC2 = new TH1D("hC2","hC2",36,0,360);
+    auto h2_0 = new TH1D("h2_0","h2_0",20,-40,360);
+    auto h2 = new TH1D("h2","h2",18,0,360);
+    auto hC2 = new TH1D("hC2","hC2",18,0,360);
     tree2->Draw("First_Ine_Depth>>h2_0","","");
     tree2->Draw("First_Ine_Depth>>h2",HI,"");
-    h1->Scale(0.5);    h1_0->Scale(0.5);
-    h2->Scale(0.5);    h2_0->Scale(0.5);
+    // h1->Scale(0.5);    h1_0->Scale(0.5);
+    // h2->Scale(0.5);    h2_0->Scale(0.5);
     cout << h1->Integral() << endl;
-    cout << h1->Integral() << endl;
-    for(int ii = 1 ; ii <= 35 ; ii++)
+    cout << h2->Integral() << endl;
+    for(int ii = 1 ; ii <= h1->GetNbinsX() ; ii++)
     {
         hC1->SetBinContent(ii, ( h1_0->Integral() - h1->Integral(1,ii) ) );
         hC2->SetBinContent(ii, ( h1_0->Integral() - h2->Integral(1,ii) ) );
