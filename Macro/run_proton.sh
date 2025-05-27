@@ -12,7 +12,7 @@ Tag=Proton
 #     ${exe} -m ${Tag}_${energy}GeV.mac
 # done
 
-for energy in $(seq 2000 1000 2000)
+for energy in $(seq 4000 1000 4000)
 do
     ${exe} -m ${Tag}_${energy}GeV.mac
 done
