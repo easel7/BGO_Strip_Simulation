@@ -3,14 +3,14 @@
 
 void Percentile2Depth()
 {
-    int Energy_Name[29]={0};
-    int Energy_Name_Err[29]={0};
+    int Energy_Name[28]={0};
+    int Energy_Name_Err[28]={0};
     auto gre_p = new TGraphErrors();
     auto gre_d = new TGraphErrors();
-    auto hist_p = new TH1D("hist_p","hist_p",29,0,29);
-    auto hist_d = new TH1D("hist_d","hist_d",29,0,29);
+    auto hist_p = new TH1D("hist_p","hist_p",28,0,28);
+    auto hist_d = new TH1D("hist_d","hist_d",28,0,28);
 
-    for (int k =0; k < 19; k++)
+    for (int k =0; k < 28; k++)
     {
         if (k < 10)      {Energy_Name[k] = (k + 1) * 10;        }       // 10 ~ 100
         else if (k < 19) {Energy_Name[k] = (k - 9 + 1) * 100;   }        // 200 ~ 1000

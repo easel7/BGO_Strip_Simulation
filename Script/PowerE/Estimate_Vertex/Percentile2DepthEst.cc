@@ -3,7 +3,7 @@
 
 void Percentile2DepthEst()
 {
-    int Energy_Name[29]={0};     
+    int Energy_Name[28]={0};     
     auto mean_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/DepthEst_Fitting.root");
     auto hist_p = (TH1D*)mean_file->Get("hist_p");
     for (int k =18; k < 19; k++)
@@ -55,16 +55,16 @@ void Percentile2DepthEst()
         TF1 *fitFunc_p[14];  auto gre_p_reso = new TGraphErrors();  auto gre_p_bias = new TGraphErrors();
         TF1 *fitFunc_d[14];  auto gre_d_reso = new TGraphErrors();  auto gre_d_bias = new TGraphErrors();
 
-        auto h2_p_int = new TH2D("h2_p_int","h2_p_int",185,-10,360,300,-240,360);  
-        auto h2_d_int = new TH2D("h2_d_int","h2_d_int",185,-10,360,300,-240,360);  
-        auto h1_p_int = new TH1D("h1_p_int","h1_p_int",12,0,360);  
-        auto h1_d_int = new TH1D("h1_d_int","h1_d_int",12,0,360);  
-        auto h1_p_inl = new TH1D("h1_p_inl","h1_p_inl",12,0,360);  
-        auto h1_d_inl = new TH1D("h1_d_inl","h1_d_inl",12,0,360);  
-        auto h1_p_sur = new TH1D("h1_p_sur","h1_p_sur",12,0,360);  
-        auto h1_d_sur = new TH1D("h1_d_sur","h1_d_sur",12,0,360);  
-        auto h1_p_lea = new TH1D("h1_p_lea","h1_p_lea",12,0,360);  
-        auto h1_d_lea = new TH1D("h1_d_lea","h1_d_lea",12,0,360);  
+        auto h2_p_int = new TH2D("h2_p_int","h2_p_int",200,-25,375,325,-275,375);  
+        auto h2_d_int = new TH2D("h2_d_int","h2_d_int",200,-25,375,325,-275,375);  
+        auto h1_p_int = new TH1D("h1_p_int","h1_p_int",14,0,357);  
+        auto h1_d_int = new TH1D("h1_d_int","h1_d_int",14,0,357);  
+        auto h1_p_inl = new TH1D("h1_p_inl","h1_p_inl",14,0,357);  
+        auto h1_d_inl = new TH1D("h1_d_inl","h1_d_inl",14,0,357);  
+        auto h1_p_sur = new TH1D("h1_p_sur","h1_p_sur",14,0,357);  
+        auto h1_d_sur = new TH1D("h1_d_sur","h1_d_sur",14,0,357);  
+        auto h1_p_lea = new TH1D("h1_p_lea","h1_p_lea",14,0,357);  
+        auto h1_d_lea = new TH1D("h1_d_lea","h1_d_lea",14,0,357);  
 
         for(int i =0 ; i<15 ; i++)  // Layer
         {
@@ -236,24 +236,29 @@ void Percentile2DepthEst()
         h2_d_int->Sumw2();    h1_d_int->Sumw2();
 
         // N_sur Fitting Function
-        TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-x/[1])", 60, 260); 
-        TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-x/[1])", 60, 260); 
+        TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-x/[1])", 80,250); 
+        TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-x/[1])", 80,250); 
         fitFunc1->SetParameters(1e4, 200); 
         fitFunc2->SetParameters(1e4, 170); 
         fitFunc1->SetLineColor(kRed); 
         fitFunc2->SetLineColor(kBlue);
-        fitFunc1->FixParameter(0, h2_p_int->Integral());
-        fitFunc2->FixParameter(0, h2_d_int->Integral());
+        fitFunc1->SetLineStyle(2);
+        fitFunc2->SetLineStyle(2);
+        // fitFunc1->FixParameter(0, 1e4);
+        // fitFunc2->FixParameter(0, 1e4);
 
         // N_int Fitting Function
-        TF1 *fitFunc3 = new TF1("fitFunc3", "[0]/[1]*exp(-x/[1])", 60, 260); 
-        TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/[1]*exp(-x/[1])", 60, 260); 
-        fitFunc3->SetParameters(h2_p_int->Integral() * h1_p_int->GetBinWidth(1), 200); 
-        fitFunc4->SetParameters(h2_d_int->Integral() * h1_d_int->GetBinWidth(1), 170); 
+        TF1 *fitFunc3 = new TF1("fitFunc3", "[0]/[1]* exp(-x/[1])", 80,250); 
+        TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/[1]* exp(-x/[1])", 80,250); 
+        fitFunc3->SetParameters(1e4 * h1_p_int->GetBinWidth(1), 200); 
+        fitFunc4->SetParameters(1e4 * h1_d_int->GetBinWidth(1), 170); 
+        cout << h1_p_int->GetBinWidth(1) << endl;
         fitFunc3->SetLineColor(kRed); 
         fitFunc4->SetLineColor(kBlue);
-        // fitFunc3->FixParameter(0, h2_p_int->Integral() * h1_p_int->GetBinWidth(1));
-        // fitFunc4->FixParameter(0, h2_d_int->Integral() * h1_d_int->GetBinWidth(1));
+        fitFunc3->SetLineStyle(2);
+        fitFunc4->SetLineStyle(2);
+        // fitFunc3->FixParameter(0, 1e4 * h1_p_int->GetBinWidth(1) );
+        // fitFunc4->FixParameter(0, 1e4 * h1_d_int->GetBinWidth(1) );
 
         cout << h2_p_int->Integral() << endl;
         cout << h2_d_int->Integral() << endl;
@@ -292,6 +297,7 @@ void Percentile2DepthEst()
         auto lg1 = new TLegend(0.3,0.7,0.6,0.88);
         lg1->AddEntry(h1_p_int,"Estimate Depth","l");
         lg1->AddEntry(h1_p_inl,"Inelastic Depth","l");
+        lg1->AddEntry(fitFunc3,"Fit on Estimated","l");
         lg1->Draw();
 
         c3->cd(3);
@@ -328,6 +334,7 @@ void Percentile2DepthEst()
         auto lg2 = new TLegend(0.3,0.7,0.6,0.88);
         lg2->AddEntry(h1_d_int,"Estimate Depth","l");
         lg2->AddEntry(h1_d_inl,"Inelastic Depth","l");
+        lg2->AddEntry(fitFunc4,"Fit on Estimated","l");
         lg2->Draw();
 
         c3->cd(6);

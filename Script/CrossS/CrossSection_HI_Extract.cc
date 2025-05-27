@@ -42,11 +42,10 @@ void CrossSection_HI_Extract()
     TH1D *h1_H[29]; TH1D *hC_H[29]; TF1  *fitFunc_H[29];
     TH1D *h1_c[29]; TH1D *hC_c[29]; TF1  *fitFunc_c[29];
 
-    TCut EM = "First_Type==0";
     TCut HD = "First_Ine_Depth>=0";
     TCut HI = "First_Ine_Depth>=0";
 
-    for (int i =0; i < 29; i++)
+    for (int i =0; i < 19; i++)
     {
         if (i < 10)      Energy[i] = (i + 1) * 10;               // 10 ~ 100
         else if (i < 29) Energy[i] = (i - 9 + 1) * 100;           // 200 ~ 1000
