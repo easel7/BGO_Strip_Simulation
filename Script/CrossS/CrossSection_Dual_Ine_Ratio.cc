@@ -3,10 +3,10 @@ void CrossSection_Dual_Ine_Ratio()
     double Ratio[18] = {0};
 
     TCut HI  = "First_Ine_Depth>=0 && Nhits >= 10";
-    auto file1 = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_1000GeV.root");
-    auto tree1 = (TTree*)file1->Get("B4");
-    auto file2 = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_1000GeV.root");
-    auto tree2 = (TTree*)file2->Get("B4");
+    auto file_p  = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_100GeV.root");
+    auto tree_p  = (TTree*)file_p->Get("B4");
+    auto file_d  = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_100GeV.root");
+    auto tree_d  = (TTree*)file_d->Get("B4");
 
     // Fit for deuteron ratio and error;
     // Fit from N_int
@@ -14,131 +14,156 @@ void CrossSection_Dual_Ine_Ratio()
     auto gre_int = new TGraphErrors();  
     auto gre_sur = new TGraphErrors();
 
+    auto gre_lambda_d_int = new TGraphErrors();  
+    auto gre_lambda_d_sur = new TGraphErrors();
+
     for (int i =0; i < 18; i++)
     {
         if (i < 10)      Ratio[i] = (i + 1) * 0.01;     
         else             Ratio[i] = (i - 9 + 1) * 0.1;  
-
         cout << Ratio[i] << " , " << 1-Ratio[i] <<  endl;
-        file1->cd();
-        if (gDirectory->FindObject("h1_0")) delete gDirectory->FindObject("h1_0");
-        if (gDirectory->FindObject("h1"  )) delete gDirectory->FindObject("h1"  );
-        if (gDirectory->FindObject("hC1" )) delete gDirectory->FindObject("hC1" );
-        auto h1_0 = new TH1D("h1_0","h1_0",16,-25,375);
-        auto h1   = new TH1D("h1","h1",14,0,357);
-        auto hC1  = new TH1D("hC1","hC1",14,0,357);
-        tree1->Draw("First_Ine_Depth>>h1_0","","");
-        tree1->Draw("First_Ine_Depth>>h1",HI,"");
+        if (gDirectory->FindObject("c0")) delete gDirectory->FindObject("c0");
+
+        file_p->cd();
+        if (gDirectory->FindObject("h_p_tot")) delete gDirectory->FindObject("h_p_tot");
+        if (gDirectory->FindObject("h_p_int")) delete gDirectory->FindObject("h_p_int");
+        if (gDirectory->FindObject("h_p_sur")) delete gDirectory->FindObject("h_p_sur");
+        auto h_p_tot = new TH1D("h_p_tot","h_p_tot",15,-25.5,357);  h_p_tot->Sumw2();
+        auto h_p_int = new TH1D("h_p_int","h_p_int",14,0,357);      h_p_int->Sumw2();
+        auto h_p_sur = new TH1D("h_p_sur","h_p_sur",14,0,357);      
+        tree_p->Draw("First_Ine_Depth>>h_p_tot","","");
+        tree_p->Draw("First_Ine_Depth>>h_p_int",HI,"");
         
-        file2->cd();
-        if (gDirectory->FindObject("h2_0")) delete gDirectory->FindObject("h2_0");
-        if (gDirectory->FindObject("h2"  )) delete gDirectory->FindObject("h2"  );
-        if (gDirectory->FindObject("hC2" )) delete gDirectory->FindObject("hC2" );
-        auto h2_0 = new TH1D("h2_0","h2_0",16,-25,375);
-        auto h2   = new TH1D("h2","h2",14,0,357);
-        auto hC2  = new TH1D("hC2","hC2",14,0,357);
-        tree2->Draw("First_Ine_Depth>>h2_0","","");
-        tree2->Draw("First_Ine_Depth>>h2",HI,"");
-        h1->Scale(1-Ratio[i]);  h1_0->Scale(1-Ratio[i]);
-        h2->Scale(Ratio[i]);    h2_0->Scale(Ratio[i]);
-        for(int k = 1 ; k <= h1->GetNbinsX() ; k++)
+        file_d->cd();
+        if (gDirectory->FindObject("h_d_tot")) delete gDirectory->FindObject("h_d_tot");
+        if (gDirectory->FindObject("h_d_int")) delete gDirectory->FindObject("h_d_int");
+        if (gDirectory->FindObject("h_d_sur")) delete gDirectory->FindObject("h_d_sur");
+        auto h_d_tot = new TH1D("h_d_tot","h_d_tot",15,-25.5,357);  h_d_tot->Sumw2();
+        auto h_d_int = new TH1D("h_d_int","h_d_int",14,0,357);      h_d_int->Sumw2();
+        auto h_d_sur = new TH1D("h_d_sur","h_d_sur",14,0,357);     
+        tree_d->Draw("First_Ine_Depth>>h_d_tot","","");
+        tree_d->Draw("First_Ine_Depth>>h_d_int",HI,"");
+
+        h_p_int->Scale( 1-Ratio[i]);  h_p_tot->Scale(1-Ratio[i]);
+        h_d_int->Scale( Ratio[i]  );    h_d_tot->Scale(Ratio[i]);
+        
+        for(int ii = 1 ; ii <= h_p_int->GetNbinsX() ; ii++)
         {
-            hC1->SetBinContent(k, ( h1_0->Integral() - h1->Integral(1,k) ) );
-            hC2->SetBinContent(k, ( h2_0->Integral() - h2->Integral(1,k) ) );
-            // cout << h1->Integral(1,k) << " , " <<  h1->GetBinContent(k) << endl;
+            h_p_sur->SetBinContent(ii, ( h_p_tot->Integral() - h_p_int->Integral(1,ii) ) );
+            h_d_sur->SetBinContent(ii, ( h_d_tot->Integral() - h_d_int->Integral(1,ii) ) );
         }
-        auto h3 = (TH1D*)h2->Clone();    h3->Add(h1);
-        auto hC3 = (TH1D*)hC2->Clone();  hC3->Add(hC1);
+        auto h_2_int = (TH1D*)h_p_int->Clone(); h_2_int->Add(h_d_int);
+        auto h_2_sur = (TH1D*)h_p_sur->Clone(); h_2_sur->Add(h_d_sur);
+        h_2_int->Sumw2();    h_p_int->Sumw2();
+        h_2_sur->Sumw2();    h_d_sur->Sumw2();
 
         // Fit for Survive
-        TF1 *fitFunc3 = new TF1("fitFunc3", "[0]*(1-[1])*exp(-x/208)+ [0]*[1]*exp(-x/173)", 0, 300); fitFunc3->SetParameters(1e4, Ratio[i]); fitFunc3->SetLineColor(kBlack); // fitFunc3->SetParLimits(1, 1e-6 ,1);
-        TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-x/[1])", 0, 300); fitFunc1->SetParameters(100, 10); fitFunc1->SetLineColor(kRed);
-        TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-x/[1])", 0, 300); fitFunc2->SetParameters(100, 10); fitFunc2->SetLineColor(kBlue);
+        TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-(x+12.75)/[1])", 0,300); fitFunc1->SetParameters(1e4, 200); fitFunc1->SetLineColor(kRed);  fitFunc1->FixParameter(0,h_p_tot->Integral());
+        TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-(x+12.75)/[1])", 0,300); fitFunc2->SetParameters(1e4, 200); fitFunc2->SetLineColor(kBlue); fitFunc2->FixParameter(0,h_d_tot->Integral());
 
         // Fit for Interaction 
-        TF1 *fitFunc4 = new TF1("fitFunc4", "[0]*[2] *(1-[1])/208*exp(-x/208)+[0]*25 *[1]/173*exp(-x/173)", 0, 300); fitFunc4->SetParameters(1e4, Ratio[i]); fitFunc4->SetLineColor(kBlack); //fitFunc4->SetParLimits(1, 1e-6 ,1);
-        TF1 *fitFunc5 = new TF1("fitFunc5", "[0]*[2] /[1]*exp(-x/[1])", 0, 300); fitFunc5->SetParameters(1e3,8); fitFunc5->SetLineColor(kRed);
-        TF1 *fitFunc6 = new TF1("fitFunc6", "[0]*[2] /[1]*exp(-x/[1])", 0, 300); fitFunc6->SetParameters(1e2,8); fitFunc6->SetLineColor(kBlue);
+        TF1 *fitFunc5 = new TF1("fitFunc5", "[0]/[1]*exp(-x/[1])", 50,300); fitFunc5->SetParameters(1e5,200); fitFunc5->SetLineColor(kRed);  fitFunc5->FixParameter(0,(h_p_tot->Integral()*h_p_int->GetBinWidth(1)));
+        TF1 *fitFunc6 = new TF1("fitFunc6", "[0]/[1]*exp(-x/[1])", 50,300); fitFunc6->SetParameters(1e5,200); fitFunc6->SetLineColor(kBlue); fitFunc6->FixParameter(0,(h_d_tot->Integral()*h_d_int->GetBinWidth(1)));
+        
         TLatex latex;
         latex.SetTextSize(0.04);
         latex.SetTextFont(72);
         latex.SetTextAlign(13);  //align at top
 
-        auto c0 = new TCanvas("c0","c0",1800,900);
+        auto c0 = new TCanvas("c0","c0",2400,1000);
         c0->Divide(2,1);
         c0->cd(1);
-        h1->SetTitle("N_{interaction};Depth(mm);Counts");
-        h1->SetLineColor(kRed);   // Proton in red
-        h2->SetLineColor(kBlue);  // Deuteron in blue
+        gStyle->SetOptStat(0);
+        h_p_sur->SetLineColor(kRed);     h_p_sur->SetLineWidth(2);
+        h_d_sur->SetLineColor(kBlue);    h_d_sur->SetLineWidth(2);
+        h_2_sur->SetLineColor(kBlack);   h_2_sur->SetLineWidth(2);
+        h_2_sur->SetTitle("N_{survive};Depth(mm);Counts");
+        h_2_sur->GetYaxis()->SetRangeUser(0,1.2*h_2_sur->GetMaximum());
+        h_2_sur->Draw("hist");
+        h_p_sur->Draw("histsame");
+        h_d_sur->Draw("histsame");
+        h_p_sur->Fit(fitFunc1, "R"); 
+        h_d_sur->Fit(fitFunc2, "R"); 
 
+        TF1 *fitFunc3 = new TF1("fitFunc3", "[0]*(1-[1])*exp(-(x+12.75)/[2])+ [0]*[1]*exp(-(x+12.75)/ [3] )", 0,300); fitFunc3->SetParameters(2e4,0.5,200,170); fitFunc3->SetLineColor(kBlack); 
+        fitFunc3->FixParameter(0,(h_p_tot->Integral()+h_d_tot->Integral()));
+        fitFunc3->FixParameter(2,fitFunc1->GetParameter(1));
+        fitFunc3->FixParameter(3,fitFunc2->GetParameter(1));
+        fitFunc3->SetParLimits(1,1e-3,1);
+        // fitFunc3->SetParLimits(2,fitFunc1->GetParameter(1)/2,fitFunc1->GetParameter(1)*2);
+        // fitFunc3->SetParLimits(3,fitFunc1->GetParameter(1)/2,fitFunc1->GetParameter(1));
+        h_2_sur->Fit(fitFunc3, "R"); 
+        fitFunc1->Draw("same");
+        fitFunc2->Draw("same");
+        fitFunc3->Draw("same");
 
-        h3->SetLineColor(kBlack);  // Deuteron in blue
-        h3->SetLineWidth(2);
-        h1->GetYaxis()->SetRangeUser(0,1.2*h3->GetMaximum());
-        h1->Draw("hist");
-        h2->Draw("histsame");
-        h3->Draw("histsame");
-        h3->Fit(fitFunc4, "RSQ"); // 进行拟合
-        h1->Fit(fitFunc5,"RSQ");
-        h2->Fit(fitFunc6,"RSQ");
+        double proton_lambda       = fitFunc3->GetParameter(2);
+        double proton_lambda_err   = fitFunc3->GetParError(2);
+        double deuteron_lambda     = fitFunc3->GetParameter(3);
+        double deuteron_lambda_err = fitFunc3->GetParError(3);
+        double deuteron_ratio      = fitFunc3->GetParameter(1);
+        double deuteron_ratio_err  = fitFunc3->GetParError(1);
+        double lambda1     = fitFunc1->GetParameter(1);
+        double lambda1_err = fitFunc1->GetParError(1);
+        double lambda2     = fitFunc2->GetParameter(1);
+        double lambda2_err = fitFunc2->GetParError(1);
+        latex.DrawLatex(0,h_2_sur->GetMaximum()-1000,"Function: N_{sur} = N_{tot} #upoint [ (1-^{}r^{}_{d}) #upoint e^{-x/#lambda_{p}} + r_{d} #upoint e^{-x/#lambda_{d}} ] ");
+        latex.DrawLatex(0,h_2_sur->GetMaximum()-2000,Form("Fitted r_{d}: %.2f#pm %.2f",deuteron_ratio , deuteron_ratio_err ));
+        latex.DrawLatex(0,h_2_sur->GetMaximum()-3000,Form("Fitted #lambda_{d}: %.2f#pm %.2f mm",deuteron_lambda , deuteron_lambda_err ));
+        latex.DrawLatex(0,h_2_sur->GetMaximum()-4000,Form("#color[2]{Fitted #lambda_{p} alone: %.2f#pm %.2f mm}",lambda1 , lambda1_err));
+        latex.DrawLatex(0,h_2_sur->GetMaximum()-5000,Form("#color[4]{Fitted #lambda_{d} alone: %.2f#pm %.2f mm}",lambda2 , lambda2_err));
+
+        c0->cd(2);
+        h_p_int->SetLineColor(kRed);     h_p_int->SetLineWidth(2);
+        h_d_int->SetLineColor(kBlue);    h_d_int->SetLineWidth(2);
+        h_2_int->SetLineColor(kBlack);   h_2_int->SetLineWidth(2);
+        h_2_int->SetTitle("N_{interaction};Depth(mm);Counts");
+        h_2_int->GetYaxis()->SetRangeUser(0,1.2*h_2_int->GetMaximum());
+        h_2_int->Draw("hist");
+        h_p_int->Draw("histsame");
+        h_d_int->Draw("histsame");
+        h_p_int->Fit(fitFunc5,"R");
+        h_d_int->Fit(fitFunc6,"R");
+        TF1 *fitFunc4 = new TF1("fitFunc4", "[0]*(1-[1])/[2]*exp(-x/[2])+[0]*[1]/[3] *exp(-x/ [3] )", 50,300); fitFunc4->SetParameters(1e5, 0.5,200,170); fitFunc4->SetLineColor(kBlack); 
+        fitFunc4->FixParameter(0,(h_p_tot->Integral()+h_d_tot->Integral())*h_p_int->GetBinWidth(1));
+        fitFunc4->FixParameter(2,fitFunc5->GetParameter(1));
+        fitFunc4->FixParameter(3,fitFunc6->GetParameter(1));
+        fitFunc4->SetParLimits(1,1e-3,1);
+        // fitFunc4->SetParLimits(2,fitFunc5->GetParameter(1)/2,fitFunc5->GetParameter(1)*2);
+        // fitFunc4->SetParLimits(3,fitFunc5->GetParameter(1)/2,fitFunc5->GetParameter(1));
+        h_2_int->Fit(fitFunc4,"R"); 
         fitFunc4->Draw("same");
         fitFunc5->Draw("same");
         fitFunc6->Draw("same");
-        double total_num1   = fitFunc4->GetParameter(0);
-        double total_num1_err = fitFunc4->GetParError(0);
-        double deuteron_ratio1 = fitFunc4->GetParameter(1);
-        double deuteron_ratio1_err = fitFunc4->GetParError(1);
 
-        gre_int->SetPoint(i,Ratio[i],deuteron_ratio1);
+        double proton_lambda1       = fitFunc4->GetParameter(2);
+        double proton_lambda1_err   = fitFunc4->GetParError(2);
+        double deuteron_lambda1     = fitFunc4->GetParameter(3);
+        double deuteron_lambda1_err = fitFunc4->GetParError(3);
+        double deuteron_ratio1      = fitFunc4->GetParameter(1);
+        double deuteron_ratio1_err  = fitFunc4->GetParError(1);
+        double lambda3     = fitFunc5->GetParameter(1);
+        double lambda3_err = fitFunc5->GetParError(1);
+        double lambda4     = fitFunc6->GetParameter(1);
+        double lambda4_err = fitFunc6->GetParError(1);
+        latex.DrawLatex(0,h_2_int->GetMaximum()-50,"Function: N_{int} = N_{tot} #upoint [  #frac{ 1-^{}r^{}_{d} }{#lambda_{p} } #upoint e^{-x/#lambda_{p} } + #frac{r_{d}}{#lambda_{d}} #upoint e^{-x/#lambda_{d}} ]");
+        latex.DrawLatex(0,h_2_int->GetMaximum()-200,Form("Fitted r_{d}: %.2f#pm %.2f",deuteron_ratio1 , deuteron_ratio1_err ));
+        latex.DrawLatex(0,h_2_int->GetMaximum()-300,Form("Fitted #lambda_{d}: %.2f#pm %.2f mm",deuteron_lambda1 , deuteron_lambda1_err ));
+        latex.DrawLatex(0,h_2_int->GetMaximum()-400,Form("#color[2]{Fitted #lambda_{p} alone: %.2f#pm %.2f mm}",lambda3 , lambda3_err));
+        latex.DrawLatex(0,h_2_int->GetMaximum()-500,Form("#color[4]{Fitted #lambda_{d} alone: %.2f#pm %.2f mm}",lambda4 , lambda4_err));
+
+
+        gre_lambda_d_int->SetPoint(i,0.99*Ratio[i],deuteron_lambda);
+        gre_lambda_d_int->SetPointError(i,0,deuteron_lambda_err);
+        gre_lambda_d_sur->SetPoint(i,1.01*Ratio[i],deuteron_lambda1);
+        gre_lambda_d_sur->SetPointError(i,0,deuteron_lambda1_err);
+
+        gre_sur->SetPoint(i,0.99*Ratio[i],deuteron_ratio);
+        gre_sur->SetPointError(i,0,deuteron_ratio_err);
+        gre_int->SetPoint(i,1.01*Ratio[i],deuteron_ratio1);
         gre_int->SetPointError(i,0,deuteron_ratio1_err);
 
-        c0->cd(2);
-        // gPad->SetLogy();
-        gStyle->SetOptFit(0);
-        gStyle->SetOptStat(0);
-
-        // Set styles and colors for clarity
-        hC1->GetYaxis()->SetRangeUser(1e1,2e4);
-        hC1->SetLineColor(kRed);   // Proton in red
-        hC1->SetLineWidth(2);
-        hC2->SetLineColor(kBlue);  // Deuteron in blue
-        hC2->SetLineWidth(2);
-
-
-        hC3->SetTitle("1000 GeV Inelastic Hadronic Depth Distribution;Depth(mm);N_{survive}");
-        hC3->Draw("hist");
-        hC1->Draw("hist");
-        hC2->Draw("histsame");
-        hC1->Fit(fitFunc1, "RSQ"); // 进行拟合
-        hC2->Fit(fitFunc2, "RSQ"); // 进行拟合
-        double constant1   = fitFunc1->GetParameter(0);
-        double lambda1     = fitFunc1->GetParameter(1);
-        double lambda1_err = fitFunc1->GetParError(1);
-        double constant2   = fitFunc2->GetParameter(0);
-        double lambda2     = fitFunc2->GetParameter(1);
-        double lambda2_err = fitFunc2->GetParError(1);
-
-
-        hC3->SetLineColor(kBlack);  // Deuteron in blue
-        hC3->SetLineWidth(2);
-        hC3->Draw("histsame");
-        hC3->Fit(fitFunc3, "RSQ"); // 进行拟合
-        fitFunc3->Draw("same");
-        double total_num   = fitFunc3->GetParameter(0);
-        double total_num_err = fitFunc3->GetParError(0);
-        double deuteron_ratio = fitFunc3->GetParameter(1);
-        double deuteron_ratio_err = fitFunc3->GetParError(1);
-
-        double n_BGO = TMath::Na()*7.13/ (1245.8344/19.); // cm-3
-        double hd_section = 1 / (lambda1) / n_BGO * 1e25; // barn, mm = 1e-1 cm, 1e24 barn = 1 cm^2
-        double hd_section_err = hd_section * lambda1_err/lambda1; // barn
-        double hi_section = 1 / (lambda2) / n_BGO * 1e25; // barn, mm = 1e-1 cm, 1e24 barn = 1 cm^2
-        double hi_section_err = hi_section * lambda2_err/lambda2; // barn
-
-        gre_sur->SetPoint(i,Ratio[i],deuteron_ratio);
-        gre_sur->SetPointError(i,0,deuteron_ratio_err);
-
-        c0->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/CrossS/Ratio_%.2f_1000GeV.pdf",Ratio[i]));
+        c0->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/CrossS/Ratio_%.2f_100GeV.pdf",Ratio[i]));
     }
 
     auto c2 = new TCanvas("c2","c2",1900,900);
@@ -157,7 +182,7 @@ void CrossSection_Dual_Ine_Ratio()
     line_ref->SetLineStyle(2);
 
     auto line_vet = new TLine(0.5,5e-3,0.5,2);
-    line_vet->SetLineColor(kBlack);
+    line_vet->SetLineColor(kOrange-3);
     line_vet->SetLineWidth(2);
     line_vet->SetLineStyle(2);
 
@@ -167,17 +192,36 @@ void CrossSection_Dual_Ine_Ratio()
     gPad->SetLogy();
     gre_int->GetXaxis()->SetLimits(5e-3,2);
     gre_int->GetYaxis()->SetRangeUser(5e-3,2);
-    gre_int->SetTitle(";True Deuteron Ratio;Fitted Deuteron Ratio");
+    gre_int->SetTitle(";True r_{d};Fitted r_{d}");
     gre_int->Draw("AP");
     gre_sur->Draw("PSAME");
     line_ref->Draw("same");
     line_vet->Draw("same");
 
     auto lg2 = new TLegend(0.68,0.12,0.88,0.22);
-    lg2->AddEntry(gre_int,"Fited Ratio From N_{int}","p");
-    lg2->AddEntry(gre_sur,"Fited Ratio From N_{sur}","p");
+    lg2->AddEntry(gre_int,"Fitted From N_{int}","ep");
+    lg2->AddEntry(gre_sur,"Fitted From N_{sur}","ep");
     lg2->AddEntry(line_ref,"y = x","l");
     lg2->AddEntry(line_vet,"x = 0.5","l");
     lg2->Draw();
     c2->SaveAs("/Users/xiongzheng/software/B4/B4e/Script/CrossS/FittedRatio.pdf");
+
+    auto c3 = new TCanvas("c3","c3",1900,900);
+    gre_lambda_d_int->SetLineColor(kRed);
+    gre_lambda_d_sur->SetLineColor(kBlue);
+    gre_lambda_d_int->SetLineWidth(2);
+    gre_lambda_d_sur->SetLineWidth(2);
+    gre_lambda_d_int->SetMarkerColor(kRed);
+    gre_lambda_d_sur->SetMarkerColor(kBlue);
+    gre_lambda_d_int->SetMarkerStyle(20);
+    gre_lambda_d_sur->SetMarkerStyle(21);
+
+    c3->cd();
+    gPad->SetGrid(1,1);
+    gPad->SetLogx();
+    gre_lambda_d_int->GetYaxis()->SetRangeUser(0,200);
+    gre_lambda_d_int->SetTitle(";True r_{d};Fitted #lambda_{d}");
+    gre_lambda_d_int->Draw("AP");
+    gre_lambda_d_sur->Draw("PSAME");
+
 }

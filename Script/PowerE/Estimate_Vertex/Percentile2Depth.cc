@@ -198,7 +198,8 @@ void Percentile2Depth()
                 double bar_odd, bar_odd_err;
                 double bar_even, bar_even_err;
                 PrepareFitData(d_EnergyVec, layer_start, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
-                bool success_odd = Fit1DParameter(FitAxisFunction, g_fit_bars[1], 0.01, 2, 19,  bar_odd, bar_odd_err);
+                bool success_odd = Fit1DParameter(F
+                    itAxisFunction, g_fit_bars[1], 0.01, 2, 19,  bar_odd, bar_odd_err);
                 if (success_odd)              bar_info[0] = std::round(bar_odd);
                 else                std::cerr << "Failed to fit bar_odd." << std::endl;
 
