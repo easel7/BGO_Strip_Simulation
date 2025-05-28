@@ -236,8 +236,8 @@ void Percentile2DepthEst()
         h2_d_int->Sumw2();    h1_d_int->Sumw2();
 
         // N_sur Fitting Function
-        TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-x/[1])", 80,250); 
-        TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-x/[1])", 80,250); 
+        TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-(x)/[1])", 80,250); 
+        TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-(x)/[1])", 80,250); 
         fitFunc1->SetParameters(1e4, 200); 
         fitFunc2->SetParameters(1e4, 170); 
         fitFunc1->SetLineColor(kRed); 
