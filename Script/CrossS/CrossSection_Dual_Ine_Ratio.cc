@@ -274,6 +274,20 @@ void CrossSection_Dual_Ine_Ratio()
     }// k Energy
 
 
+    auto file2 = TFile::Open("/Users/xiongzheng/software/Hadr00/build/deuteron_BGO.root");
+    auto hist2 = (TH1D*)file2->Get("h4");
+    auto hist7 = (TH1D*)file2->Get("h1");
+    int Nbins = hist2->GetNbinsX();
+    double KN_Energy[60] = {0};
+    double Deuteron[60] = {0};
+    double KN_Deuteron[60] = {0};
+    for (int ii = 0 ; ii < Nbins ; ii++)
+    {
+        KN_Energy[ii]   = pow(10,hist2->GetBinCenter(ii+1)-3);
+        file2->cd();Deuteron[ii] = hist2->GetBinContent(ii+1); KN_Deuteron[ii] = hist7->GetBinContent(ii+1)* 10.;
+    }
+    auto gre7 = new TGraph(Nbins,KN_Energy, KN_Deuteron);   gre7->SetLineColor(kBlue);
+
     auto c4 = new TCanvas("c4","c4",2500,2500);
 
     TMultiGraph* mg1 = new TMultiGraph();
@@ -318,6 +332,7 @@ void CrossSection_Dual_Ine_Ratio()
     gPad->SetLogx(1);
     mg3->GetHistogram()->SetTitle("Fitted #lambda_{d} vs Energy at fixed true r_{d};Energy (GeV);Fitted #lambda_{d} based on N_{sur}");
     mg3->Draw("AL");
+    gre7->Draw("LSAME");
 
     c4->cd(4);
     mg4->GetYaxis()->SetRangeUser(20,200);
@@ -326,4 +341,5 @@ void CrossSection_Dual_Ine_Ratio()
     gPad->SetLogx(1);
     mg4->GetHistogram()->SetTitle("Fitted #lambda_{d} vs Energy at fixed true r_{d};Energy (GeV);Fitted #lambda_{d} based on N_{int}");
     mg4->Draw("AL");
+    gre7->Draw("LSAME");
 }
