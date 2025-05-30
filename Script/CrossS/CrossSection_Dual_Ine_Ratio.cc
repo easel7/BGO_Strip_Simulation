@@ -29,7 +29,7 @@ void CrossSection_Dual_Ine_Ratio()
     lamb_int->SetTitle("N_{int};Incident Energy (GeV);True r_{d}; Fitted #lambda_{d}");
     lamb_sur->SetTitle("N_{sur};Incident Energy (GeV);True r_{d}; Fitted #lambda_{d}");
 
-    // for (int k =13; k < 14; k++)
+    // for (int k =18; k < 19; k++)
     for (int k =0; k < 28; k++)
     {
         if (k < 10)      {Energy_Name[k] = (k + 1) * 10;        }       // 10 ~ 100
@@ -51,7 +51,7 @@ void CrossSection_Dual_Ine_Ratio()
         auto gre_lambda_d_int = new TGraphErrors();  
         auto gre_lambda_d_sur = new TGraphErrors();
 
-        // for (int i =9; i < 10; i++)
+        // for (int i =5; i < 6; i++)
         for (int i =0; i < 18; i++)
         {
             if (i < 10)      Ratio[i] = (i + 1) * 0.01;     
@@ -123,10 +123,11 @@ void CrossSection_Dual_Ine_Ratio()
             TF1 *fitFunc3 = new TF1("fitFunc3", "[0]*(1-[1])*exp(-(x+12.75)/[2])+ [0]*[1]*exp(-(x+12.75)/ [3] )", 0,300); fitFunc3->SetParameters(2e4,Ratio[i],200,170); fitFunc3->SetLineColor(kBlack); 
             fitFunc3->FixParameter(0,(h_p_tot->Integral()+h_d_tot->Integral()));
             fitFunc3->FixParameter(2,fitFunc1->GetParameter(1));
-            fitFunc3->FixParameter(3,fitFunc2->GetParameter(1));
+            // fitFunc3->FixParameter(3,fitFunc2->GetParameter(1));
             fitFunc3->SetParLimits(1,1e-3,1);
             // fitFunc3->SetParLimits(2,fitFunc1->GetParameter(1)/2,fitFunc1->GetParameter(1)*2);
-            // fitFunc3->SetParLimits(3,fitFunc1->GetParameter(1)/2,fitFunc1->GetParameter(1));
+            fitFunc3->SetParLimits(3,fitFunc1->GetParameter(1)/2,fitFunc1->GetParameter(1));
+            // fitFunc3->SetParLimits(3,-100,0);
             h_2_sur->Fit(fitFunc3, "R"); 
             fitFunc1->Draw("same");
             fitFunc2->Draw("same");
@@ -162,10 +163,11 @@ void CrossSection_Dual_Ine_Ratio()
             TF1 *fitFunc4 = new TF1("fitFunc4", "[0]*(1-[1])/[2]*exp(-x/[2])+[0]*[1]/[3] *exp(-x/ [3] )", 50,300); fitFunc4->SetParameters(1e5, Ratio[i],200,170); fitFunc4->SetLineColor(kBlack); 
             fitFunc4->FixParameter(0,(h_p_tot->Integral()+h_d_tot->Integral())*h_p_int->GetBinWidth(1));
             fitFunc4->FixParameter(2,fitFunc5->GetParameter(1));
-            fitFunc4->FixParameter(3,fitFunc6->GetParameter(1));
+            // fitFunc4->FixParameter(3,fitFunc6->GetParameter(1));
             fitFunc4->SetParLimits(1,1e-3,1);
             // fitFunc4->SetParLimits(2,fitFunc5->GetParameter(1)/2,fitFunc5->GetParameter(1)*2);
-            // fitFunc4->SetParLimits(3,fitFunc5->GetParameter(1)/2,fitFunc5->GetParameter(1));
+            fitFunc4->SetParLimits(3,fitFunc5->GetParameter(1)/2,fitFunc5->GetParameter(1));
+            // fitFunc4->SetParLimits(3,-100,0);
             h_2_int->Fit(fitFunc4,"R"); 
             fitFunc4->Draw("same");
             fitFunc5->Draw("same");
@@ -207,7 +209,7 @@ void CrossSection_Dual_Ine_Ratio()
             lamb_sur->SetBinError(k+1,i+1, deuteron_lambda_err);
             lamb_int->SetBinError(k+1,i+1, deuteron_lambda1_err);
 
-            c0->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/CrossS/Ratio_%.2f_%dGeV.pdf",Ratio[i],Energy_Name[k]));
+            c0->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/CrossS/RatioEnergySearch/Ratio_%.2f_%dGeV.pdf",Ratio[i],Energy_Name[k]));
         } // i Ratio
 
         auto c2 = new TCanvas("c2","c2",1900,900);
@@ -248,7 +250,7 @@ void CrossSection_Dual_Ine_Ratio()
         lg2->AddEntry(line_ref,"y = x","l");
         lg2->AddEntry(line_vet,"x = 0.5","l");
         lg2->Draw();
-        c2->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/CrossS/FittedRatio_%dGeV.pdf",Energy_Name[k]));
+        c2->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/CrossS/RatioEnergySearch/FittedRatio_%dGeV.pdf",Energy_Name[k]));
 
         auto c3 = new TCanvas("c3","c3",1900,900);
         gre_lambda_d_int->SetLineColor(kRed);
@@ -295,23 +297,24 @@ void CrossSection_Dual_Ine_Ratio()
     TMultiGraph* mg3 = new TMultiGraph();
     TMultiGraph* mg4 = new TMultiGraph();
 
-    std::vector<TGraph*> graphs;
     for (int j = 0; j < 18; j++) {
-        TH1D* proj = hist_sur->ProjectionX(Form("proj_%d", j), j+1, j+1); proj->SetLineColor(j+1);  proj->SetLineWidth(2);
-        TH1D* prok = hist_int->ProjectionX(Form("prok_%d", j), j+1, j+1); prok->SetLineColor(j+1);  prok->SetLineWidth(2);
-        TH1D* prol = lamb_sur->ProjectionX(Form("prol_%d", j), j+1, j+1); prol->SetLineColor(j+1);  prol->SetLineWidth(2);
-        TH1D* prom = lamb_int->ProjectionX(Form("prom_%d", j), j+1, j+1); prom->SetLineColor(j+1);  prom->SetLineWidth(2);
+        TH1D* proj = hist_sur->ProjectionX(Form("proj_%d", j), j+1, j+1); proj->SetLineColor(j+11);  proj->SetLineWidth(2);
+        TH1D* prok = hist_int->ProjectionX(Form("prok_%d", j), j+1, j+1); prok->SetLineColor(j+11);  prok->SetLineWidth(2);
+        TH1D* prol = lamb_sur->ProjectionX(Form("prol_%d", j), j+1, j+1); prol->SetLineColor(j+11);  prol->SetLineWidth(2);
+        TH1D* prom = lamb_int->ProjectionX(Form("prom_%d", j), j+1, j+1); prom->SetLineColor(j+11);  prom->SetLineWidth(2);
 
-        TGraph* g1 = new TGraph(proj);  g1->SetLineColor(j+1); g1->SetTitle(Form("r_{d}=%.2f", hist_sur->GetYaxis()->GetBinCenter(j+1))); mg1->Add(g1); graphs.push_back(g1);
-        TGraph* g2 = new TGraph(prok);  g2->SetLineColor(j+1); g2->SetTitle(Form("r_{d}=%.2f", hist_int->GetYaxis()->GetBinCenter(j+1))); mg2->Add(g2); graphs.push_back(g2);
-        TGraph* g3 = new TGraph(prol);  g3->SetLineColor(j+1); g3->SetTitle(Form("r_{d}=%.2f", lamb_sur->GetYaxis()->GetBinCenter(j+1))); mg3->Add(g3); graphs.push_back(g3);
-        TGraph* g4 = new TGraph(prom);  g4->SetLineColor(j+1); g4->SetTitle(Form("r_{d}=%.2f", lamb_int->GetYaxis()->GetBinCenter(j+1))); mg4->Add(g4); graphs.push_back(g4);
+        TGraph* g1 = new TGraph(proj);  g1->SetLineColor(j+11); g1->SetTitle(Form("r_{d}=%.2f", hist_sur->GetYaxis()->GetBinCenter(j+1))); mg1->Add(g1); // graphs.push_back(g1);
+        TGraph* g2 = new TGraph(prok);  g2->SetLineColor(j+11); g2->SetTitle(Form("r_{d}=%.2f", hist_int->GetYaxis()->GetBinCenter(j+1))); mg2->Add(g2); // graphs.push_back(g2);
+        TGraph* g3 = new TGraph(prol);  g3->SetLineColor(j+11); g3->SetTitle(Form("r_{d}=%.2f", lamb_sur->GetYaxis()->GetBinCenter(j+1))); mg3->Add(g3); // graphs.push_back(g3);
+        TGraph* g4 = new TGraph(prom);  g4->SetLineColor(j+11); g4->SetTitle(Form("r_{d}=%.2f", lamb_int->GetYaxis()->GetBinCenter(j+1))); mg4->Add(g4); // graphs.push_back(g4);
     }
 
     c4->Divide(2,2);
     c4->cd(1);
     mg1->GetYaxis()->SetRangeUser(5e-3,2);
     mg1->GetXaxis()->SetLimits(9e0,1.1e4);
+    mg1->GetYaxis()->SetTitleSize(0.05);
+    mg1->GetXaxis()->SetTitleSize(0.05);
     gPad->SetLogy(1);
     gPad->SetLogx(1);
     mg1->GetHistogram()->SetTitle("Fitted r_{d} vs Energy at fixed true r_{d};Energy (GeV);Fitted r_{d} based on N_{sur}");
@@ -320,26 +323,37 @@ void CrossSection_Dual_Ine_Ratio()
     c4->cd(2);
     mg2->GetYaxis()->SetRangeUser(5e-3,2);
     mg2->GetXaxis()->SetLimits(9e0,1.1e4);
+    mg2->GetYaxis()->SetTitleSize(0.05);
+    mg2->GetXaxis()->SetTitleSize(0.05);
     gPad->SetLogy(1);
     gPad->SetLogx(1);
     mg2->GetHistogram()->SetTitle("Fitted r_{d} vs Energy at fixed true r_{d};Energy (GeV);Fitted r_{d} based on N_{int}");
     mg2->Draw("AL");
 
     c4->cd(3);
-    mg3->GetYaxis()->SetRangeUser(20,200);
+    mg3->GetYaxis()->SetRangeUser(20,300);
     mg3->GetXaxis()->SetLimits(9e0,1.1e4);
-    // gPad->SetLogy(1);
+    mg3->GetYaxis()->SetTitleSize(0.05);
+    mg3->GetXaxis()->SetTitleSize(0.05);
     gPad->SetLogx(1);
     mg3->GetHistogram()->SetTitle("Fitted #lambda_{d} vs Energy at fixed true r_{d};Energy (GeV);Fitted #lambda_{d} based on N_{sur}");
     mg3->Draw("AL");
     gre7->Draw("LSAME");
 
+    auto lg4 = new TLegend(0.68,0.12,0.88,0.28);
+    lg4->AddEntry(mg3,"Fitted #lambda_{d}","l");
+    lg4->AddEntry(gre7,"GEANT4 #lambda_{d}","l");
+    lg4->Draw();
+
     c4->cd(4);
-    mg4->GetYaxis()->SetRangeUser(20,200);
+    mg4->GetYaxis()->SetRangeUser(20,300);
     mg4->GetXaxis()->SetLimits(9e0,1.1e4);
-    // gPad->SetLogy(1);
+    mg4->GetYaxis()->SetTitleSize(0.05);
+    mg4->GetXaxis()->SetTitleSize(0.05);
     gPad->SetLogx(1);
     mg4->GetHistogram()->SetTitle("Fitted #lambda_{d} vs Energy at fixed true r_{d};Energy (GeV);Fitted #lambda_{d} based on N_{int}");
     mg4->Draw("AL");
     gre7->Draw("LSAME");
+    lg4->Draw();
+
 }
