@@ -7,15 +7,17 @@ void CrossSection_Dual_Ine_Ratio()
     double Ratio_Edge[19];
     double Energy_Edge[29];
 
-    int idx = 0;
-    for (int i = 0; i <= 10; ++i) Ratio_Edge[idx++] = 0.005 + i * 0.01;
-    for (int i = 0; i < 8; ++i)  Ratio_Edge[idx++] = 0.15 + i * 0.1;
+    for (int j = 0; j < 19; j++)
+    {
+        if (j <= 10)       Ratio_Edge[j] = 0.005 + 0.01 * j;        // Center: 10~100 → edges: 5~105
+        else               Ratio_Edge[j] = 0.15 + 0.1 * (j - 10); // Center: 2000~10000 → edges: 1500~10500    
+        // cout << Ratio_Edge[j] << endl;
+    }
     for (int j = 0; j < 29; j++)
     {
         if (j <= 10)       Energy_Edge[j] = 5 + 10 * j;         // Center: 10~100 → edges: 5~105
-        else if (j <= 19)  Energy_Edge[j] = 150 + 100 * (j - 11); // Center: 200~1000 → edges: 150~1050
-        else               Energy_Edge[j] = 1500 + 1000 * (j - 20); // Center: 2000~10000 → edges: 1500~10500
-        // cout << Energy_Edge[j] << endl;
+        else if (j <= 19)  Energy_Edge[j] = 150 + 100 * (j - 10); // Center: 200~1000 → edges: 150~1050
+        else               Energy_Edge[j] = 1500 + 1000 * (j - 19); // Center: 2000~10000 → edges: 1500~10500        
     }
 
     auto hist_int = new TH2D("hist_int","hist_int",28,Energy_Edge,18,Ratio_Edge);
