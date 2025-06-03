@@ -2,28 +2,22 @@ void CrossSection_Dual_Ine_Ratio()
 {
     int Energy_Name[28]={0};
     int Energy_Name_Err[28]={0};
-    double Ratio[18] = {0};
+    double Ratio[28] = {0};
 
-    double Ratio_Edge[19];
+    double Ratio_Edge[29];
     double Energy_Edge[29];
 
-    for (int j = 0; j < 19; j++)
-    {
-        if (j <= 10)       Ratio_Edge[j] = 0.005 + 0.01 * j;        // Center: 10~100 → edges: 5~105
-        else               Ratio_Edge[j] = 0.15 + 0.1 * (j - 10); // Center: 2000~10000 → edges: 1500~10500    
-        // cout << Ratio_Edge[j] << endl;
-    }
     for (int j = 0; j < 29; j++)
     {
-        if (j <= 10)       Energy_Edge[j] = 5 + 10 * j;         // Center: 10~100 → edges: 5~105
-        else if (j <= 19)  Energy_Edge[j] = 150 + 100 * (j - 10); // Center: 200~1000 → edges: 150~1050
-        else               Energy_Edge[j] = 1500 + 1000 * (j - 19); // Center: 2000~10000 → edges: 1500~10500        
+        if (j <= 10)                 { Energy_Edge[j] = 5 + 10 * j;             Ratio_Edge[j] = 0.0005 + 0.001 * j;     }   // Center: 10~100 → edges: 5~105
+        else if (j > 10 && j <= 19)  { Energy_Edge[j] = 150 + 100 * (j - 10);   Ratio_Edge[j] = 0.015 + 0.01 * (j - 10);      }   // Center: 10~100 → edges: 5~105  
+        else                         { Energy_Edge[j] = 1500 + 1000 * (j - 19); Ratio_Edge[j] = 0.15 + 0.1 * (j - 19); } // Center: 2000~10000 → edges: 1500~10500     
     }
 
-    auto hist_int = new TH2D("hist_int","hist_int",28,Energy_Edge,18,Ratio_Edge);
-    auto hist_sur = new TH2D("hist_sur","hist_sur",28,Energy_Edge,18,Ratio_Edge);
-    auto lamb_int = new TH2D("lamb_int","lamb_int",28,Energy_Edge,18,Ratio_Edge);
-    auto lamb_sur = new TH2D("lamb_sur","lamb_sur",28,Energy_Edge,18,Ratio_Edge);
+    auto hist_int = new TH2D("hist_int","hist_int",28,Energy_Edge,28,Ratio_Edge);
+    auto hist_sur = new TH2D("hist_sur","hist_sur",28,Energy_Edge,28,Ratio_Edge);
+    auto lamb_int = new TH2D("lamb_int","lamb_int",28,Energy_Edge,28,Ratio_Edge);
+    auto lamb_sur = new TH2D("lamb_sur","lamb_sur",28,Energy_Edge,28,Ratio_Edge);
 
     hist_int->SetTitle("N_{int};Incident Energy (GeV);True r_{d}; Fitted r_{d}");
     hist_sur->SetTitle("N_{sur};Incident Energy (GeV);True r_{d}; Fitted r_{d}");
@@ -54,10 +48,11 @@ void CrossSection_Dual_Ine_Ratio()
         auto gre_lambda_d_sur = new TGraphErrors();
 
         // for (int i =5; i < 6; i++)
-        for (int i =0; i < 18; i++)
+        for (int i =0; i < 27; i++)
         {
-            if (i < 10)      Ratio[i] = (i + 1) * 0.01;     
-            else             Ratio[i] = (i - 9 + 1) * 0.1;  
+            if      (i < 10)          Ratio[i] = (i + 1) * 0.001;     
+            else if (i < 19)          Ratio[i] = (i - 9 + 1) * 0.01;
+            else                      Ratio[i] = (i - 18 + 1) * 0.1;  
             cout << Ratio[i] << " , " << 1-Ratio[i] <<  endl;
             if (gDirectory->FindObject("c0")) delete gDirectory->FindObject("c0");
 
