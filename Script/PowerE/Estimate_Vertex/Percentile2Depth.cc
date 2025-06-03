@@ -7,10 +7,13 @@ void Percentile2Depth()
     int Energy_Name_Err[28]={0};
     auto gre_p = new TGraphErrors();
     auto gre_d = new TGraphErrors();
+    if (gDirectory->FindObject("hist_p")) delete gDirectory->FindObject("hist_p");
+    if (gDirectory->FindObject("hist_d")) delete gDirectory->FindObject("hist_d");
     auto hist_p = new TH1D("hist_p","hist_p",28,0,28);
     auto hist_d = new TH1D("hist_d","hist_d",28,0,28);
 
-    for (int k =0; k < 28; k++)
+    // for (int k =0; k < 28; k++)
+    for (int k =18; k < 19; k++)
     {
         if (k < 10)      {Energy_Name[k] = (k + 1) * 10;        }       // 10 ~ 100
         else if (k < 19) {Energy_Name[k] = (k - 9 + 1) * 100;   }        // 200 ~ 1000
@@ -62,6 +65,9 @@ void Percentile2Depth()
 
         auto h1_p_int = new TH1D("h1_p_int","h1_p_int",120,-10,5);  
         auto h1_d_int = new TH1D("h1_d_int","h1_d_int",120,-10,5);  
+
+        auto h1_p_int_Sel = new TH1D("h1_p_int_Sel","h1_p_int_Sel",120,-10,5);  // Selected Ranged [3 - 12]
+        auto h1_d_int_Sel = new TH1D("h1_d_int_Sel","h1_d_int_Sel",120,-10,5);  // Selected Ranged [3 - 12]
 
 
         for(int i =0 ; i<15 ; i++)  // Deposit Energy Bin
@@ -157,6 +163,7 @@ void Percentile2Depth()
 
             // h1_p[p_energy_index][p_FI_Lay]->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
             // h1_p_inter[p_energy_index]->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3)) ;
+            if(p_FI_Lay>= 0 && p_FI_Lay <= 4 ) {h1_p_int_Sel->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));}
             h1_p_int->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
             h1_p_Lay[p_FI_Lay]->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
         }
@@ -198,8 +205,7 @@ void Percentile2Depth()
                 double bar_odd, bar_odd_err;
                 double bar_even, bar_even_err;
                 PrepareFitData(d_EnergyVec, layer_start, 14, g_fit_bars, g_fit_energies, g_fit_total_energy);
-                bool success_odd = Fit1DParameter(F
-                    itAxisFunction, g_fit_bars[1], 0.01, 2, 19,  bar_odd, bar_odd_err);
+                bool success_odd = Fit1DParameter(FitAxisFunction, g_fit_bars[1], 0.01, 2, 19,  bar_odd, bar_odd_err);
                 if (success_odd)              bar_info[0] = std::round(bar_odd);
                 else                std::cerr << "Failed to fit bar_odd." << std::endl;
 
@@ -233,6 +239,7 @@ void Percentile2Depth()
 
             // h1_d[d_energy_index][d_FI_Lay]->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
             // h1_d_inter[d_energy_index]->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3)) ;
+            if(d_FI_Lay>= 0 && d_FI_Lay <= 4 ) {h1_d_int_Sel->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));}
             h1_d_int->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
             h1_d_Lay[d_FI_Lay]->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
         }
@@ -295,17 +302,17 @@ void Percentile2Depth()
         fitFunc2->SetLineColor(kBlue);
         fitFunc2->SetLineWidth(2);
 
-        h1_p_int->SetLineColor(kRed);   h1_p_int->SetMarkerColor(kRed);  h1_p_int->SetLineWidth(2);   h1_p_int->Sumw2();
-        h1_d_int->SetLineColor(kBlue);  h1_d_int->SetMarkerColor(kBlue); h1_d_int->SetLineWidth(2);   h1_d_int->Sumw2();
-        h1_p_int->Scale(1.0/h1_p_int->Integral()); 
-        h1_d_int->Scale(1.0/h1_d_int->Integral()); 
-        h1_p_int->GetYaxis()->SetRangeUser(0,h1_p_int->GetMaximum()*1.2);
-        h1_p_int->SetTitle(" Stack Multi Layer;(Xine-Xmid)/Slope;Normalized Count");
+        h1_p_int_Sel->SetLineColor(kRed);   h1_p_int_Sel->SetMarkerColor(kRed);  h1_p_int_Sel->SetLineWidth(2);   h1_p_int_Sel->Sumw2();
+        h1_d_int_Sel->SetLineColor(kBlue);  h1_d_int_Sel->SetMarkerColor(kBlue); h1_d_int_Sel->SetLineWidth(2);   h1_d_int_Sel->Sumw2();
+        h1_p_int_Sel->Scale(1.0/h1_p_int_Sel->Integral()); 
+        h1_d_int_Sel->Scale(1.0/h1_d_int_Sel->Integral()); 
+        h1_p_int_Sel->GetYaxis()->SetRangeUser(0,h1_p_int_Sel->GetMaximum()*1.2);
+        h1_p_int_Sel->SetTitle(" Stack Multi Layer;(Xine-Xmid)/Slope;Normalized Count");
 
-        h1_p_int->Fit(fitFunc1,"R");  
-        h1_d_int->Fit(fitFunc2,"R");  
-        h1_p_int->Draw("hist");
-        h1_d_int->Draw("histsame");
+        h1_p_int_Sel->Fit(fitFunc1,"R");  
+        h1_d_int_Sel->Fit(fitFunc2,"R");  
+        h1_p_int_Sel->Draw("hist");
+        h1_d_int_Sel->Draw("histsame");
         fitFunc1->Draw("same");
         fitFunc2->Draw("same");
         gre_p->AddPointError(Energy_Name[k],fitFunc1->GetParameter(1),Energy_Name_Err[k],fitFunc1->GetParError(1));

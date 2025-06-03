@@ -35,7 +35,7 @@ void Percentile2DepthEst()
     auto N_d_sur = new TH1D("N_d_sur","N_d_sur",28,Energy_Edge);
 
     // for (int k =0; k < 28; k++)
-    for (int k =9; k < 10; k++)
+    for (int k =18; k < 19; k++)
     {
         if (k < 10)      Energy_Name[k] = (k + 1) * 10;               // 10 ~ 100
         else if (k < 19) Energy_Name[k] = (k - 9 + 1) * 100;           // 200 ~ 1000
@@ -273,12 +273,12 @@ void Percentile2DepthEst()
         fitFunc2->SetLineColor(kBlue);
         fitFunc1->SetLineStyle(2);
         fitFunc2->SetLineStyle(2);
-        fitFunc1->FixParameter(0, 1e4);
-        fitFunc2->FixParameter(0, 1e4);
+        // fitFunc1->FixParameter(0, 1e4);
+        // fitFunc2->FixParameter(0, 1e4);
 
         // N_int Fitting Function
-        TF1 *fitFunc3 = new TF1("fitFunc3", "[0]/[1]* exp(-x/[1])", 50,300); 
-        TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/[1]* exp(-x/[1])", 50,300); 
+        TF1 *fitFunc3 = new TF1("fitFunc3", "[0]/[1]* exp(-x/[1])", 60,300); 
+        TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/[1]* exp(-x/[1])", 60,300); 
         fitFunc3->SetParameters(1e4 * h1_p_int->GetBinWidth(1), 200); 
         fitFunc4->SetParameters(1e4 * h1_d_int->GetBinWidth(1), 170); 
         cout << h1_p_int->GetBinWidth(1) << endl;
@@ -286,8 +286,8 @@ void Percentile2DepthEst()
         fitFunc4->SetLineColor(kBlue);
         fitFunc3->SetLineStyle(2);
         fitFunc4->SetLineStyle(2);
-        fitFunc3->FixParameter(0, 1e4 * h1_p_int->GetBinWidth(1) );
-        fitFunc4->FixParameter(0, 1e4 * h1_d_int->GetBinWidth(1) );
+        // fitFunc3->FixParameter(0, 1e4 * h1_p_int->GetBinWidth(1) );
+        // fitFunc4->FixParameter(0, 1e4 * h1_d_int->GetBinWidth(1) );
 
         cout << h2_p_int->Integral() << endl;
         cout << h2_d_int->Integral() << endl;
@@ -462,6 +462,7 @@ void Percentile2DepthEst()
         c5->Divide(2,1);
         c5->cd(1);
         gPad->SetGrid(0,1);
+        gre_p_bias->GetYaxis()->SetRangeUser(-1,1);
         gre_p_bias->GetXaxis()->SetLimits(0,14);
         gre_p_bias->SetTitle(";BGO Layer;Bias of (Xine-#hat{Xest})/Xine");
         gre_p_bias->Draw("AP");
@@ -473,6 +474,7 @@ void Percentile2DepthEst()
 
         c5->cd(2);
         gPad->SetGrid(0,1);
+        gre_p_reso->GetYaxis()->SetRangeUser(0,1);
         gre_p_reso->GetXaxis()->SetLimits(0,14);
         gre_p_reso->SetTitle(";BGO Layer;Resolution of (Xine-#hat{Xest})/Xine");
         gre_p_reso->Draw("AP");
@@ -546,52 +548,85 @@ void Percentile2DepthEst()
     gre_d_sur->SetMarkerStyle(25);    grN_d_sur->SetMarkerStyle(25);
 
 
-    auto c6 = new TCanvas("c6","c6",2500,1500);
-    c6->cd();
+    auto c6 = new TCanvas("c6","c6",2500,1200);
+    c6->Divide(2,1);
+    c6->cd(1);
     gPad->SetGrid(1,1);
     gPad->SetLogx(1);
     gre_p_int->GetYaxis()->SetRangeUser(100,250);
     gre_p_int->GetXaxis()->SetLimits(4,2e4);
-    gre_p_int->SetTitle(";Energy(GeV);#lambda Based on Estimated Interaction Depth");
+    gre_p_int->SetTitle("Fitted From N_{int};Energy(GeV);#lambda Based on Estimated Interaction Depth");
     gre_p_int->Draw("AP");
-    gre_p_sur->Draw("PSAME");
     gre_d_int->Draw("PSAME");
+    gre6->Draw("LSAME");
+    gre7->Draw("LSAME");
+
+    auto lg6_1 = new TLegend(0.48,0.12,0.88,0.18);
+    lg6_1->SetNColumns(2);
+    lg6_1->AddEntry(gre_p_int,"Proton Fitted N_{int}" ,"pe");
+    lg6_1->AddEntry(gre_d_int,"Deuteron Fitted N_{int}" ,"pe");
+    lg6_1->AddEntry(gre6,"Proton GEANT4" ,"l");
+    lg6_1->AddEntry(gre7,"Deuteron GEANT4" ,"l");
+    lg6_1->Draw();
+
+    c6->cd(2);
+    gPad->SetGrid(1,1);
+    gPad->SetLogx(2);
+    gre_p_sur->GetYaxis()->SetRangeUser(100,250);
+    gre_p_sur->GetXaxis()->SetLimits(4,2e4);
+    gre_p_sur->SetTitle("Fitted From N_{sur};Energy(GeV);#lambda Based on Estimated Interaction Depth");
+    gre_p_sur->Draw("AP");
     gre_d_sur->Draw("PSAME");
     gre6->Draw("LSAME");
     gre7->Draw("LSAME");
-    auto lg6 = new TLegend(0.58,0.12,0.88,0.32);
-    lg6->SetNColumns(2);
-    lg6->AddEntry(gre_p_int,"Proton Fitted N_{int}" ,"pe");
-    lg6->AddEntry(gre_d_int,"Deuteron Fitted N_{int}" ,"pe");
-    lg6->AddEntry(gre_p_sur,"Proton Fitted N_{sur}" ,"pe");
-    lg6->AddEntry(gre_d_sur,"Deuteron Fitted N_{sur}" ,"pe");
-    lg6->AddEntry(gre6,"Proton GEANT4" ,"l");
-    lg6->AddEntry(gre7,"Deuteron GEANT4" ,"l");
-    lg6->Draw();
+    
+    auto lg6_2 = new TLegend(0.48,0.12,0.88,0.18);
+    lg6_2->SetNColumns(2);
+    lg6_2->AddEntry(gre_p_sur,"Proton Fitted N_{sur}" ,"pe");
+    lg6_2->AddEntry(gre_d_sur,"Deuteron Fitted N_{sur}" ,"pe");
+    lg6_2->AddEntry(gre6,"Proton GEANT4" ,"l");
+    lg6_2->AddEntry(gre7,"Deuteron GEANT4" ,"l");
+    lg6_2->Draw();
 
-    auto c7 = new TCanvas("c7","c7",2500,1500);
-    c7->cd();
+
+    auto c7 = new TCanvas("c7","c7",2500,1200);
+    c7->Divide(2,1);
+    c7->cd(1);
     gPad->SetGrid(1,1);
     gPad->SetLogy(0);
     gPad->SetLogx(1);
     grN_p_int->GetYaxis()->SetRangeUser(8e3,2e4);
     grN_p_int->GetXaxis()->SetLimits(4,2e4);
-    grN_p_int->SetTitle(";Energy(GeV);#lambda Based on Estimated Interaction Depth");
+    grN_p_int->SetTitle("Fitted From N_{int};Energy(GeV);N_{0} Based on Estimated Interaction Depth");
     grN_p_int->Draw("AP");
-    grN_p_sur->Draw("PSAME");
     grN_d_int->Draw("PSAME");
-    grN_d_sur->Draw("PSAME");
-
     auto line_Ntot = new TLine(4,1e4,2e4,1e4);
     line_Ntot->Draw("same");
+    auto lg7_1 = new TLegend(0.48,0.72,0.88,0.88);
+    lg7_1->SetNColumns(2);
+    lg7_1->AddEntry(grN_p_int,"Proton Fitted N_{int}" ,"pe");
+    lg7_1->AddEntry(grN_d_int,"Deuteron Fitted N_{int}" ,"pe");
+    lg7_1->AddEntry(line_Ntot,"Ture Simulated N_{0}" ,"l");
+    lg7_1->Draw();
 
-    auto lg7 = new TLegend(0.58,0.72,0.88,0.88);
-    lg7->SetNColumns(2);
-    lg7->AddEntry(grN_p_int,"Proton Fitted N_{int}" ,"pe");
-    lg7->AddEntry(grN_d_int,"Deuteron Fitted N_{int}" ,"pe");
-    lg7->AddEntry(grN_p_sur,"Proton Fitted N_{sur}" ,"pe");
-    lg7->AddEntry(grN_d_sur,"Deuteron Fitted N_{sur}" ,"pe");
-    lg7->AddEntry(line_Ntot,"Ture Simulated N_{0}" ,"l");
-    lg7->Draw();
+    c7->cd(2);
+    gPad->SetGrid(1,1);
+    gPad->SetLogy(0);
+    gPad->SetLogx(1);
+    grN_p_sur->GetYaxis()->SetRangeUser(8e3,2e4);
+    grN_p_sur->GetXaxis()->SetLimits(4,2e4);
+    grN_p_sur->SetTitle("Fitted From N_{sur};Energy(GeV);N_{0} Based on Estimated Interaction Depth");
+    grN_p_sur->Draw("AP");
+    grN_d_sur->Draw("PSAME");
+    line_Ntot->Draw("same");
+    auto lg7_2 = new TLegend(0.48,0.72,0.88,0.88);
+    lg7_2->SetNColumns(2);
+    lg7_2->AddEntry(grN_p_sur,"Proton Fitted N_{sur}" ,"pe");
+    lg7_2->AddEntry(grN_d_sur,"Deuteron Fitted N_{sur}" ,"pe");
+    lg7_2->AddEntry(line_Ntot,"Ture Simulated N_{0}" ,"l");
+    lg7_2->Draw();
+
+
+
 
 }

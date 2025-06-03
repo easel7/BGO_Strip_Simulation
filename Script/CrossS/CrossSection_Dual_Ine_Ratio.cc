@@ -162,7 +162,7 @@ void CrossSection_Dual_Ine_Ratio()
             h_d_int->Draw("histsame");
             h_p_int->Fit(fitFunc5,"R");
             h_d_int->Fit(fitFunc6,"R");
-            TF1 *fitFunc4 = new TF1("fitFunc4", "[0]*(1-[1])/[2]*exp(-x/[2])+[0]*[1]/[3] *exp(-x/ [3] )", 50,300); fitFunc4->SetParameters(1e5, Ratio[i],200,170); fitFunc4->SetLineColor(kBlack); 
+            TF1 *fitFunc4 = new TF1("fitFunc4", "[0]*(1-[1]) /[2] *exp(-x/[2])+ [0]*[1] /[3] *exp(-x/ [3] )", 50,300); fitFunc4->SetParameters(1e5, Ratio[i],200,170); fitFunc4->SetLineColor(kBlack); 
             fitFunc4->FixParameter(0,(h_p_tot->Integral()+h_d_tot->Integral())*h_p_int->GetBinWidth(1));
             fitFunc4->FixParameter(2,fitFunc5->GetParameter(1));
             // fitFunc4->FixParameter(3,fitFunc6->GetParameter(1));
