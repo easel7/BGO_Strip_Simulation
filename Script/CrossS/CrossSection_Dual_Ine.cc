@@ -16,8 +16,8 @@ void CrossSection_Dual_Ine()
     tree_d->Draw("First_Ine_Depth>>h_d_tot","","");
     tree_d->Draw("First_Ine_Depth>>h_d_int","","");
 
-    h_p_int->Scale(0.5);    h_p_tot->Scale(0.5);
-    h_d_int->Scale(0.5);    h_d_tot->Scale(0.5);
+    // h_p_int->Scale(0.5);    h_p_tot->Scale(0.5);
+    // h_d_int->Scale(0.5);    h_d_tot->Scale(0.5);
 
     cout << h_p_tot->Integral() << " , " <<  h_d_tot->Integral()  << endl;
     for(int ii = 1 ; ii <= h_p_int->GetNbinsX() ; ii++)

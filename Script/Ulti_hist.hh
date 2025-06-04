@@ -262,3 +262,5 @@ int Inverse_Mod_sigmoid(double percentile,double Xmid, double Slope)
     double X =  Xmid + Slope * log(percentile / (1.0 - percentile));
     return floor(X);
 }
+
+//----------------------------------------------------------------------------------

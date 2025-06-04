@@ -1,3 +1,5 @@
+#include "Fit/Fitter.h"
+
 void CrossSection_Dual_Ine_Mono()
 {
     int Energy_Name[28]={0};
@@ -48,8 +50,8 @@ void CrossSection_Dual_Ine_Mono()
         auto gre_d_int = new TGraphErrors();  
         auto gre_d_sur = new TGraphErrors();
 
-        // for (int i =27; i < 28; i++)
-        for (int i =0; i < 27; i++)
+        for (int i =16; i < 17; i++)
+        // for (int i =0; i < 27; i++)
         {
             if      (i < 10)          Ratio[i] = (i + 1) * 0.001;     
             else if (i < 19)          Ratio[i] = (i - 9 + 1) * 0.01;
@@ -65,9 +67,12 @@ void CrossSection_Dual_Ine_Mono()
             auto h_p_tot = new TH1D("h_p_tot","h_p_tot",15,-25.5,357);  h_p_tot->Sumw2();
             auto h_p_int = new TH1D("h_p_int","h_p_int",14,0,357);      h_p_int->Sumw2();
             auto h_p_sur = new TH1D("h_p_sur","h_p_sur",14,0,357);      
+            auto C_p_int = new TH1D("C_p_int","C_p_int",14,0,357);      C_p_int->Sumw2();
+            auto C_p_sur = new TH1D("C_p_sur","C_p_sur",14,0,357);      
             tree_p->Draw("First_Ine_Depth>>h_p_tot","","");
             tree_p->Draw("First_Ine_Depth>>h_p_int",HI,"");
-            
+            tree_p->Draw("First_Ine_Depth>>C_p_int",HI,"");
+
             file_d->cd();
             if (gDirectory->FindObject("h_d_tot")) delete gDirectory->FindObject("h_d_tot");
             if (gDirectory->FindObject("h_d_int")) delete gDirectory->FindObject("h_d_int");
@@ -78,9 +83,17 @@ void CrossSection_Dual_Ine_Mono()
             tree_d->Draw("First_Ine_Depth>>h_d_tot","","");
             tree_d->Draw("First_Ine_Depth>>h_d_int",HI,"");
 
+            cout << h_p_tot->Integral() << endl;
+            for(int ii = 1 ; ii <= C_p_int->GetNbinsX() ; ii++)
+            {
+                C_p_sur->SetBinContent(ii , ( h_p_tot->Integral() - C_p_int->Integral(1,ii) ));
+                cout << ii << " , " << C_p_sur->GetBinContent(ii) << endl;
+            }
+            C_p_sur->Sumw2();
+
             h_p_int->Scale( 1-Ratio[i]);    h_p_tot->Scale(1-Ratio[i]);
             h_d_int->Scale( Ratio[i]  );    h_d_tot->Scale(Ratio[i]);
-            
+
             for(int ii = 1 ; ii <= h_p_int->GetNbinsX() ; ii++)
             {
                 h_p_sur->SetBinContent(ii, ( h_p_tot->Integral() - h_p_int->Integral(1,ii) ) );
@@ -88,6 +101,7 @@ void CrossSection_Dual_Ine_Mono()
             }
             auto h_2_int = (TH1D*)h_p_int->Clone(); h_2_int->Add(h_d_int);
             auto h_2_sur = (TH1D*)h_p_sur->Clone(); h_2_sur->Add(h_d_sur);
+
             h_2_int->Sumw2();    h_p_int->Sumw2();
             h_2_sur->Sumw2();    h_d_sur->Sumw2();
 
@@ -112,9 +126,9 @@ void CrossSection_Dual_Ine_Mono()
             latex.SetTextAlign(13);  //align at top
 
             auto c0 = new TCanvas("c0","c0",2400,1000);
+            // gStyle->SetOptStat(1);
             c0->Divide(2,1);
             c0->cd(1);
-            gStyle->SetOptStat(0);
             h_p_sur->SetLineColor(kRed);     h_p_sur->SetLineWidth(2);
             h_d_sur->SetLineColor(kBlue);    h_d_sur->SetLineWidth(2);
             h_2_sur->SetLineColor(kBlack);   h_2_sur->SetLineWidth(2);
@@ -141,6 +155,29 @@ void CrossSection_Dual_Ine_Mono()
             latex.DrawLatex(0,h_2_sur->GetMaximum()-4000,Form("#color[2]{Fitted #lambda_{p} alone: %.2f#pm %.2f mm}",lambda1 , lambda1_err));
             latex.DrawLatex(0,h_2_sur->GetMaximum()-5000,Form("#color[4]{Fitted #lambda_{d} alone: %.2f#pm %.2f mm}",lambda2 , lambda2_err));
 
+            auto c0_1 = new TCanvas("c0_1","c0_1",2400,1000);
+            c0_1->cd();
+            C_p_sur->Draw("hist");
+            h_2_sur->Draw("histsame");
+            cout << (h_p_tot->Integral()+h_d_tot->Integral()) << endl;
+            auto data_sur = ROOT::Fit::BinData();
+            ROOT::Fit::FillData(data_sur, C_p_sur); 
+            ROOT::Fit::FillData(data_sur, h_2_sur); 
+            auto *f1 = new TF1("f1",Form("%.2f*exp(-(x+12.75)/[0])", (h_p_tot->Integral()+h_d_tot->Integral()) ),60,300);
+            f1->SetParameter(0,200);
+            auto wf = ROOT::Math::WrappedTF1(*f1);
+            auto fitter = ROOT::Fit::Fitter() ;
+            fitter.SetFunction(wf);
+            fitter.Fit(data_sur);
+            auto result = fitter.Result();
+            // result.Print(std::cout);
+            // cout << result.Chi2() << endl;
+            double Chi2_combine_sur = result.Chi2();
+            double Chi2_proton_sur  = fitFunc1->GetChisquare();
+
+            
+
+
             c0->cd(2);
             h_p_int->SetLineColor(kRed);     h_p_int->SetLineWidth(2);
             h_d_int->SetLineColor(kBlue);    h_d_int->SetLineWidth(2);
@@ -152,13 +189,14 @@ void CrossSection_Dual_Ine_Mono()
             h_d_int->Draw("histsame");
             h_p_int->Fit(fitFunc5,"R");
             h_d_int->Fit(fitFunc6,"R");
-            
-            // 
-            // fitFunc4->FixParameter(1,fitFunc5->GetParameter(1));
             h_2_int->Fit(fitFunc4,"R"); 
             fitFunc4->Draw("same");
             fitFunc5->Draw("same");
             fitFunc6->Draw("same");
+
+            cout << fitFunc5->GetChisquare() << endl;
+            cout << fitFunc6->GetChisquare() << endl;
+
 
             double mixture_length1      = fitFunc4->GetParameter(1);
             double mixture_length1_err  = fitFunc4->GetParError(1);
