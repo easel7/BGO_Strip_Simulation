@@ -39,6 +39,7 @@ void CrossSection_Dual_Ine_Mono()
         else if (k < 19) {Energy_Name[k] = (k - 9 + 1) * 100;    Energy[k] = (k - 9 + 1) * 100.;  }        // 200 ~ 1000
         else             {Energy_Name[k] = (k - 18 + 1) * 1000;  Energy[k] = (k - 18 + 1) * 1000.;}        // 2000 ~ 10000
 
+        cout << " Processing Energy " << Energy[k] << " GeV !!!! " << endl; 
         TCut HI  = "First_Ine_Depth>=0 && Nhits >= 10";
         auto file_p  = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Proton_%dGeV.root",Energy_Name[k]));
         auto tree_p  = (TTree*)file_p->Get("B4");
@@ -55,13 +56,16 @@ void CrossSection_Dual_Ine_Mono()
         auto gre_d_int = new TGraphErrors();  
         auto gre_d_sur = new TGraphErrors();
 
+        auto chi2_int = new TGraph();
+        auto chi2_sur = new TGraph();
+
         CL95_Sur[k]=1e-3; int Sur_95_Tag = -1;
         CL90_Sur[k]=1e-3; int Sur_90_Tag = -1;
         CL95_Int[k]=1e-3; int Int_95_Tag = -1;
         CL90_Int[k]=1e-3; int Int_90_Tag = -1;
-        ROOT::Fit::DataRange range;
+        auto range = ROOT::Fit::DataRange();
         range.SetRange(60, 300);
-        ROOT::Fit::DataOptions opt;
+        auto opt = ROOT::Fit::DataOptions();
 
         // for (int i =16; i < 17; i++)
         for (int i =0; i < 27; i++)
@@ -141,7 +145,7 @@ void CrossSection_Dual_Ine_Mono()
             latex.SetTextAlign(13);  //align at top
 
             auto c0 = new TCanvas("c0","c0",2400,1000);
-            // gStyle->SetOptStat(1);
+            gStyle->SetOptStat(0);
             c0->Divide(2,1);
             c0->cd(1);
             h_p_sur->SetLineColor(kRed);     h_p_sur->SetLineWidth(2);
@@ -170,15 +174,9 @@ void CrossSection_Dual_Ine_Mono()
             latex.DrawLatex(0,h_2_sur->GetMaximum()-4000,Form("#color[2]{Fitted #lambda_{p} alone: %.2f#pm %.2f mm}",lambda1 , lambda1_err));
             latex.DrawLatex(0,h_2_sur->GetMaximum()-5000,Form("#color[4]{Fitted #lambda_{d} alone: %.2f#pm %.2f mm}",lambda2 , lambda2_err));
 
-            // auto c0_1 = new TCanvas("c0_1","c0_1",2400,1000);
-            // c0_1->cd();
-            // C_p_sur->Draw("hist");
-            // h_2_sur->Draw("histsame");
+
             cout << (h_p_tot->Integral()+h_d_tot->Integral()) << endl;
-
-
-
-            ROOT::Fit::BinData data_sur(opt,range); 
+            auto data_sur = ROOT::Fit::BinData(opt, range);
             ROOT::Fit::FillData(data_sur, C_p_sur); 
             ROOT::Fit::FillData(data_sur, h_2_sur); 
             auto *f1_sur = new TF1("f1_sur",Form("%.2f*exp(-(x+12.75)/[0])", (h_p_tot->Integral()+h_d_tot->Integral()) ),60,300);
@@ -196,6 +194,18 @@ void CrossSection_Dual_Ine_Mono()
             double Chi2_proton_sur    = fitFunc1->GetChisquare();
             double Chi2_deuteron_sur  = fitFunc2->GetChisquare();
             double Chi2_mixture_sur   = fitFunc3->GetChisquare();
+
+            auto c0_1 = new TCanvas("c0_1","c0_1",2400,1000);
+            c0_1->cd();
+            h_2_sur->Draw("hist");
+            C_p_sur->Draw("histsame");
+            f1_sur->Draw("same");
+    
+            auto lg01 = new TLegend(0.72,0.72,0.88,0.88);
+            lg01->AddEntry(C_p_sur,"Proton Sample","l");
+            lg01->AddEntry(h_2_sur,"Mixture","l");
+            lg01->AddEntry(f1_sur ,"Function share same #lambda","l");
+            lg01->Draw();
 
             if( (Chi2_combine_sur - (Chi2_mixture_sur + Chi2_proton_sur) ) >=2.71 && Sur_90_Tag < 0) 
             { 
@@ -235,9 +245,7 @@ void CrossSection_Dual_Ine_Mono()
             latex.DrawLatex(0,h_2_int->GetMaximum()-400,Form("#color[2]{Fitted #lambda_{p} alone: %.2f#pm %.2f mm}",lambda3 , lambda3_err));
             latex.DrawLatex(0,h_2_int->GetMaximum()-500,Form("#color[4]{Fitted #lambda_{d} alone: %.2f#pm %.2f mm}",lambda4 , lambda4_err));
 
-
-
-            ROOT::Fit::BinData data_int(opt, range); 
+            auto data_int = ROOT::Fit::BinData(opt, range);
             ROOT::Fit::FillData(data_int, C_p_int); // NDF = 13
             ROOT::Fit::FillData(data_int, h_2_int); //
             auto *f1_int = new TF1("f1_int",Form("%.2f/[0]*exp(-x/[0])", (h_p_tot->Integral()+h_d_tot->Integral())*h_p_int->GetBinWidth(1) ),60,300);
@@ -267,6 +275,9 @@ void CrossSection_Dual_Ine_Mono()
                 Int_95_Tag = 1;
             }
 
+            chi2_int->SetPoint(i,Ratio[i],Chi2_combine_int - (Chi2_mixture_int + Chi2_proton_int));
+            chi2_sur->SetPoint(i,Ratio[i],Chi2_combine_sur - (Chi2_mixture_sur + Chi2_proton_sur));
+
             gre_sur->SetPoint(i,Ratio[i],mixture_length);
             gre_sur->SetPointError(i,0,mixture_length_err);
             gre_int->SetPoint(i,Ratio[i],mixture_length1);
@@ -290,8 +301,8 @@ void CrossSection_Dual_Ine_Mono()
             // c0->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/CrossS/RatioEnergySearch/Ratio_%.2f_%dGeV.pdf",Ratio[i],Energy_Name[k]));
         } // i Ratio
 
-        auto c2 = new TCanvas("c2","c2",2100,900);
-        c2->Divide(2,1);
+        auto c2 = new TCanvas("c2","c2",2100,2100);
+        c2->Divide(2,2);
         c2->cd(1);
         gPad->SetGrid(1,1);
         gPad->SetLogx();
@@ -326,7 +337,6 @@ void CrossSection_Dual_Ine_Mono()
         c2->cd(2);
         gPad->SetGrid(1,1);
         gPad->SetLogx();
-
         gre_sur->SetLineColor(kBlack);
         gre_sur->SetLineWidth(2);
         gre_sur->SetMarkerColor(kBlack);
@@ -354,6 +364,26 @@ void CrossSection_Dual_Ine_Mono()
         lg2_2->AddEntry(gre_d_sur,"Deuteron","ep");
         lg2_2->AddEntry(gre_p_sur,"Proton","ep");
         lg2_2->Draw();
+
+        c2->cd(3);
+        gPad->SetGrid(1,1);
+        gPad->SetLogx();
+        chi2_int->SetLineColor(kRed);
+        chi2_int->SetLineWidth(2);
+        chi2_int->GetXaxis()->SetLimits(5e-4,2);
+        chi2_int->GetYaxis()->SetRangeUser(0,20);
+        chi2_int->SetTitle("Fitted From N_{int};True r_{d};#Delta#chi^{2}");
+        chi2_int->Draw("AL");
+
+        c2->cd(4);
+        gPad->SetGrid(1,1);
+        gPad->SetLogx();
+        chi2_sur->SetLineColor(kRed);
+        chi2_sur->SetLineWidth(2);
+        chi2_sur->GetXaxis()->SetLimits(5e-4,2);
+        chi2_sur->GetYaxis()->SetRangeUser(0,20);
+        chi2_sur->SetTitle("Fitted From N_{sur};True r_{d};#Delta#chi^{2}");
+        chi2_sur->Draw("AL");
         // c2->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/CrossS/RatioEnergySearch/FittedRatio_%dGeV.pdf",Energy_Name[k]));
 
         cout << "Survival   90 CL " << CL90_Sur[k] << " , 95 CL = " << CL95_Sur[k] << endl;
@@ -380,6 +410,7 @@ void CrossSection_Dual_Ine_Mono()
     auto c4 = new TCanvas("c4","c4",2500,1200);
     c4->Divide(2,1);
     c4->cd(1);
+    gPad->SetGrid(1,1);
     gPad->SetLogy();
     gPad->SetLogx();
     gre_90_sur->GetYaxis()->SetRangeUser(9e-4,2);
@@ -387,12 +418,13 @@ void CrossSection_Dual_Ine_Mono()
     gre_90_sur->SetTitle("Sensitivity Curve from N_{sur};Energy(GeV); True r_{d}");
     gre_90_sur->Draw("ALP");
     gre_95_sur->Draw("LPSAME");
-    auto lg4 = new TLegend(0.72,0.78,0.88,0.88);
-    lg4->AddEntry(gre_90_sur,"90 Confidence Level","l");
-    lg4->AddEntry(gre_95_sur,"95 Confidence Level","l");
+    auto lg4 = new TLegend(0.72,0.12,0.88,0.22);
+    lg4->AddEntry(gre_90_sur,"90% C.L.","l");
+    lg4->AddEntry(gre_95_sur,"95% C.L.","l");
     lg4->Draw();
 
     c4->cd(2);
+    gPad->SetGrid(1,1);
     gPad->SetLogy();
     gPad->SetLogx();
     gre_90_int->GetYaxis()->SetRangeUser(9e-4,2);
