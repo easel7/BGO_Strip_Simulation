@@ -288,7 +288,6 @@ void CrossSection_Dual_Ine_Ratio()
     auto gre7 = new TGraph(Nbins,KN_Energy, KN_Deuteron);   gre7->SetLineColor(kBlue);
 
     auto c4 = new TCanvas("c4","c4",2500,2500);
-
     TMultiGraph* mg1 = new TMultiGraph();
     TMultiGraph* mg2 = new TMultiGraph();
     TMultiGraph* mg3 = new TMultiGraph();
