@@ -13,8 +13,8 @@ void Draw_Pattern3()
     int p_FI_Lay;
     double p_Total_E;
     const char* string1;
-    const char* string2 = "Deuteron_PowerLaw";
-    // const char* string2 = "Proton_PowerLaw";
+    // const char* string2 = "Deuteron_PowerLaw";
+    const char* string2 = "Proton_10GeV";
 
     auto proton_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/%s.root",string2));
     auto proton_tree = (TTree*)proton_file->Get("B4");
@@ -38,8 +38,8 @@ void Draw_Pattern3()
     {
         proton_tree->GetEntry(entry);
         if (p_Nhits < 10 ) continue;
-        int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
-        if(p_energy_index < 0 || p_energy_index > 14) continue;
+        int p_energy_index = int(floor((log10(p_Total_E) ) / 0.2));
+        if(p_energy_index < 0 || p_energy_index > 20) continue;
         if (gDirectory->FindObject("hBGO1")) delete gDirectory->FindObject("hBGO1");
         if (gDirectory->FindObject("hBGO2")) delete gDirectory->FindObject("hBGO2");
         if (gDirectory->FindObject("hBGO3")) delete gDirectory->FindObject("hBGO3");

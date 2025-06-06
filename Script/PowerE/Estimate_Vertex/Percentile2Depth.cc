@@ -12,6 +12,7 @@ void Percentile2Depth()
     auto hist_p = new TH1D("hist_p","hist_p",28,0,28);
     auto hist_d = new TH1D("hist_d","hist_d",28,0,28);
 
+    // for (int k =0; k < 1; k++)
     for (int k =0; k < 28; k++)
     // for (int k =18; k < 19; k++)
     {
@@ -96,8 +97,8 @@ void Percentile2Depth()
         {        
             proton_tree->GetEntry(entry);
             if (entry%1000==0) cout << " Proton : " << entry << endl;
-            int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
-            // if(p_energy_index < 0 || p_energy_index > 14) continue;
+            int p_energy_index = int(floor((log10(p_Total_E) ) / 0.2));
+            if(p_energy_index < 0 || p_energy_index > 20) continue;
             if(p_FI_Dep < 0) continue;
             if (p_Nhits < 10 ) continue;
             double sum_p = 0;
@@ -163,7 +164,7 @@ void Percentile2Depth()
 
             // h1_p[p_energy_index][p_FI_Lay]->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
             // h1_p_inter[p_energy_index]->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3)) ;
-            if(p_FI_Lay>= 0 && p_FI_Lay <= 4 ) {h1_p_int_Sel->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));}
+            if(p_FI_Lay>= 0 && p_FI_Lay <= 3 ) {h1_p_int_Sel->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));}
             h1_p_int->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
             h1_p_Lay[p_FI_Lay]->Fill((p_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
         }
@@ -172,8 +173,8 @@ void Percentile2Depth()
         {
             deuteron_tree->GetEntry(entry);
             if (entry%1000==0) cout << " Deuteron : " << entry << endl;
-            int d_energy_index = int(floor((log10(d_Total_E) - 1) / 0.2));
-            // if(d_energy_index < 0 || d_energy_index > 14) continue;
+            int d_energy_index = int(floor((log10(d_Total_E) ) / 0.2));
+            if(d_energy_index < 0 || d_energy_index > 20) continue;
             if(d_FI_Dep < 0) continue;
             if (d_Nhits < 10 ) continue;
             double sum_d = 0;
@@ -239,7 +240,7 @@ void Percentile2Depth()
 
             // h1_d[d_energy_index][d_FI_Lay]->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
             // h1_d_inter[d_energy_index]->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3)) ;
-            if(d_FI_Lay>= 0 && d_FI_Lay <= 4 ) {h1_d_int_Sel->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));}
+            if(d_FI_Lay>= 0 && d_FI_Lay <= 3 ) {h1_d_int_Sel->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));}
             h1_d_int->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
             h1_d_Lay[d_FI_Lay]->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
         }
