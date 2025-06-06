@@ -14,7 +14,7 @@ void Draw_Pattern2()
     double p_FI_Dep;
     int p_FI_Lay;
     const char* string1;
-    const char* string2 = "Proton_1000GeV";
+    const char* string2 = "Proton_10GeV";
     // const char* string2 = "Proton_PowerLaw";
     // const char* string2 = "Proton_10000GeV";
     // const char* string2 = "Deuteron_1000GeV";

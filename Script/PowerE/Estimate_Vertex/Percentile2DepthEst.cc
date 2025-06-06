@@ -35,6 +35,7 @@ void Percentile2DepthEst()
     auto N_d_sur = new TH1D("N_d_sur","N_d_sur",28,Energy_Edge);
 
     // for (int k =0; k < 28; k++)
+    // for (int k =0; k < 1; k++)
     for (int k =18; k < 19; k++)
     {
         if (k < 10)      Energy_Name[k] = (k + 1) * 10;               // 10 ~ 100
@@ -113,10 +114,10 @@ void Percentile2DepthEst()
         {        
             proton_tree->GetEntry(entry);
             if (entry%1000==0) cout << " Proton : " << entry << endl;
-            int p_energy_index = int(floor((log10(p_Total_E) - 1) / 0.2));
-            // if (p_energy_index < 0 || p_energy_index > 14) continue;
+            int p_energy_index = int(floor((log10(p_Total_E) ) / 0.2));
+            if (p_energy_index < 0 || p_energy_index > 20) continue;
             if (p_FI_Dep < 0) {p_FI_Lay = 14;}
-            // if (p_Nhits < 10 ) continue;
+            if (p_Nhits < 10 ) continue;
             double sum_p = 0;
             int bar_info[2] = {0};
             double bar_Energy_info[14] = {0};
@@ -190,10 +191,10 @@ void Percentile2DepthEst()
         {
             deuteron_tree->GetEntry(entry);
             if (entry%1000==0) cout << " Deuteron : " << entry << endl;
-            int d_energy_index = int(floor((log10(d_Total_E) - 1) / 0.2));
-            // if (d_energy_index < 0 || d_energy_index > 14) continue;
+            int d_energy_index = int(floor((log10(d_Total_E) ) / 0.2));
+            if (d_energy_index < 0 || d_energy_index > 20) continue;
             if (d_FI_Dep < 0) {d_FI_Lay = 14;}
-            // if (d_Nhits < 10 ) continue;
+            if (d_Nhits < 10 ) continue;
             double sum_d = 0;
             int bar_info[2] = {0};
             double bar_Energy_info[14] = {0};
@@ -265,8 +266,8 @@ void Percentile2DepthEst()
         h2_d_int->Sumw2();    h1_d_int->Sumw2();
 
         // N_sur Fitting Function
-        TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-(x+12.75)/[1])", 120,270); 
-        TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-(x+12.75)/[1])", 120,270); 
+        TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-(x+12.75)/[1])", 80,270); 
+        TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-(x+12.75)/[1])", 80,270); 
         fitFunc1->SetParameters(1e4, 200); 
         fitFunc2->SetParameters(1e4, 170); 
         fitFunc1->SetLineColor(kRed); 
@@ -277,8 +278,8 @@ void Percentile2DepthEst()
         // fitFunc2->FixParameter(0, h2_d_int->Integral());
 
         // N_int Fitting Function
-        TF1 *fitFunc3 = new TF1("fitFunc3", "[0]/[1]* exp(-x/[1])", 120,270); 
-        TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/[1]* exp(-x/[1])", 120,270); 
+        TF1 *fitFunc3 = new TF1("fitFunc3", "[0]/[1]* exp(-x/[1])", 80,270); 
+        TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/[1]* exp(-x/[1])", 80,270); 
         fitFunc3->SetParameters(1e4 * h1_p_int->GetBinWidth(1), 200); 
         fitFunc4->SetParameters(1e4 * h1_d_int->GetBinWidth(1), 170); 
         cout << h1_p_int->GetBinWidth(1) << endl;
@@ -625,8 +626,5 @@ void Percentile2DepthEst()
     lg7_2->AddEntry(grN_d_sur,"Deuteron Fitted N_{sur}" ,"pe");
     lg7_2->AddEntry(line_Ntot,"Ture Simulated N_{0}" ,"l");
     lg7_2->Draw();
-
-
-
 
 }
