@@ -86,25 +86,25 @@ void Percentile2DepthEst()
 
         auto h2_p_int = new TH2D("h2_p_int","h2_p_int",200,-25,375,325,-275,375);  
         auto h2_d_int = new TH2D("h2_d_int","h2_d_int",200,-25,375,325,-275,375);  
-        auto h1_p_int = new TH1D("h1_p_int","h1_p_int",14,0,357);  
-        auto h1_d_int = new TH1D("h1_d_int","h1_d_int",14,0,357);  
-        auto h1_p_inl = new TH1D("h1_p_inl","h1_p_inl",14,0,357);  
-        auto h1_d_inl = new TH1D("h1_d_inl","h1_d_inl",14,0,357);  
-        auto h1_p_sur = new TH1D("h1_p_sur","h1_p_sur",14,0,357);  
-        auto h1_d_sur = new TH1D("h1_d_sur","h1_d_sur",14,0,357);  
-        auto h1_p_lea = new TH1D("h1_p_lea","h1_p_lea",14,0,357);  
-        auto h1_d_lea = new TH1D("h1_d_lea","h1_d_lea",14,0,357);  
+        auto h1_p_int = new TH1D("h1_p_int","h1_p_int",14,0,357);  // EST
+        auto h1_d_int = new TH1D("h1_d_int","h1_d_int",14,0,357);  // EST
+        auto h1_p_inl = new TH1D("h1_p_inl","h1_p_inl",14,0,357);  // REAL
+        auto h1_d_inl = new TH1D("h1_d_inl","h1_d_inl",14,0,357);  // REAL
+        auto h1_p_sur = new TH1D("h1_p_sur","h1_p_sur",14,0,357);  // EST
+        auto h1_d_sur = new TH1D("h1_d_sur","h1_d_sur",14,0,357);  // EST
+        auto h1_p_lea = new TH1D("h1_p_lea","h1_p_lea",14,0,357);  // REAL
+        auto h1_d_lea = new TH1D("h1_d_lea","h1_d_lea",14,0,357);  // REAL
 
         for(int i =0 ; i<15 ; i++)  // Layer
         {
-            h1_p_Lay[i] =new TH1D(Form("h1_p_Lay[%d]",i),Form("h1_p_Lay[%d]",i),60,-3,3);  
-            h1_d_Lay[i] =new TH1D(Form("h1_d_Lay[%d]",i),Form("h1_d_Lay[%d]",i),60,-3,3); 
+            h1_p_Lay[i] =new TH1D(Form("h1_p_Lay[%d]",i),Form("h1_p_Lay[%d]",i),30,-3,3);  
+            h1_d_Lay[i] =new TH1D(Form("h1_d_Lay[%d]",i),Form("h1_d_Lay[%d]",i),30,-3,3); 
             if (i<14)
             {
                 Layer[i] = 0.5 + i;
                 Layer_Err[i] = 0.5;
-                fitFunc_p[i] = new TF1(Form("fitFunc_p[%d]",i), "gaus", -1, 1); // 注意替换范围
-                fitFunc_d[i] = new TF1(Form("fitFunc_d[%d]",i), "gaus", -1, 1); // 注意替换范围
+                fitFunc_p[i] = new TF1(Form("fitFunc_p[%d]",i), "gaus", -2, 2); // 注意替换范围
+                fitFunc_d[i] = new TF1(Form("fitFunc_d[%d]",i), "gaus", -2, 2); // 注意替换范围
             }
         }
         
@@ -265,20 +265,20 @@ void Percentile2DepthEst()
         h2_d_int->Sumw2();    h1_d_int->Sumw2();
 
         // N_sur Fitting Function
-        TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-(x+12.75)/[1])", 0,300); 
-        TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-(x+12.75)/[1])", 0,300); 
+        TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-(x+12.75)/[1])", 120,270); 
+        TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-(x+12.75)/[1])", 120,270); 
         fitFunc1->SetParameters(1e4, 200); 
         fitFunc2->SetParameters(1e4, 170); 
         fitFunc1->SetLineColor(kRed); 
         fitFunc2->SetLineColor(kBlue);
         fitFunc1->SetLineStyle(2);
         fitFunc2->SetLineStyle(2);
-        // fitFunc1->FixParameter(0, 1e4);
-        // fitFunc2->FixParameter(0, 1e4);
+        // fitFunc1->FixParameter(0, h2_p_int->Integral());
+        // fitFunc2->FixParameter(0, h2_d_int->Integral());
 
         // N_int Fitting Function
-        TF1 *fitFunc3 = new TF1("fitFunc3", "[0]/[1]* exp(-x/[1])", 60,300); 
-        TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/[1]* exp(-x/[1])", 60,300); 
+        TF1 *fitFunc3 = new TF1("fitFunc3", "[0]/[1]* exp(-x/[1])", 120,270); 
+        TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/[1]* exp(-x/[1])", 120,270); 
         fitFunc3->SetParameters(1e4 * h1_p_int->GetBinWidth(1), 200); 
         fitFunc4->SetParameters(1e4 * h1_d_int->GetBinWidth(1), 170); 
         cout << h1_p_int->GetBinWidth(1) << endl;
@@ -286,8 +286,8 @@ void Percentile2DepthEst()
         fitFunc4->SetLineColor(kBlue);
         fitFunc3->SetLineStyle(2);
         fitFunc4->SetLineStyle(2);
-        // fitFunc3->FixParameter(0, 1e4 * h1_p_int->GetBinWidth(1) );
-        // fitFunc4->FixParameter(0, 1e4 * h1_d_int->GetBinWidth(1) );
+        // fitFunc3->FixParameter(0, h2_p_int->Integral() * h1_p_int->GetBinWidth(1) );
+        // fitFunc4->FixParameter(0, h2_d_int->Integral() * h1_d_int->GetBinWidth(1) );
 
         cout << h2_p_int->Integral() << endl;
         cout << h2_d_int->Integral() << endl;

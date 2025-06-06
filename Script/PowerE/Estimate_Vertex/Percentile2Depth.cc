@@ -12,8 +12,8 @@ void Percentile2Depth()
     auto hist_p = new TH1D("hist_p","hist_p",28,0,28);
     auto hist_d = new TH1D("hist_d","hist_d",28,0,28);
 
-    // for (int k =0; k < 28; k++)
-    for (int k =18; k < 19; k++)
+    for (int k =0; k < 28; k++)
+    // for (int k =18; k < 19; k++)
     {
         if (k < 10)      {Energy_Name[k] = (k + 1) * 10;        }       // 10 ~ 100
         else if (k < 19) {Energy_Name[k] = (k - 9 + 1) * 100;   }        // 200 ~ 1000
@@ -63,11 +63,11 @@ void Percentile2Depth()
         TH1D *h1_p[15][14];     TH1D *h1_p_inter[15];  TH1D *h1_p_Lay[14];
         TH1D *h1_d[15][14];     TH1D *h1_d_inter[15];  TH1D *h1_d_Lay[14];
 
-        auto h1_p_int = new TH1D("h1_p_int","h1_p_int",120,-10,5);  
-        auto h1_d_int = new TH1D("h1_d_int","h1_d_int",120,-10,5);  
+        auto h1_p_int = new TH1D("h1_p_int","h1_p_int",80,-10,6);  
+        auto h1_d_int = new TH1D("h1_d_int","h1_d_int",80,-10,6);  
 
-        auto h1_p_int_Sel = new TH1D("h1_p_int_Sel","h1_p_int_Sel",120,-10,5);  // Selected Ranged [3 - 12]
-        auto h1_d_int_Sel = new TH1D("h1_d_int_Sel","h1_d_int_Sel",120,-10,5);  // Selected Ranged [3 - 12]
+        auto h1_p_int_Sel = new TH1D("h1_p_int_Sel","h1_p_int_Sel",80,-10,6);  // Selected Ranged [3 - 12]
+        auto h1_d_int_Sel = new TH1D("h1_d_int_Sel","h1_d_int_Sel",80,-10,6);  // Selected Ranged [3 - 12]
 
 
         for(int i =0 ; i<15 ; i++)  // Deposit Energy Bin
@@ -76,19 +76,19 @@ void Percentile2Depth()
             Energy_LL[i] = 1.0 + 0.2 * i;
             Energy_UL[i] = 1.2 + 0.2 * i;
 
-            h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i),120,-10,5);  
-            h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i),120,-10,5);  
+            h1_p_inter[i] =new TH1D(Form("h1_p_inter[%d]",i),Form("h1_p_inter[%d]",i),80,-10,6);  
+            h1_d_inter[i] =new TH1D(Form("h1_d_inter[%d]",i),Form("h1_d_inter[%d]",i),80,-10,6);  
             for( int j= 0; j<14 ;j++)
             {
-                h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j),120,-10,5);  
-                h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j),120,-10,5);  
+                h1_p[i][j] = new TH1D(Form("h1_p[%d][%d]",i,j), Form("h1_p[%d][%d]",i,j),80,-10,6);  
+                h1_d[i][j] = new TH1D(Form("h1_d[%d][%d]",i,j), Form("h1_d[%d][%d]",i,j),80,-10,6);  
                 Layer[j] = 0.5 + j;
                 Layer_Err[j] = 0.5;
             }
             if (i<14)
             {
-                h1_p_Lay[i] =new TH1D(Form("h1_p_Lay[%d]",i),Form("h1_p_Lay[%d]",i),120,-10,5);  
-                h1_d_Lay[i] =new TH1D(Form("h1_d_Lay[%d]",i),Form("h1_d_Lay[%d]",i),120,-10,5);  
+                h1_p_Lay[i] =new TH1D(Form("h1_p_Lay[%d]",i),Form("h1_p_Lay[%d]",i),80,-10,6);  
+                h1_d_Lay[i] =new TH1D(Form("h1_d_Lay[%d]",i),Form("h1_d_Lay[%d]",i),80,-10,6);  
             }
         }
     
@@ -339,7 +339,7 @@ void Percentile2Depth()
             h1_p_Lay[i]->Draw("hist");
             h1_d_Lay[i]->Draw("histsame");
         }
-
+        c3->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/Depth_%dGeV.pdf",Energy_Name[k]));
     }
 
     auto write_file = new TFile("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/DepthEst_Fitting.root", "RECREATE");
