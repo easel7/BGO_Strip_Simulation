@@ -297,7 +297,6 @@ void Percentile2DepthEst()
     c0->cd(3); lg0->Draw();
     c0->cd(4); lg0->Draw();
 
-
     // for (int k =18; k < 19; k++)
     // {
     //     double BEST_FIT_MEAN = hist_p->GetBinContent(k+1);
