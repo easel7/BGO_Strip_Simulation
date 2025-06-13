@@ -5,8 +5,8 @@ void Percentile2Depth()
 {
     int Energy_Name[28]={0};
     int Energy_Name_Err[28]={0};
-    auto gre_p = new TGraphErrors();
-    auto gre_d = new TGraphErrors();
+    auto gre_p = new TGraphErrors();gre_p->SetName("gre_p");
+    auto gre_d = new TGraphErrors();gre_d->SetName("gre_d");
     if (gDirectory->FindObject("hist_p")) delete gDirectory->FindObject("hist_p");
     if (gDirectory->FindObject("hist_d")) delete gDirectory->FindObject("hist_d");
     auto hist_p = new TH1D("hist_p","hist_p",28,0,28);

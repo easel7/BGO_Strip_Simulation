@@ -299,7 +299,6 @@ void Percentile2DepthEst()
             h1_p_lea->SetBinContent(i, (h2_p_int->Integral() - h1_p_inl->Integral(1,i) ));
             h1_d_lea->SetBinContent(i, (h2_d_int->Integral() - h1_d_inl->Integral(1,i) ));
             cout << h1_p_int->Integral(1,i) << " , " <<  h1_p_int->GetBinContent(i) << endl;
-
             // cout << h1_d_int->Integral(0,i) << endl;
         }
 
