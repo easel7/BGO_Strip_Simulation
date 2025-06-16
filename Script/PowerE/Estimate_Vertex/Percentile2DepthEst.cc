@@ -7,9 +7,9 @@ void Percentile2DepthEst()
     double Ratio_Edge[19];
     double Energy_Dep[8] = {8,19,43,100,320,1e3,3.2e3,1e4};
 
-    auto mean_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/EnergyEst.root");
-    auto hist_p_2 = (TH1D*)mean_file->Get("hist_p_2");
-    auto Energy_Mid_p = (TH1D*)mean_file->Get("hist_p_2");
+    auto mean_file    = TFile::Open("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/EnergyEst.root");
+    auto hist_p_2     = (TH1D*)mean_file->Get("hist_p_2");
+    auto Energy_Mid_p = (TH1D*)mean_file->Get("Energy_Mid_p");
 
     for (int j = 0; j < 19; j++)
     {
@@ -66,15 +66,10 @@ void Percentile2DepthEst()
     deuteron_tree->SetBranchAddress("Nhits"          , &d_Nhits);
     deuteron_tree->SetBranchAddress("weight"         ,&d_weight);
 
-    // auto lambda_p_sur = new TH1D("lambda_p_sur","lambda_p_sur",28,Energy_Edge);
-    // auto lambda_p_int = new TH1D("lambda_p_int","lambda_p_int",28,Energy_Edge);
-    // auto lambda_d_int = new TH1D("lambda_d_int","lambda_d_int",28,Energy_Edge);
-    // auto lambda_d_sur = new TH1D("lambda_d_sur","lambda_d_sur",28,Energy_Edge);
-
-    // auto N_p_sur = new TH1D("N_p_sur","N_p_sur",28,Energy_Edge);
-    // auto N_p_int = new TH1D("N_p_int","N_p_int",28,Energy_Edge);
-    // auto N_d_int = new TH1D("N_d_int","N_d_int",28,Energy_Edge);
-    // auto N_d_sur = new TH1D("N_d_sur","N_d_sur",28,Energy_Edge);
+    TGraphErrors* gre_p_int[7]; TGraphErrors* grN_p_int[7];
+    TGraphErrors* gre_p_sur[7]; TGraphErrors* grN_p_sur[7];
+    TGraphErrors* gre_d_int[7]; TGraphErrors* grN_d_int[7];
+    TGraphErrors* gre_d_sur[7]; TGraphErrors* grN_d_sur[7];
     
     double Layer[14]={0};
     double Layer_Err[14]={0};
@@ -117,8 +112,8 @@ void Percentile2DepthEst()
         h1_d_lea[j] = new TH1D(Form("h1_d_lea[%d]",j),Form("h1_d_lea[%d]",j),14,0,357);  // REAL
         for(int i =0 ; i<15 ; i++)  // Layer
         {
-            h1_p_Lay[j][i] =new TH1D(Form("h1_p_Lay[%d][%d]",j,i),Form("h1_p_Lay[%d][%d]",j,i),30,-3,3);  
-            h1_d_Lay[j][i] =new TH1D(Form("h1_d_Lay[%d][%d]",j,i),Form("h1_d_Lay[%d][%d]",j,i),30,-3,3); 
+            h1_p_Lay[j][i] =new TH1D(Form("h1_p_Lay[%d][%d]",j,i),Form("h1_p_Lay[%d][%d]",j,i),30,-3,3); h1_p_Lay[j][i]->Sumw2(); 
+            h1_d_Lay[j][i] =new TH1D(Form("h1_d_Lay[%d][%d]",j,i),Form("h1_d_Lay[%d][%d]",j,i),30,-3,3); h1_d_Lay[j][i]->Sumw2();
             if (i<14)
             {
                 fitFunc_p[j][i] = new TF1(Form("fitFunc_p[%d][%d]",j, i), "gaus", -2, 2); // 注意替换范围
@@ -131,14 +126,14 @@ void Percentile2DepthEst()
     for (Long64_t entry = 0; entry < 50000; entry++)
     {        
         proton_tree->GetEntry(entry);
-        if (entry%1000==0) cout << " Proton : " << entry << endl;
+        if (entry%10000==0) cout << " Proton : " << entry << endl;
         int p_energy_index = int(floor((log10(p_Total_E) ) / 0.2));
         if (p_energy_index < 0 || p_energy_index > 20) continue;
         if (p_FI_Dep < 0) {p_FI_Lay = 14;}
         if (p_Nhits < 10 ) continue;
         if (p_Total_E < hist_p_2->GetXaxis()->GetXmin() || p_Total_E > hist_p_2->GetXaxis()->GetXmax()) continue;
-        int BEST_FIT_MEAN_BIN = hist_p_2->FindBin(p_Total_E);
-        double BEST_FIT_MEAN     = hist_p_2->GetBinContent(BEST_FIT_MEAN_BIN);
+        int BEST_FIT_MEAN_BIN  = hist_p_2->FindBin(p_Total_E);
+        double BEST_FIT_MEAN   = hist_p_2->GetBinContent(BEST_FIT_MEAN_BIN);
         double sum_p = 0;
         int bar_info[2] = {0};
         double bar_Energy_info[14] = {0};
@@ -201,17 +196,18 @@ void Percentile2DepthEst()
         TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RSQ");  // R: fit range, S: return TFitResultPtr
         double Est_Depth = (BEST_FIT_MEAN * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5;
         // if ( Est_Depth < -40 ) cout << "Watch out " << entry << " Value " << Est_Depth <<endl;
-        h2_p_int[BEST_FIT_MEAN_BIN-1]->Fill(p_FI_Dep, Est_Depth, p_weight*1e5);   
-        h1_p_Lay[BEST_FIT_MEAN_BIN-1][p_FI_Lay]->Fill( (p_FI_Dep -  Est_Depth) / p_FI_Dep , p_weight*1e5);  // bias and reso
-        h1_p_int[BEST_FIT_MEAN_BIN-1]->Fill(Est_Depth, p_weight*1e5);
-        h1_p_inl[BEST_FIT_MEAN_BIN-1]->Fill(p_FI_Dep, p_weight*1e5);
+        h2_p_int[BEST_FIT_MEAN_BIN-1]->Fill(p_FI_Dep, Est_Depth, p_weight*1e4);   
+        h1_p_Lay[BEST_FIT_MEAN_BIN-1][p_FI_Lay]->Fill( (p_FI_Dep -  Est_Depth) / p_FI_Dep , p_weight*1e4);  // bias and reso
+        h1_p_int[BEST_FIT_MEAN_BIN-1]->Fill(Est_Depth, p_weight*1e4);
+        h1_p_inl[BEST_FIT_MEAN_BIN-1]->Fill(p_FI_Dep, p_weight*1e4);
+
     }
 
     // for (Long64_t entry = 0; entry < deuteron_tree->GetEntries() ; ++entry)
     for (Long64_t entry = 0; entry < 50000 ; ++entry)
     {
         deuteron_tree->GetEntry(entry);
-        if (entry%1000==0) cout << " Deuteron : " << entry << endl;
+        if (entry%10000==0) cout << " Deuteron : " << entry << endl;
         int d_energy_index = int(floor((log10(d_Total_E) ) / 0.2));
         if (d_energy_index < 0 || d_energy_index > 20) continue;
         if (d_FI_Dep < 0) {d_FI_Lay = 14;}
@@ -280,10 +276,10 @@ void Percentile2DepthEst()
         sigmoid->SetParLimits(4, max(hBGO1->GetBinContent(1)*0.1,0.01) , hBGO1->GetBinContent(1) * 10);   // [4] linear bias
         TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RSQ");  // R: fit range, S: return TFitResultPtr
         double Est_Depth = (BEST_FIT_MEAN * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5;
-        h2_d_int[BEST_FIT_MEAN_BIN-1]->Fill(d_FI_Dep, Est_Depth, d_weight*1e5);
-        h1_d_Lay[BEST_FIT_MEAN_BIN-1][d_FI_Lay]->Fill( (d_FI_Dep -  Est_Depth) / d_FI_Dep , d_weight*1e5);
-        h1_d_int[BEST_FIT_MEAN_BIN-1]->Fill(Est_Depth, d_weight*1e5);
-        h1_d_inl[BEST_FIT_MEAN_BIN-1]->Fill(d_FI_Dep, d_weight*1e5);
+        h2_d_int[BEST_FIT_MEAN_BIN-1]->Fill(d_FI_Dep, Est_Depth, d_weight*1e4);
+        h1_d_Lay[BEST_FIT_MEAN_BIN-1][d_FI_Lay]->Fill( (d_FI_Dep -  Est_Depth) / d_FI_Dep , d_weight*1e4);
+        h1_d_int[BEST_FIT_MEAN_BIN-1]->Fill(Est_Depth, d_weight*1e4);
+        h1_d_inl[BEST_FIT_MEAN_BIN-1]->Fill(d_FI_Dep, d_weight*1e4);
     }
 
     for(int j=0 ;j< 7 ; j++)
@@ -294,8 +290,8 @@ void Percentile2DepthEst()
         // N_sur Fitting Function
         TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-(x+12.75)/[1])", 80,270); 
         TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-(x+12.75)/[1])", 80,270); 
-        fitFunc1->SetParameters(1e4, 200); 
-        fitFunc2->SetParameters(1e4, 170); 
+        fitFunc1->SetParameters(h2_p_int[j]->Integral(), 200); 
+        fitFunc2->SetParameters(h2_d_int[j]->Integral(), 170); 
         fitFunc1->SetLineColor(kRed); 
         fitFunc2->SetLineColor(kBlue);
         fitFunc1->SetLineStyle(2);
@@ -304,8 +300,8 @@ void Percentile2DepthEst()
         // N_int Fitting Function
         TF1 *fitFunc3 = new TF1("fitFunc3", "[0]/[1]* exp(-x/[1])", 80,270); 
         TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/[1]* exp(-x/[1])", 80,270); 
-        fitFunc3->SetParameters(1e4 * h1_p_int[j]->GetBinWidth(1), 200); 
-        fitFunc4->SetParameters(1e4 * h1_d_int[j]->GetBinWidth(1), 170); 
+        fitFunc3->SetParameters(h2_p_int[j]->Integral() * h1_p_int[j]->GetBinWidth(1), 200); 
+        fitFunc4->SetParameters(h2_d_int[j]->Integral() * h1_d_int[j]->GetBinWidth(1), 170); 
         fitFunc3->SetLineColor(kRed); 
         fitFunc4->SetLineColor(kBlue);
         fitFunc3->SetLineStyle(2);
@@ -396,35 +392,121 @@ void Percentile2DepthEst()
         h1_d_lea[j]->Draw("histsame");
         lg2->Draw();
 
+        auto c4 = new TCanvas("c4","c4",2500,1500);
+        c4->cd();
+        c4->Clear();
+        c4->Divide(5,3);
+        gStyle->SetOptStat(0);
+        for (int k = 0; k <= 14; k++) // layer
+        {
+            c4->cd(k + 1);
+            h1_p_Lay[j][k]->SetLineColor(kRed);   h1_p_Lay[j][k]->SetMarkerColor(kRed);  h1_p_Lay[j][k]->SetLineWidth(2);   
+            h1_d_Lay[j][k]->SetLineColor(kBlue);  h1_d_Lay[j][k]->SetMarkerColor(kBlue); h1_d_Lay[j][k]->SetLineWidth(2);   
+            // 获取积分，避免除以0
+            double p_integral = h1_p_Lay[j][k]->Integral();
+            double d_integral = h1_d_Lay[j][k]->Integral();
+
+            // 归一化直方图
+            if (p_integral > 0 && d_integral > 0) 
+            {
+                h1_p_Lay[j][k]->Scale(1.0 / p_integral);
+                h1_d_Lay[j][k]->Scale(1.0 / d_integral);
+                h1_p_Lay[j][k]->GetYaxis()->SetRangeUser(0,h1_p_Lay[j][k]->GetMaximum()*1.2);
+                h1_p_Lay[j][k]->GetXaxis()->CenterTitle();
+                h1_p_Lay[j][k]->GetYaxis()->CenterTitle();
+                h1_p_Lay[j][k]->GetYaxis()->SetTitleSize(0.05); 
+                h1_p_Lay[j][k]->GetYaxis()->SetTitleOffset(0.9); 
+                h1_p_Lay[j][k]->GetXaxis()->SetTitleSize(0.05); 
+                h1_p_Lay[j][k]->Draw("hist");
+                h1_d_Lay[j][k]->Draw("histsame");
+
+                if (k<14) // layer
+                {
+                    h1_p_Lay[j][k]->Fit(fitFunc_p[j][k],"RSQ");
+                    gre_p_bias[j]->SetPoint(k,Layer[k],fitFunc_p[j][k]->GetParameter(1));
+                    gre_p_bias[j]->SetPointError(k,Layer_Err[k],fitFunc_p[j][k]->GetParError(1));
+                    gre_p_reso[j]->SetPoint(k,Layer[k],fitFunc_p[j][k]->GetParameter(2));
+                    gre_p_reso[j]->SetPointError(k,Layer_Err[k],fitFunc_p[j][k]->GetParError(2));
+                    fitFunc_p[j][k]->SetLineColor(kRed);
+                    fitFunc_p[j][k]->Draw("same");
+
+                    h1_d_Lay[j][k]->Fit(fitFunc_d[j][k],"RSQ");
+                    gre_d_bias[j]->SetPoint(k,Layer[k],fitFunc_d[j][k]->GetParameter(1));
+                    gre_d_bias[j]->SetPointError(k,Layer_Err[k],fitFunc_d[j][k]->GetParError(1));
+                    gre_d_reso[j]->SetPoint(k,Layer[k],fitFunc_d[j][k]->GetParameter(2));
+                    gre_d_reso[j]->SetPointError(k,Layer_Err[k],fitFunc_d[j][k]->GetParError(2));
+                    fitFunc_d[j][k]->SetLineColor(kBlue);
+                    fitFunc_d[j][k]->Draw("same");
+                    
+                    
+                }
+            }
+            if (k<14) h1_p_Lay[j][k]->SetTitle(Form("Inelastic interaction at Layer %d;(Xine-#hat{Xest})/Xine;Normalized Count",k));
+            else h1_p_Lay[j][k]->SetTitle("No Inelastic interaction, Pass through;(Xine-#hat{Xest})/Xine;Normalized Count");
+        }
+
+        gre_p_bias[j]->SetLineColor(kRed);
+        gre_d_bias[j]->SetLineColor(kBlue);
+        gre_p_reso[j]->SetLineColor(kRed);
+        gre_d_reso[j]->SetLineColor(kBlue);
+        gre_p_bias[j]->SetLineWidth(2);
+        gre_d_bias[j]->SetLineWidth(2);
+        gre_p_reso[j]->SetLineWidth(2);
+        gre_d_reso[j]->SetLineWidth(2);
+
+        gre_p_bias[j]->SetMarkerColor(kRed);
+        gre_d_bias[j]->SetMarkerColor(kBlue);
+        gre_p_reso[j]->SetMarkerColor(kRed);
+        gre_d_reso[j]->SetMarkerColor(kBlue);
+        gre_p_bias[j]->SetMarkerStyle(20);
+        gre_d_bias[j]->SetMarkerStyle(21);
+        gre_p_reso[j]->SetMarkerStyle(20);
+        gre_d_reso[j]->SetMarkerStyle(21);
+
+        auto c5 = new TCanvas("c5","c5",2500,1500);
+        c5->Divide(2,1);
+        c5->cd(1);
+        gPad->SetGrid(0,1);
+        gre_p_bias[j]->GetYaxis()->SetRangeUser(-1,1);
+        gre_p_bias[j]->GetXaxis()->SetLimits(0,14);
+        gre_p_bias[j]->SetTitle(";BGO Layer;Bias of (Xine-#hat{Xest})/Xine");
+        gre_p_bias[j]->Draw("AP");
+        gre_d_bias[j]->Draw("PSAME");
+        auto lg5 = new TLegend(0.5,0.78,0.7,0.88);
+        lg5->AddEntry(gre_p_bias[j],"Proton","ep");
+        lg5->AddEntry(gre_d_bias[j],"Detueron","ep");
+        lg5->Draw();
+
+        c5->cd(2);
+        gPad->SetGrid(0,1);
+        gre_p_reso[j]->GetYaxis()->SetRangeUser(0,1);
+        gre_p_reso[j]->GetXaxis()->SetLimits(0,14);
+        gre_p_reso[j]->SetTitle(";BGO Layer;Resolution of (Xine-#hat{Xest})/Xine");
+        gre_p_reso[j]->Draw("AP");
+        gre_d_reso[j]->Draw("PSAME");
+        lg5->Draw();
+
         auto write_file = new TFile(Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/DepthEst_%d.root",j), "RECREATE");
         write_file->cd();
         h2_p_int[j]->Write();
         h2_d_int[j]->Write();
+        h1_p_int[j]->Write();
+        h1_d_int[j]->Write();
+        h1_p_inl[j]->Write();
+        h1_d_inl[j]->Write();
+
+        h1_p_sur[j]->Write();
+        h1_d_sur[j]->Write();
+        h1_p_lea[j]->Write();
+        h1_d_lea[j]->Write();
         c0->Write();
+        c4->Write();
+        // c5->Write();
         write_file->Close();
     }
 
 
 
-
-        
-
-
-
-
-
-    //     cout << h2_p_int->Integral() << endl;
-    //     cout << h2_d_int->Integral() << endl;
-    //     for(int i=1 ; i<= h1_p_int->GetNbinsX(); i++)
-    //     {
-    //         h1_p_sur->SetBinContent(i, (h2_p_int->Integral() - h1_p_int->Integral(1,i) ));
-    //         h1_d_sur->SetBinContent(i, (h2_d_int->Integral() - h1_d_int->Integral(1,i) ));
-    //         h1_p_lea->SetBinContent(i, (h2_p_int->Integral() - h1_p_inl->Integral(1,i) ));
-    //         h1_d_lea->SetBinContent(i, (h2_d_int->Integral() - h1_d_inl->Integral(1,i) ));
-    //         cout << h1_p_int->Integral(1,i) << " , " <<  h1_p_int->GetBinContent(i) << endl;
-
-    //         // cout << h1_d_int->Integral(0,i) << endl;
-    //     }
 
 
 
@@ -448,109 +530,6 @@ void Percentile2DepthEst()
     //     N_d_int->SetBinError(k+1, fitFunc4->GetParError(0) / h1_d_int->GetBinWidth(1));
     //     N_d_sur->SetBinError(k+1, fitFunc2->GetParError(0));
 
-    //     // Xine = Xmid - 4.879 * Slope
-    //     auto c4 = new TCanvas("c4","c4",2500,1500);
-    //     c4->cd();
-    //     c4->Clear();
-    //     c4->Divide(5,3);
-    //     gStyle->SetOptStat(0);
-    //     for (int j = 0; j <= 14; j++) // layer
-    //     {
-    //         c4->cd(j + 1);
-    //         h1_p_Lay[j]->SetLineColor(kRed);   h1_p_Lay[j]->SetMarkerColor(kRed);  h1_p_Lay[j]->SetLineWidth(2);   h1_p_Lay[j]->Sumw2();
-    //         h1_d_Lay[j]->SetLineColor(kBlue);  h1_d_Lay[j]->SetMarkerColor(kBlue); h1_d_Lay[j]->SetLineWidth(2);   h1_d_Lay[j]->Sumw2();
-    //         h1_p_Lay[j]->Scale(1.0/h1_p_Lay[j]->Integral()); 
-    //         h1_d_Lay[j]->Scale(1.0/h1_d_Lay[j]->Integral()); 
-    //         h1_p_Lay[j]->GetYaxis()->SetRangeUser(0,h1_p_Lay[j]->GetMaximum()*1.2);
-    //         h1_p_Lay[j]->GetXaxis()->CenterTitle();
-    //         h1_p_Lay[j]->GetYaxis()->CenterTitle();
-    //         h1_p_Lay[j]->Draw("hist");
-    //         h1_d_Lay[j]->Draw("histsame");
-    //         if (j<14)
-    //         {
-    //             h1_p_Lay[j]->Fit(fitFunc_p[j],"RSQ");
-    //             h1_d_Lay[j]->Fit(fitFunc_d[j],"RSQ");
-    //             gre_p_bias->SetPoint(j,Layer[j],fitFunc_p[j]->GetParameter(1));
-    //             gre_d_bias->SetPoint(j,Layer[j],fitFunc_d[j]->GetParameter(1));
-    //             gre_p_bias->SetPointError(j,Layer_Err[j],fitFunc_p[j]->GetParError(1));
-    //             gre_d_bias->SetPointError(j,Layer_Err[j],fitFunc_d[j]->GetParError(1));
-    //             gre_p_reso->SetPoint(j,Layer[j],fitFunc_p[j]->GetParameter(2));
-    //             gre_d_reso->SetPoint(j,Layer[j],fitFunc_d[j]->GetParameter(2));
-    //             gre_p_reso->SetPointError(j,Layer_Err[j],fitFunc_p[j]->GetParError(2));
-    //             gre_d_reso->SetPointError(j,Layer_Err[j],fitFunc_d[j]->GetParError(2));
-    //             h1_p_Lay[j]->SetTitle(Form("Inelastic interaction at Layer %d;(Xine-#hat{Xest})/Xine;Normalized Count",j));
-    //             fitFunc_p[j]->SetLineColor(kRed);
-    //             fitFunc_d[j]->SetLineColor(kBlue);
-    //             fitFunc_p[j]->Draw("same");
-    //             fitFunc_d[j]->Draw("same");
-    //         }
-    //         else h1_p_Lay[j]->SetTitle("No Inelastic interaction, Pass through;(Xine-#hat{Xest})/Xine;Normalized Count");
-    //         h1_p_Lay[j]->GetYaxis()->SetTitleSize(0.05); 
-    //         h1_p_Lay[j]->GetYaxis()->SetTitleOffset(0.9); 
-    //         h1_p_Lay[j]->GetXaxis()->SetTitleSize(0.05); 
-    //     }
-
-
-    //     gre_p_bias->SetLineColor(kRed);
-    //     gre_d_bias->SetLineColor(kBlue);
-    //     gre_p_reso->SetLineColor(kRed);
-    //     gre_d_reso->SetLineColor(kBlue);
-    //     gre_p_bias->SetLineWidth(2);
-    //     gre_d_bias->SetLineWidth(2);
-    //     gre_p_reso->SetLineWidth(2);
-    //     gre_d_reso->SetLineWidth(2);
-
-    //     gre_p_bias->SetMarkerColor(kRed);
-    //     gre_d_bias->SetMarkerColor(kBlue);
-    //     gre_p_reso->SetMarkerColor(kRed);
-    //     gre_d_reso->SetMarkerColor(kBlue);
-    //     gre_p_bias->SetMarkerStyle(20);
-    //     gre_d_bias->SetMarkerStyle(21);
-    //     gre_p_reso->SetMarkerStyle(20);
-    //     gre_d_reso->SetMarkerStyle(21);
-
-    //     auto c5 = new TCanvas("c5","c5",2500,1500);
-    //     c5->Divide(2,1);
-    //     c5->cd(1);
-    //     gPad->SetGrid(0,1);
-    //     gre_p_bias->GetYaxis()->SetRangeUser(-1,1);
-    //     gre_p_bias->GetXaxis()->SetLimits(0,14);
-    //     gre_p_bias->SetTitle(";BGO Layer;Bias of (Xine-#hat{Xest})/Xine");
-    //     gre_p_bias->Draw("AP");
-    //     gre_d_bias->Draw("PSAME");
-    //     auto lg5 = new TLegend(0.5,0.78,0.7,0.88);
-    //     lg5->AddEntry(gre_p_bias,"Proton","ep");
-    //     lg5->AddEntry(gre_d_bias,"Detueron","ep");
-    //     lg5->Draw();
-
-    //     c5->cd(2);
-    //     gPad->SetGrid(0,1);
-    //     gre_p_reso->GetYaxis()->SetRangeUser(0,1);
-    //     gre_p_reso->GetXaxis()->SetLimits(0,14);
-    //     gre_p_reso->SetTitle(";BGO Layer;Resolution of (Xine-#hat{Xest})/Xine");
-    //     gre_p_reso->Draw("AP");
-    //     gre_d_reso->Draw("PSAME");
-    //     lg5->Draw();
-
-    //     auto write_file = new TFile(Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/DepthEst_%dGeV.root",Energy_Name[k]), "RECREATE");
-    //     write_file->cd();
-    //     h2_p_int->Write();
-    //     h2_d_int->Write();
-
-    //     h1_p_int->Write();
-    //     h1_d_int->Write();
-    //     h1_p_inl->Write();
-    //     h1_d_inl->Write();
-
-    //     h1_p_sur->Write();
-    //     h1_d_sur->Write();
-    //     h1_p_lea->Write();
-    //     h1_d_lea->Write();
-    //     c0->Write();
-    //     c4->Write();
-    //     c5->Write();
-    //     write_file->Close();
-    // } // ENERGY k
 
     // auto file1 = TFile::Open("/Users/xiongzheng/software/Hadr00/build/proton_BGO.root");
     // auto hist1 = (TH1D*)file1->Get("h4");
@@ -573,10 +552,7 @@ void Percentile2DepthEst()
     // auto gre7 = new TGraph(Nbins,KN_Energy, KN_Deuteron);   gre7->SetLineColor(kBlue);
 
 
-    // TGraphErrors* gre_p_int = new TGraphErrors(lambda_p_int);     TGraphErrors* grN_p_int = new TGraphErrors(N_p_int);
-    // TGraphErrors* gre_p_sur = new TGraphErrors(lambda_p_sur);     TGraphErrors* grN_p_sur = new TGraphErrors(N_p_sur);
-    // TGraphErrors* gre_d_int = new TGraphErrors(lambda_d_int);     TGraphErrors* grN_d_int = new TGraphErrors(N_d_int);
-    // TGraphErrors* gre_d_sur = new TGraphErrors(lambda_d_sur);     TGraphErrors* grN_d_sur = new TGraphErrors(N_d_sur);
+
 
     // gre_p_int->SetLineColor(kRed);  grN_p_int->SetLineColor(kRed); 
     // gre_p_sur->SetLineColor(kRed);  grN_p_sur->SetLineColor(kRed); 
