@@ -29,6 +29,27 @@ void Percentile2DepthEst()
         // cout << bin_edges[j] << endl;
     }
 
+    auto file1 = TFile::Open("/Users/xiongzheng/software/Hadr00/build/proton_BGO.root");
+    auto hist1 = (TH1D*)file1->Get("h4");
+    auto hist6 = (TH1D*)file1->Get("h1");
+
+    auto file2 = TFile::Open("/Users/xiongzheng/software/Hadr00/build/deuteron_BGO.root");
+    auto hist2 = (TH1D*)file2->Get("h4");
+    auto hist7 = (TH1D*)file2->Get("h1");
+    int Nbins = hist2->GetNbinsX();
+    double KN_Energy[60] = {0};
+    double Deuteron[60] = {0};        double Proton[60] = {0};
+    double KN_Deuteron[60] = {0};     double KN_Proton[60] = {0};
+    for (int ii = 0 ; ii < Nbins ; ii++)
+    {
+        KN_Energy[ii]   = pow(10,hist2->GetBinCenter(ii+1)-3);
+        file1->cd();Proton[ii]   = hist1->GetBinContent(ii+1); KN_Proton[ii]   = hist6->GetBinContent(ii+1)* 10.;
+        file2->cd();Deuteron[ii] = hist2->GetBinContent(ii+1); KN_Deuteron[ii] = hist7->GetBinContent(ii+1)* 10.;
+    }
+    auto gre6 = new TGraph(Nbins,KN_Energy, KN_Proton);     gre6->SetLineColor(kRed);
+    auto gre7 = new TGraph(Nbins,KN_Energy, KN_Deuteron);   gre7->SetLineColor(kBlue);
+    auto line_Ntot = new TGraph();
+
     int p_FH_Lay; int p_FH_Type; double p_Total_E;  double p_Energy;    int p_Nhits;std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_L_EnergyVec = nullptr;   std::vector<double>* p_EnergyVec = nullptr;   std::vector<double>* p_Efrac = nullptr; double p_weight;
     int d_FH_Lay; int d_FH_Type; double d_Total_E;  double d_Energy;    int d_Nhits;std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_L_EnergyVec = nullptr;   std::vector<double>* d_EnergyVec = nullptr;   std::vector<double>* d_Efrac = nullptr; double d_weight;
     int p_FI_Lay;    double p_FI_Dep;    int p_particle;
@@ -66,10 +87,10 @@ void Percentile2DepthEst()
     deuteron_tree->SetBranchAddress("Nhits"          , &d_Nhits);
     deuteron_tree->SetBranchAddress("weight"         ,&d_weight);
 
-    TGraphErrors* gre_p_int[7]; TGraphErrors* grN_p_int[7];
-    TGraphErrors* gre_p_sur[7]; TGraphErrors* grN_p_sur[7];
-    TGraphErrors* gre_d_int[7]; TGraphErrors* grN_d_int[7];
-    TGraphErrors* gre_d_sur[7]; TGraphErrors* grN_d_sur[7];
+    TGraphErrors* gre_p_int = new TGraphErrors(); TGraphErrors* grN_p_int = new TGraphErrors();
+    TGraphErrors* gre_p_sur = new TGraphErrors(); TGraphErrors* grN_p_sur = new TGraphErrors();
+    TGraphErrors* gre_d_int = new TGraphErrors(); TGraphErrors* grN_d_int = new TGraphErrors();
+    TGraphErrors* gre_d_sur = new TGraphErrors(); TGraphErrors* grN_d_sur = new TGraphErrors();
     
     double Layer[14]={0};
     double Layer_Err[14]={0};
@@ -87,8 +108,8 @@ void Percentile2DepthEst()
     TH1D *h1_d_sur[7]; 
     TH1D *h1_p_lea[7]; 
     TH1D *h1_d_lea[7]; 
-    TGraphErrors *gre_p_reso[7];  
-    TGraphErrors *gre_d_reso[7];  
+    TGraphErrors *gre_p_reso[7];
+    TGraphErrors *gre_d_reso[7];
     TGraphErrors *gre_p_bias[7];
     TGraphErrors *gre_d_bias[7];
 
@@ -110,6 +131,11 @@ void Percentile2DepthEst()
         h1_d_sur[j] = new TH1D(Form("h1_d_sur[%d]",j),Form("h1_d_sur[%d]",j),14,0,357);  // EST
         h1_p_lea[j] = new TH1D(Form("h1_p_lea[%d]",j),Form("h1_p_lea[%d]",j),14,0,357);  // REAL
         h1_d_lea[j] = new TH1D(Form("h1_d_lea[%d]",j),Form("h1_d_lea[%d]",j),14,0,357);  // REAL
+
+        gre_p_reso[j] = new TGraphErrors();
+        gre_d_reso[j] = new TGraphErrors();
+        gre_p_bias[j] = new TGraphErrors();
+        gre_d_bias[j] = new TGraphErrors();
         for(int i =0 ; i<15 ; i++)  // Layer
         {
             h1_p_Lay[j][i] =new TH1D(Form("h1_p_Lay[%d][%d]",j,i),Form("h1_p_Lay[%d][%d]",j,i),30,-3,3); h1_p_Lay[j][i]->Sumw2(); 
@@ -288,8 +314,8 @@ void Percentile2DepthEst()
         h2_d_int[j]->Sumw2();    h1_d_int[j]->Sumw2();
 
         // N_sur Fitting Function
-        TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-(x+12.75)/[1])", 80,270); 
-        TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-(x+12.75)/[1])", 80,270); 
+        TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-(x+12.75)/[1])", 40,150); 
+        TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-(x+12.75)/[1])", 40,150); 
         fitFunc1->SetParameters(h2_p_int[j]->Integral(), 200); 
         fitFunc2->SetParameters(h2_d_int[j]->Integral(), 170); 
         fitFunc1->SetLineColor(kRed); 
@@ -298,8 +324,8 @@ void Percentile2DepthEst()
         fitFunc2->SetLineStyle(2);
 
         // N_int Fitting Function
-        TF1 *fitFunc3 = new TF1("fitFunc3", "[0]/[1]* exp(-x/[1])", 80,270); 
-        TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/[1]* exp(-x/[1])", 80,270); 
+        TF1 *fitFunc3 = new TF1("fitFunc3", "[0]/[1]* exp(-x/[1])", 40,150); 
+        TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/[1]* exp(-x/[1])", 40,150); 
         fitFunc3->SetParameters(h2_p_int[j]->Integral() * h1_p_int[j]->GetBinWidth(1), 200); 
         fitFunc4->SetParameters(h2_d_int[j]->Integral() * h1_d_int[j]->GetBinWidth(1), 170); 
         fitFunc3->SetLineColor(kRed); 
@@ -437,8 +463,6 @@ void Percentile2DepthEst()
                     gre_d_reso[j]->SetPointError(k,Layer_Err[k],fitFunc_d[j][k]->GetParError(2));
                     fitFunc_d[j][k]->SetLineColor(kBlue);
                     fitFunc_d[j][k]->Draw("same");
-                    
-                    
                 }
             }
             if (k<14) h1_p_Lay[j][k]->SetTitle(Form("Inelastic interaction at Layer %d;(Xine-#hat{Xest})/Xine;Normalized Count",k));
@@ -486,6 +510,32 @@ void Percentile2DepthEst()
         gre_d_reso[j]->Draw("PSAME");
         lg5->Draw();
 
+        gre_p_int->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc3->GetParameter(1));
+        gre_p_int->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc3->GetParError(1));
+
+        gre_p_sur->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc1->GetParameter(1));
+        gre_p_sur->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc1->GetParError(1));
+
+        gre_d_int->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc4->GetParameter(1));
+        gre_d_int->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc4->GetParError(1));
+
+        gre_d_sur->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc2->GetParameter(1));
+        gre_d_sur->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc2->GetParError(1));
+
+        grN_p_int->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc3->GetParameter(0) /  h1_p_int[j]->GetBinWidth(1));
+        grN_p_int->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc3->GetParError(0) /  h1_p_int[j]->GetBinWidth(1));
+
+        grN_p_sur->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc1->GetParameter(0));
+        grN_p_sur->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc1->GetParError(0));
+
+        grN_d_int->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc4->GetParameter(0) /  h1_d_int[j]->GetBinWidth(1));
+        grN_d_int->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc4->GetParError(0) /  h1_d_int[j]->GetBinWidth(1));
+
+        grN_d_sur->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc2->GetParameter(1));
+        grN_d_sur->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc2->GetParError(1));
+
+        line_Ntot->SetPoint(j,Energy_Mid_p->GetBinContent(j+1), h2_p_int[j]->Integral());
+
         auto write_file = new TFile(Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/DepthEst_%d.root",j), "RECREATE");
         write_file->cd();
         h2_p_int[j]->Write();
@@ -494,163 +544,121 @@ void Percentile2DepthEst()
         h1_d_int[j]->Write();
         h1_p_inl[j]->Write();
         h1_d_inl[j]->Write();
-
+    
         h1_p_sur[j]->Write();
         h1_d_sur[j]->Write();
         h1_p_lea[j]->Write();
         h1_d_lea[j]->Write();
         c0->Write();
         c4->Write();
-        // c5->Write();
+        c5->Write();
         write_file->Close();
-    }
 
+    } // J Deposit Energy
+    gre_p_int->SetLineColor(kRed);  grN_p_int->SetLineColor(kRed); 
+    gre_p_sur->SetLineColor(kRed);  grN_p_sur->SetLineColor(kRed); 
+    gre_d_int->SetLineColor(kBlue); grN_d_int->SetLineColor(kBlue);
+    gre_d_sur->SetLineColor(kBlue); grN_d_sur->SetLineColor(kBlue);
 
+    gre_p_int->SetLineWidth(2);     grN_p_int->SetLineWidth(2);
+    gre_p_sur->SetLineWidth(2);     grN_p_sur->SetLineWidth(2);
+    gre_d_int->SetLineWidth(2);     grN_d_int->SetLineWidth(2);
+    gre_d_sur->SetLineWidth(2);     grN_d_sur->SetLineWidth(2);
 
+    gre_p_int->SetMarkerColor(kRed);   grN_p_int->SetMarkerColor(kRed); 
+    gre_p_sur->SetMarkerColor(kRed);   grN_p_sur->SetMarkerColor(kRed); 
+    gre_d_int->SetMarkerColor(kBlue);  grN_d_int->SetMarkerColor(kBlue);
+    gre_d_sur->SetMarkerColor(kBlue);  grN_d_sur->SetMarkerColor(kBlue);
 
+    gre_p_int->SetMarkerStyle(20);    grN_p_int->SetMarkerStyle(20);
+    gre_p_sur->SetMarkerStyle(24);    grN_p_sur->SetMarkerStyle(24);
+    gre_d_int->SetMarkerStyle(21);    grN_d_int->SetMarkerStyle(21);
+    gre_d_sur->SetMarkerStyle(25);    grN_d_sur->SetMarkerStyle(25);
 
+    auto c6 = new TCanvas("c6","c6",2500,1200);
+    c6->Divide(2,1);
+    c6->cd(1);
+    gPad->SetGrid(1,1);
+    gPad->SetLogx(1);
+    gre_p_int->GetYaxis()->SetRangeUser(0,250);
+    gre_p_int->GetXaxis()->SetLimits(4,2e4);
+    gre_p_int->SetTitle("Fitted From N_{int};Energy(GeV);#lambda Based on Estimated Interaction Depth");
+    gre_p_int->Draw("AP");
+    gre_d_int->Draw("PSAME");
+    gre6->Draw("LSAME");
+    gre7->Draw("LSAME");
 
-    //     lambda_p_int->SetBinContent(k+1, fitFunc3->GetParameter(1));
-    //     lambda_p_sur->SetBinContent(k+1, fitFunc1->GetParameter(1));
-    //     lambda_d_int->SetBinContent(k+1, fitFunc4->GetParameter(1));
-    //     lambda_d_sur->SetBinContent(k+1, fitFunc2->GetParameter(1));
+    auto lg6_1 = new TLegend(0.48,0.12,0.88,0.18);
+    lg6_1->SetNColumns(2);
+    lg6_1->AddEntry(gre_p_int,"Proton Fitted N_{int}" ,"pe");
+    lg6_1->AddEntry(gre_d_int,"Deuteron Fitted N_{int}" ,"pe");
+    lg6_1->AddEntry(gre6,"Proton GEANT4" ,"l");
+    lg6_1->AddEntry(gre7,"Deuteron GEANT4" ,"l");
+    lg6_1->Draw();
 
-    //     lambda_p_int->SetBinError(k+1, fitFunc3->GetParError(1));
-    //     lambda_p_sur->SetBinError(k+1, fitFunc1->GetParError(1));
-    //     lambda_d_int->SetBinError(k+1, fitFunc4->GetParError(1));
-    //     lambda_d_sur->SetBinError(k+1, fitFunc2->GetParError(1));
-
-    //     N_p_int->SetBinContent(k+1, fitFunc3->GetParameter(0) / h1_p_int->GetBinWidth(1));
-    //     N_p_sur->SetBinContent(k+1, fitFunc1->GetParameter(0)  );
-    //     N_d_int->SetBinContent(k+1, fitFunc4->GetParameter(0) / h1_d_int->GetBinWidth(1));
-    //     N_d_sur->SetBinContent(k+1, fitFunc2->GetParameter(0)  );
-
-    //     N_p_int->SetBinError(k+1, fitFunc3->GetParError(0) / h1_p_int->GetBinWidth(1));
-    //     N_p_sur->SetBinError(k+1, fitFunc1->GetParError(0));
-    //     N_d_int->SetBinError(k+1, fitFunc4->GetParError(0) / h1_d_int->GetBinWidth(1));
-    //     N_d_sur->SetBinError(k+1, fitFunc2->GetParError(0));
-
-
-    // auto file1 = TFile::Open("/Users/xiongzheng/software/Hadr00/build/proton_BGO.root");
-    // auto hist1 = (TH1D*)file1->Get("h4");
-    // auto hist6 = (TH1D*)file1->Get("h1");
-
-    // auto file2 = TFile::Open("/Users/xiongzheng/software/Hadr00/build/deuteron_BGO.root");
-    // auto hist2 = (TH1D*)file2->Get("h4");
-    // auto hist7 = (TH1D*)file2->Get("h1");
-    // int Nbins = hist2->GetNbinsX();
-    // double KN_Energy[60] = {0};
-    // double Deuteron[60] = {0};        double Proton[60] = {0};
-    // double KN_Deuteron[60] = {0};     double KN_Proton[60] = {0};
-    // for (int ii = 0 ; ii < Nbins ; ii++)
-    // {
-    //     KN_Energy[ii]   = pow(10,hist2->GetBinCenter(ii+1)-3);
-    //     file1->cd();Proton[ii]   = hist1->GetBinContent(ii+1); KN_Proton[ii]   = hist6->GetBinContent(ii+1)* 10.;
-    //     file2->cd();Deuteron[ii] = hist2->GetBinContent(ii+1); KN_Deuteron[ii] = hist7->GetBinContent(ii+1)* 10.;
-    // }
-    // auto gre6 = new TGraph(Nbins,KN_Energy, KN_Proton);     gre6->SetLineColor(kRed);
-    // auto gre7 = new TGraph(Nbins,KN_Energy, KN_Deuteron);   gre7->SetLineColor(kBlue);
-
-
-
-
-    // gre_p_int->SetLineColor(kRed);  grN_p_int->SetLineColor(kRed); 
-    // gre_p_sur->SetLineColor(kRed);  grN_p_sur->SetLineColor(kRed); 
-    // gre_d_int->SetLineColor(kBlue); grN_d_int->SetLineColor(kBlue);
-    // gre_d_sur->SetLineColor(kBlue); grN_d_sur->SetLineColor(kBlue);
-
-    // gre_p_int->SetLineWidth(2);     grN_p_int->SetLineWidth(2);
-    // gre_p_sur->SetLineWidth(2);     grN_p_sur->SetLineWidth(2);
-    // gre_d_int->SetLineWidth(2);     grN_d_int->SetLineWidth(2);
-    // gre_d_sur->SetLineWidth(2);     grN_d_sur->SetLineWidth(2);
-
-    // gre_p_int->SetMarkerColor(kRed);   grN_p_int->SetMarkerColor(kRed); 
-    // gre_p_sur->SetMarkerColor(kRed);   grN_p_sur->SetMarkerColor(kRed); 
-    // gre_d_int->SetMarkerColor(kBlue);  grN_d_int->SetMarkerColor(kBlue);
-    // gre_d_sur->SetMarkerColor(kBlue);  grN_d_sur->SetMarkerColor(kBlue);
-
-    // gre_p_int->SetMarkerStyle(20);    grN_p_int->SetMarkerStyle(20);
-    // gre_p_sur->SetMarkerStyle(24);    grN_p_sur->SetMarkerStyle(24);
-    // gre_d_int->SetMarkerStyle(21);    grN_d_int->SetMarkerStyle(21);
-    // gre_d_sur->SetMarkerStyle(25);    grN_d_sur->SetMarkerStyle(25);
-
-
-    // auto c6 = new TCanvas("c6","c6",2500,1200);
-    // c6->Divide(2,1);
-    // c6->cd(1);
-    // gPad->SetGrid(1,1);
-    // gPad->SetLogx(1);
-    // gre_p_int->GetYaxis()->SetRangeUser(100,250);
-    // gre_p_int->GetXaxis()->SetLimits(4,2e4);
-    // gre_p_int->SetTitle("Fitted From N_{int};Energy(GeV);#lambda Based on Estimated Interaction Depth");
-    // gre_p_int->Draw("AP");
-    // gre_d_int->Draw("PSAME");
-    // gre6->Draw("LSAME");
-    // gre7->Draw("LSAME");
-
-    // auto lg6_1 = new TLegend(0.48,0.12,0.88,0.18);
-    // lg6_1->SetNColumns(2);
-    // lg6_1->AddEntry(gre_p_int,"Proton Fitted N_{int}" ,"pe");
-    // lg6_1->AddEntry(gre_d_int,"Deuteron Fitted N_{int}" ,"pe");
-    // lg6_1->AddEntry(gre6,"Proton GEANT4" ,"l");
-    // lg6_1->AddEntry(gre7,"Deuteron GEANT4" ,"l");
-    // lg6_1->Draw();
-
-    // c6->cd(2);
-    // gPad->SetGrid(1,1);
-    // gPad->SetLogx(2);
-    // gre_p_sur->GetYaxis()->SetRangeUser(100,250);
-    // gre_p_sur->GetXaxis()->SetLimits(4,2e4);
-    // gre_p_sur->SetTitle("Fitted From N_{sur};Energy(GeV);#lambda Based on Estimated Interaction Depth");
-    // gre_p_sur->Draw("AP");
-    // gre_d_sur->Draw("PSAME");
-    // gre6->Draw("LSAME");
-    // gre7->Draw("LSAME");
+    c6->cd(2);
+    gPad->SetGrid(1,1);
+    gPad->SetLogx(2);
+    gre_p_sur->GetYaxis()->SetRangeUser(0,250);
+    gre_p_sur->GetXaxis()->SetLimits(4,2e4);
+    gre_p_sur->SetTitle("Fitted From N_{sur};Energy(GeV);#lambda Based on Estimated Interaction Depth");
+    gre_p_sur->Draw("AP");
+    gre_d_sur->Draw("PSAME");
+    gre6->Draw("LSAME");
+    gre7->Draw("LSAME");
     
-    // auto lg6_2 = new TLegend(0.48,0.12,0.88,0.18);
-    // lg6_2->SetNColumns(2);
-    // lg6_2->AddEntry(gre_p_sur,"Proton Fitted N_{sur}" ,"pe");
-    // lg6_2->AddEntry(gre_d_sur,"Deuteron Fitted N_{sur}" ,"pe");
-    // lg6_2->AddEntry(gre6,"Proton GEANT4" ,"l");
-    // lg6_2->AddEntry(gre7,"Deuteron GEANT4" ,"l");
-    // lg6_2->Draw();
+    auto lg6_2 = new TLegend(0.48,0.12,0.88,0.18);
+    lg6_2->SetNColumns(2);
+    lg6_2->AddEntry(gre_p_sur,"Proton Fitted N_{sur}" ,"pe");
+    lg6_2->AddEntry(gre_d_sur,"Deuteron Fitted N_{sur}" ,"pe");
+    lg6_2->AddEntry(gre6,"Proton GEANT4" ,"l");
+    lg6_2->AddEntry(gre7,"Deuteron GEANT4" ,"l");
+    lg6_2->Draw();
 
 
-    // auto c7 = new TCanvas("c7","c7",2500,1200);
-    // c7->Divide(2,1);
-    // c7->cd(1);
-    // gPad->SetGrid(1,1);
-    // gPad->SetLogy(0);
-    // gPad->SetLogx(1);
-    // grN_p_int->GetYaxis()->SetRangeUser(8e3,2e4);
-    // grN_p_int->GetXaxis()->SetLimits(4,2e4);
-    // grN_p_int->SetTitle("Fitted From N_{int};Energy(GeV);N_{0} Based on Estimated Interaction Depth");
-    // grN_p_int->Draw("AP");
-    // grN_d_int->Draw("PSAME");
-    // auto line_Ntot = new TLine(4,1e4,2e4,1e4);
-    // line_Ntot->Draw("same");
-    // auto lg7_1 = new TLegend(0.48,0.72,0.88,0.88);
-    // lg7_1->SetNColumns(2);
-    // lg7_1->AddEntry(grN_p_int,"Proton Fitted N_{int}" ,"pe");
-    // lg7_1->AddEntry(grN_d_int,"Deuteron Fitted N_{int}" ,"pe");
-    // lg7_1->AddEntry(line_Ntot,"Ture Simulated N_{0}" ,"l");
-    // lg7_1->Draw();
+    auto c7 = new TCanvas("c7","c7",2500,1200);
+    c7->Divide(2,1);
+    c7->cd(1);
+    gPad->SetGrid(1,1);
+    gPad->SetLogy(1);
+    gPad->SetLogx(1);
+    double ymin_int = 8e2;
+    double ymax_int = 2e8;
+    grN_p_int->GetYaxis()->SetRangeUser(ymin_int, ymax_int);
+    grN_p_int->GetXaxis()->SetLimits(4,2e4);
+    grN_p_int->SetTitle("Fitted From N_{int};Energy(GeV);N_{0} Based on Estimated Interaction Depth");
+    grN_p_int->Draw("AP");
+    grN_d_int->Draw("PSAME");
+    line_Ntot->Draw("Lsame");
+    auto lg7_1 = new TLegend(0.48,0.72,0.88,0.88);
+    lg7_1->SetNColumns(2);
+    lg7_1->AddEntry(grN_p_int,"Proton Fitted N_{int}" ,"pe");
+    lg7_1->AddEntry(grN_d_int,"Deuteron Fitted N_{int}" ,"pe");
+    lg7_1->AddEntry(line_Ntot,"Ture Simulated N_{0}" ,"l");
+    lg7_1->Draw();
 
-    // c7->cd(2);
-    // gPad->SetGrid(1,1);
-    // gPad->SetLogy(0);
-    // gPad->SetLogx(1);
-    // grN_p_sur->GetYaxis()->SetRangeUser(8e3,2e4);
-    // grN_p_sur->GetXaxis()->SetLimits(4,2e4);
-    // grN_p_sur->SetTitle("Fitted From N_{sur};Energy(GeV);N_{0} Based on Estimated Interaction Depth");
-    // grN_p_sur->Draw("AP");
-    // grN_d_sur->Draw("PSAME");
-    // line_Ntot->Draw("same");
-    // auto lg7_2 = new TLegend(0.48,0.72,0.88,0.88);
-    // lg7_2->SetNColumns(2);
-    // lg7_2->AddEntry(grN_p_sur,"Proton Fitted N_{sur}" ,"pe");
-    // lg7_2->AddEntry(grN_d_sur,"Deuteron Fitted N_{sur}" ,"pe");
-    // lg7_2->AddEntry(line_Ntot,"Ture Simulated N_{0}" ,"l");
-    // lg7_2->Draw();
+    c7->cd(2);
+    gPad->SetGrid(1,1);
+    gPad->SetLogy(1);
+    gPad->SetLogx(1);
+    double ymin_sur = 8e2;
+    double ymax_sur = 2e8;
+    grN_p_sur->GetYaxis()->SetRangeUser(ymin_sur, ymax_sur);
+    grN_p_sur->GetXaxis()->SetLimits(4,2e4);
+    grN_p_sur->SetTitle("Fitted From N_{sur};Energy(GeV);N_{0} Based on Estimated Interaction Depth");
+    grN_p_sur->Draw("AP");
+    grN_d_sur->Draw("PSAME");
+    line_Ntot->Draw("Lsame");
+    auto lg7_2 = new TLegend(0.48,0.72,0.88,0.88);
+    lg7_2->SetNColumns(2);
+    lg7_2->AddEntry(grN_p_sur,"Proton Fitted N_{sur}" ,"pe");
+    lg7_2->AddEntry(grN_d_sur,"Deuteron Fitted N_{sur}" ,"pe");
+    lg7_2->AddEntry(line_Ntot,"Ture Simulated N_{0}" ,"l");
+    lg7_2->Draw();
 
+    auto write_file2 = new TFile("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/DepthEst.root", "RECREATE");
+    write_file2->cd();
+    c6->Write();
+    c7->Write();
+    write_file2->Close();
 }
