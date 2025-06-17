@@ -148,8 +148,8 @@ void Percentile2DepthEst()
         }
     }
 
-    // for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
-    for (Long64_t entry = 0; entry < 50000; entry++)
+    for (Long64_t entry = 0; entry < proton_tree->GetEntries(); entry++)
+    // for (Long64_t entry = 0; entry < 50000; entry++)
     {        
         proton_tree->GetEntry(entry);
         if (entry%10000==0) cout << " Proton : " << entry << endl;
@@ -222,15 +222,15 @@ void Percentile2DepthEst()
         TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RSQ");  // R: fit range, S: return TFitResultPtr
         double Est_Depth = (BEST_FIT_MEAN * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5;
         // if ( Est_Depth < -40 ) cout << "Watch out " << entry << " Value " << Est_Depth <<endl;
-        h2_p_int[BEST_FIT_MEAN_BIN-1]->Fill(p_FI_Dep, Est_Depth, p_weight*1e4);   
-        h1_p_Lay[BEST_FIT_MEAN_BIN-1][p_FI_Lay]->Fill( (p_FI_Dep -  Est_Depth) / p_FI_Dep , p_weight*1e4);  // bias and reso
-        h1_p_int[BEST_FIT_MEAN_BIN-1]->Fill(Est_Depth, p_weight*1e4);
-        h1_p_inl[BEST_FIT_MEAN_BIN-1]->Fill(p_FI_Dep, p_weight*1e4);
+        h2_p_int[BEST_FIT_MEAN_BIN-1]->Fill(p_FI_Dep, Est_Depth, p_weight);   
+        h1_p_Lay[BEST_FIT_MEAN_BIN-1][p_FI_Lay]->Fill( (p_FI_Dep -  Est_Depth) / p_FI_Dep , p_weight);  // bias and reso
+        h1_p_int[BEST_FIT_MEAN_BIN-1]->Fill(Est_Depth, p_weight);
+        h1_p_inl[BEST_FIT_MEAN_BIN-1]->Fill(p_FI_Dep, p_weight);
 
     }
 
-    // for (Long64_t entry = 0; entry < deuteron_tree->GetEntries() ; ++entry)
-    for (Long64_t entry = 0; entry < 50000 ; ++entry)
+    for (Long64_t entry = 0; entry < deuteron_tree->GetEntries() ; ++entry)
+    // for (Long64_t entry = 0; entry < 50000 ; ++entry)
     {
         deuteron_tree->GetEntry(entry);
         if (entry%10000==0) cout << " Deuteron : " << entry << endl;
@@ -302,10 +302,10 @@ void Percentile2DepthEst()
         sigmoid->SetParLimits(4, max(hBGO1->GetBinContent(1)*0.1,0.01) , hBGO1->GetBinContent(1) * 10);   // [4] linear bias
         TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RSQ");  // R: fit range, S: return TFitResultPtr
         double Est_Depth = (BEST_FIT_MEAN * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5;
-        h2_d_int[BEST_FIT_MEAN_BIN-1]->Fill(d_FI_Dep, Est_Depth, d_weight*1e4);
-        h1_d_Lay[BEST_FIT_MEAN_BIN-1][d_FI_Lay]->Fill( (d_FI_Dep -  Est_Depth) / d_FI_Dep , d_weight*1e4);
-        h1_d_int[BEST_FIT_MEAN_BIN-1]->Fill(Est_Depth, d_weight*1e4);
-        h1_d_inl[BEST_FIT_MEAN_BIN-1]->Fill(d_FI_Dep, d_weight*1e4);
+        h2_d_int[BEST_FIT_MEAN_BIN-1]->Fill(d_FI_Dep, Est_Depth, d_weight);
+        h1_d_Lay[BEST_FIT_MEAN_BIN-1][d_FI_Lay]->Fill( (d_FI_Dep -  Est_Depth) / d_FI_Dep , d_weight);
+        h1_d_int[BEST_FIT_MEAN_BIN-1]->Fill(Est_Depth, d_weight);
+        h1_d_inl[BEST_FIT_MEAN_BIN-1]->Fill(d_FI_Dep, d_weight);
     }
 
     for(int j=0 ;j< 7 ; j++)
@@ -339,9 +339,11 @@ void Percentile2DepthEst()
             h1_d_sur[j]->SetBinContent(i, (h2_d_int[j]->Integral() - h1_d_int[j]->Integral(1,i) ));
             h1_p_lea[j]->SetBinContent(i, (h2_p_int[j]->Integral() - h1_p_inl[j]->Integral(1,i) ));
             h1_d_lea[j]->SetBinContent(i, (h2_d_int[j]->Integral() - h1_d_inl[j]->Integral(1,i) ));
-            cout << h1_p_int[j]->Integral(1,i) << " , " <<  h1_p_int[j]->GetBinContent(i) << endl;
+            // cout << h1_p_int[j]->Integral(1,i) << " , " <<  h1_p_int[j]->GetBinContent(i) << endl;
             // cout << h1_d_int->Integral(0,i) << endl;
         }
+        cout << h1_p_int[j]->Integral() << " , " <<  h1_p_inl[j]->Integral() << endl;
+
 
         auto c0 = new TCanvas("c0","c0",2400,1600);
         gStyle->SetOptFit(1111);
@@ -531,8 +533,8 @@ void Percentile2DepthEst()
         grN_d_int->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc4->GetParameter(0) /  h1_d_int[j]->GetBinWidth(1));
         grN_d_int->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc4->GetParError(0) /  h1_d_int[j]->GetBinWidth(1));
 
-        grN_d_sur->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc2->GetParameter(1));
-        grN_d_sur->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc2->GetParError(1));
+        grN_d_sur->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc2->GetParameter(0));
+        grN_d_sur->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc2->GetParError(0));
 
         line_Ntot->SetPoint(j,Energy_Mid_p->GetBinContent(j+1), h2_p_int[j]->Integral());
 

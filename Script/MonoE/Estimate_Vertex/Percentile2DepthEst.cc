@@ -5,24 +5,18 @@ void Percentile2DepthEst()
 {
     int Energy_Name[28]={0};
     int Energy_Name_Err[28]={0};
-    double Ratio[18] = {0};
-    double Ratio_Edge[19];
+    double Ratio[28] = {0};
+    double Ratio_Edge[29];
     double Energy_Edge[29];
     auto mean_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Estimate_Vertex/DepthEst_Fitting.root");
     auto hist_p = (TH1D*)mean_file->Get("hist_p");
-    for (int j = 0; j < 19; j++)
+    for (int j = 0; j < 29; j++)
     {
-        if (j <= 10)       Ratio_Edge[j] = 0.005 + 0.01 * j;        // Center: 10~100 → edges: 5~105
-        else               Ratio_Edge[j] = 0.15 + 0.1 * (j - 10); // Center: 2000~10000 → edges: 1500~10500    
-        // cout << Ratio_Edge[j] << endl;
+        if (j <= 10)                 { Energy_Edge[j] = 5 + 10 * j;             Ratio_Edge[j] = 0.0005 + 0.001 * j;     }   // Center: 10~100 → edges: 5~105
+        else if (j > 10 && j <= 19)  { Energy_Edge[j] = 150 + 100 * (j - 10);   Ratio_Edge[j] = 0.015 + 0.01 * (j - 10);      }   // Center: 10~100 → edges: 5~105  
+        else                         { Energy_Edge[j] = 1500 + 1000 * (j - 19); Ratio_Edge[j] = 0.15 + 0.1 * (j - 19); } // Center: 2000~10000 → edges: 1500~10500     
+    }
 
-    }
-    for (int j = 0; j < 29; j++){
-        if (j <= 10)       Energy_Edge[j] = 5 + 10 * j;         // Center: 10~100 → edges: 5~105
-        else if (j <= 19)  Energy_Edge[j] = 150 + 100 * (j - 10); // Center: 200~1000 → edges: 150~1050
-        else               Energy_Edge[j] = 1500 + 1000 * (j - 19); // Center: 2000~10000 → edges: 1500~10500      
-        // cout << j << " , " <<Energy_Edge[j] << endl;
-    }
 
     auto lambda_p_sur = new TH1D("lambda_p_sur","lambda_p_sur",28,Energy_Edge);
     auto lambda_p_int = new TH1D("lambda_p_int","lambda_p_int",28,Energy_Edge);
@@ -34,7 +28,7 @@ void Percentile2DepthEst()
     auto N_d_int = new TH1D("N_d_int","N_d_int",28,Energy_Edge);
     auto N_d_sur = new TH1D("N_d_sur","N_d_sur",28,Energy_Edge);
 
-    for (int k =0; k < 28; k++)
+    for (int k =0; k < 28; k++) //. Energy
     // for (int k =0; k < 1; k++)
     // for (int k =18; k < 19; k++)
     {
@@ -87,14 +81,14 @@ void Percentile2DepthEst()
 
         auto h2_p_int = new TH2D("h2_p_int","h2_p_int",200,-25,375,325,-275,375);  
         auto h2_d_int = new TH2D("h2_d_int","h2_d_int",200,-25,375,325,-275,375);  
-        auto h1_p_int = new TH1D("h1_p_int","h1_p_int",14,0,357);  // EST
-        auto h1_d_int = new TH1D("h1_d_int","h1_d_int",14,0,357);  // EST
-        auto h1_p_inl = new TH1D("h1_p_inl","h1_p_inl",14,0,357);  // REAL
-        auto h1_d_inl = new TH1D("h1_d_inl","h1_d_inl",14,0,357);  // REAL
-        auto h1_p_sur = new TH1D("h1_p_sur","h1_p_sur",14,0,357);  // EST
-        auto h1_d_sur = new TH1D("h1_d_sur","h1_d_sur",14,0,357);  // EST
-        auto h1_p_lea = new TH1D("h1_p_lea","h1_p_lea",14,0,357);  // REAL
-        auto h1_d_lea = new TH1D("h1_d_lea","h1_d_lea",14,0,357);  // REAL
+        auto h1_p_int = new TH1D("h1_p_int","h1_p_int",28,0,357);  // EST
+        auto h1_d_int = new TH1D("h1_d_int","h1_d_int",28,0,357);  // EST
+        auto h1_p_inl = new TH1D("h1_p_inl","h1_p_inl",28,0,357);  // REAL
+        auto h1_d_inl = new TH1D("h1_d_inl","h1_d_inl",28,0,357);  // REAL
+        auto h1_p_sur = new TH1D("h1_p_sur","h1_p_sur",28,0,357);  // EST
+        auto h1_d_sur = new TH1D("h1_d_sur","h1_d_sur",28,0,357);  // EST
+        auto h1_p_lea = new TH1D("h1_p_lea","h1_p_lea",28,0,357);  // REAL
+        auto h1_d_lea = new TH1D("h1_d_lea","h1_d_lea",28,0,357);  // REAL
 
         for(int i =0 ; i<15 ; i++)  // Layer
         {
@@ -499,7 +493,7 @@ void Percentile2DepthEst()
         c4->Write();
         c5->Write();
         write_file->Close();
-    } // ENERGY k
+    } //. Energy k
 
     auto file1 = TFile::Open("/Users/xiongzheng/software/Hadr00/build/proton_BGO.root");
     auto hist1 = (TH1D*)file1->Get("h4");
@@ -626,4 +620,10 @@ void Percentile2DepthEst()
     lg7_2->AddEntry(line_Ntot,"Ture Simulated N_{0}" ,"l");
     lg7_2->Draw();
 
+    auto write_file2 = new TFile("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Estimate_Vertex/DepthEst_Energy.root", "RECREATE");
+    write_file2->cd();
+    c6->Write();
+    c7->Write();
+
+    write_file2->Close();
 }

@@ -12,8 +12,6 @@ void CrossSection_Dual_Ine_Mono()
     double Ratio_Edge[29];
     double Energy_Edge[29];
 
-
-
     for (int j = 0; j < 29; j++)
     {
         if (j <= 10)                 { Energy_Edge[j] = 5 + 10 * j;             Ratio_Edge[j] = 0.0005 + 0.001 * j;     }   // Center: 10~100 → edges: 5~105
@@ -32,8 +30,8 @@ void CrossSection_Dual_Ine_Mono()
     lamb_int->SetTitle("N_{int};Incident Energy (GeV);True r_{d}; Fitted #lambda_{d}");
     lamb_sur->SetTitle("N_{sur};Incident Energy (GeV);True r_{d}; Fitted #lambda_{d}");
 
-    // for (int k =18; k < 19; k++)
-    for (int k =0; k < 28; k++)
+    for (int k =18; k < 19; k++)
+    // for (int k =0; k < 28; k++)
     {
         if (k < 10)      {Energy_Name[k] = (k + 1) * 10;         Energy[k] = (k + 1) * 10.;       }       // 10 ~ 100
         else if (k < 19) {Energy_Name[k] = (k - 9 + 1) * 100;    Energy[k] = (k - 9 + 1) * 100.;  }        // 200 ~ 1000
