@@ -222,10 +222,10 @@ void Percentile2DepthEst()
         TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RSQ");  // R: fit range, S: return TFitResultPtr
         double Est_Depth = (BEST_FIT_MEAN * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5;
         // if ( Est_Depth < -40 ) cout << "Watch out " << entry << " Value " << Est_Depth <<endl;
-        h2_p_int[BEST_FIT_MEAN_BIN-1]->Fill(p_FI_Dep, Est_Depth, p_weight);   
-        h1_p_Lay[BEST_FIT_MEAN_BIN-1][p_FI_Lay]->Fill( (p_FI_Dep -  Est_Depth) / p_FI_Dep , p_weight);  // bias and reso
-        h1_p_int[BEST_FIT_MEAN_BIN-1]->Fill(Est_Depth, p_weight);
-        h1_p_inl[BEST_FIT_MEAN_BIN-1]->Fill(p_FI_Dep, p_weight);
+        h2_p_int[BEST_FIT_MEAN_BIN-1]->Fill(p_FI_Dep, Est_Depth, p_weight*1e4);   
+        h1_p_Lay[BEST_FIT_MEAN_BIN-1][p_FI_Lay]->Fill( (p_FI_Dep -  Est_Depth) / p_FI_Dep , p_weight*1e4);  // bias and reso
+        h1_p_int[BEST_FIT_MEAN_BIN-1]->Fill(Est_Depth, p_weight*1e4);
+        h1_p_inl[BEST_FIT_MEAN_BIN-1]->Fill(p_FI_Dep, p_weight*1e4);
 
     }
 
@@ -302,10 +302,10 @@ void Percentile2DepthEst()
         sigmoid->SetParLimits(4, max(hBGO1->GetBinContent(1)*0.1,0.01) , hBGO1->GetBinContent(1) * 10);   // [4] linear bias
         TFitResultPtr fitResult = hBGO3->Fit(sigmoid, "RSQ");  // R: fit range, S: return TFitResultPtr
         double Est_Depth = (BEST_FIT_MEAN * sigmoid->GetParameter(3) + sigmoid->GetParameter(2)) * 25.5;
-        h2_d_int[BEST_FIT_MEAN_BIN-1]->Fill(d_FI_Dep, Est_Depth, d_weight);
-        h1_d_Lay[BEST_FIT_MEAN_BIN-1][d_FI_Lay]->Fill( (d_FI_Dep -  Est_Depth) / d_FI_Dep , d_weight);
-        h1_d_int[BEST_FIT_MEAN_BIN-1]->Fill(Est_Depth, d_weight);
-        h1_d_inl[BEST_FIT_MEAN_BIN-1]->Fill(d_FI_Dep, d_weight);
+        h2_d_int[BEST_FIT_MEAN_BIN-1]->Fill(d_FI_Dep, Est_Depth, d_weight*1e4);
+        h1_d_Lay[BEST_FIT_MEAN_BIN-1][d_FI_Lay]->Fill( (d_FI_Dep -  Est_Depth) / d_FI_Dep , d_weight*1e4);
+        h1_d_int[BEST_FIT_MEAN_BIN-1]->Fill(Est_Depth, d_weight*1e4);
+        h1_d_inl[BEST_FIT_MEAN_BIN-1]->Fill(d_FI_Dep, d_weight*1e4);
     }
 
     for(int j=0 ;j< 7 ; j++)

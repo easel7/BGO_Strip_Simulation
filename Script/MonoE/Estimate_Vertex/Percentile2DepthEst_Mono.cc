@@ -33,8 +33,8 @@ void Percentile2DepthEst_Mono()
     auto N_d_sur = new TH1D("N_d_sur","N_d_sur",28,Energy_Edge);
 
     for (int k =0; k < 28; k++) //. Energy
-    // for (int k =0; k < 1; k++)
-    // for (int k =18; k < 19; k++)
+    // for (int k =1; k < 2; k++)
+    // for (int k =23; k < 24; k++)
     {
         if (k < 10)      { Energy_Name[k] = (k + 1) * 10;            Energy[k] = (k + 1) * 10.;       }       // 10 ~ 100
         else if (k < 19) { Energy_Name[k] = (k - 9 + 1) * 100;       Energy[k] = (k - 9 + 1) * 100.;  }        // 200 ~ 1000
@@ -289,9 +289,9 @@ void Percentile2DepthEst_Mono()
         TF1 *fitFunc3 = new TF1("fitFunc3", "[0]*exp(-(x+12.75)/[1])", 80,270); fitFunc3->SetParameters(1e4,200); fitFunc3->SetLineColor(kBlack);
 
         // Fit for Interaction 
-        TF1 *fitFunc5 = new TF1("fitFunc5", "[0]/[1]*exp(-x/[1])", 80,270); fitFunc5->SetParameters(1e4 * h1_p_int->GetBinWidth(1), 200); fitFunc5->SetLineColor(kRed);  
-        TF1 *fitFunc6 = new TF1("fitFunc6", "[0]/[1]*exp(-x/[1])", 80,270); fitFunc6->SetParameters(1e4 * h1_d_int->GetBinWidth(1), 170); fitFunc6->SetLineColor(kBlue); 
-        TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/[1]*exp(-x/[1])", 80,270); fitFunc4->SetParameters(1e5,170); fitFunc4->SetLineColor(kBlack);
+        TF1 *fitFunc5 = new TF1("fitFunc5", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc5->SetParameters(1e4,200); fitFunc5->SetLineColor(kRed);  
+        TF1 *fitFunc6 = new TF1("fitFunc6", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc6->SetParameters(1e4,170); fitFunc6->SetLineColor(kBlue); 
+        TF1 *fitFunc4 = new TF1("fitFunc4", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc4->SetParameters(1e4,170); fitFunc4->SetLineColor(kBlack);
 
         for(int ii = 1 ; ii <= hC_p_int->GetNbinsX() ; ii++)
         {
@@ -394,6 +394,7 @@ void Percentile2DepthEst_Mono()
             ROOT::Fit::FillData(data_sur, h_2_sur); 
             auto *f1_sur = new TF1("f1_sur","[1]*exp(-(x+12.75)/[0])",80,270);
             f1_sur->SetParameters(200, (h2_p_tot->Integral()+h2_d_tot->Integral()) );
+            f1_sur->SetParLimits(0, 0, 500 );
             auto wf_sur = ROOT::Math::WrappedTF1(*f1_sur);
             auto fitter_sur = ROOT::Fit::Fitter() ;
             fitter_sur.SetFunction(wf_sur);
@@ -420,16 +421,17 @@ void Percentile2DepthEst_Mono()
             lg01->AddEntry(f1_sur ,"Function share same #lambda","l");
             lg01->Draw();
 
-            if( (Chi2_combine_sur - (Chi2_mixture_sur + Chi2_proton_sur) ) >=4.605 && Sur_90_Tag < 0) 
+            if( (Chi2_combine_sur - (Chi2_mixture_sur + Chi2_proton_sur) ) >=2.71 && Sur_90_Tag < 0) 
             { 
                 CL90_Sur[k] = Ratio[i];
                 Sur_90_Tag = 1;
             }
-            if( (Chi2_combine_sur - (Chi2_mixture_sur + Chi2_proton_sur) ) >=5.991 && Sur_95_Tag < 0) 
+            if( (Chi2_combine_sur - (Chi2_mixture_sur + Chi2_proton_sur) ) >=3.84 && Sur_95_Tag < 0) 
             { 
                 CL95_Sur[k] = Ratio[i];
                 Sur_95_Tag = 1;
             }
+
 
             c0->cd(2);
             h1_p_int->SetLineColor(kRed);     h1_p_int->SetLineWidth(2);
@@ -440,9 +442,9 @@ void Percentile2DepthEst_Mono()
             h_2_int->Draw("hist");
             h1_p_int->Draw("histsame");
             h1_d_int->Draw("histsame");
-            fitFunc5->SetParameters((h2_p_tot->Integral()*h1_p_int->GetBinWidth(1))                     , 170);
-            fitFunc6->SetParameters((h2_d_tot->Integral()*h1_d_int->GetBinWidth(1))                     , 170);
-            fitFunc4->SetParameters((h2_p_tot->Integral()+h2_d_tot->Integral())*h1_p_int->GetBinWidth(1), 170);
+            fitFunc5->SetParameters((h2_p_tot->Integral())                     , 170);
+            fitFunc6->SetParameters((h2_d_tot->Integral())                     , 170);
+            fitFunc4->SetParameters((h2_p_tot->Integral()+h2_d_tot->Integral()), 170);
             h1_p_int->Fit(fitFunc5,"QSR");
             h1_d_int->Fit(fitFunc6,"QSR");
             h_2_int->Fit(fitFunc4,"QSR"); 
@@ -464,8 +466,9 @@ void Percentile2DepthEst_Mono()
             auto data_int = ROOT::Fit::BinData(opt, range);
             ROOT::Fit::FillData(data_int, hC_p_int); // NDF = 13
             ROOT::Fit::FillData(data_int, h_2_int); //
-            auto *f1_int = new TF1("f1_int","[1]/[0]*exp(-x/[0])",80,270);
-            f1_int->SetParameters((h2_p_tot->Integral()+h2_d_tot->Integral())*h1_p_int->GetBinWidth(1),200);
+            auto *f1_int = new TF1("f1_int","25.5*[1]/[0]*exp(-x/[0])",80,270);
+            f1_int->SetParameters(200 , (h2_p_tot->Integral()+h2_d_tot->Integral()));
+            f1_int->SetParLimits(0, 0, 500 );
             auto wf_int = ROOT::Math::WrappedTF1(*f1_int);
             auto fitter_int = ROOT::Fit::Fitter() ;
             fitter_int.SetFunction(wf_int);
@@ -480,13 +483,19 @@ void Percentile2DepthEst_Mono()
             double Chi2_deuteron_int  = fitFunc6->GetChisquare();
             double Chi2_mixture_int   = fitFunc4->GetChisquare();
 
-            if( (Chi2_combine_int - (Chi2_mixture_int + Chi2_proton_int) ) >=4.605 && Int_90_Tag < 0) 
+            if( (Chi2_combine_int - (Chi2_mixture_int + Chi2_proton_int) ) >=2.71 && Int_90_Tag < 0) 
             { 
                 CL90_Int[k] = Ratio[i];
+                CL95_Int[k] = Ratio[i];
                 Int_90_Tag = 1;
             }
-            if( (Chi2_combine_int - (Chi2_mixture_int + Chi2_proton_int) ) >=5.991 && Int_95_Tag < 0) 
+            if( (Chi2_combine_int - (Chi2_mixture_int + Chi2_proton_int) ) >=3.84 && Int_95_Tag < 0) 
             { 
+                CL95_Int[k] = Ratio[i];
+                Int_95_Tag = 1;
+            }
+            if (Ratio[i] == 0.9 && Int_95_Tag < 0 )
+            {
                 CL95_Int[k] = Ratio[i];
                 Int_95_Tag = 1;
             }
@@ -615,7 +624,7 @@ void Percentile2DepthEst_Mono()
         h1_p_int_orig->SetLineColor(kBlack);
         h1_p_int_orig->SetTitle("Proton N_{inteaction};Depth (mm);Counts");
         h1_p_int_orig->Draw("hist");
-        fitFunc5->SetParameters(1e4 * h1_p_int->GetBinWidth(1), 200);
+        fitFunc5->SetParameters(1e4, 200);
         h1_p_int_orig->Fit(fitFunc5,"QSR");  
         fitFunc5->Draw("same");
         h1_p_inl->SetLineColor(kRed);
@@ -652,7 +661,7 @@ void Percentile2DepthEst_Mono()
         h1_d_int_orig->SetLineColor(kBlack);
         h1_d_int_orig->SetTitle("Deuteron N_{inteaction};Depth (mm);Counts");
         h1_d_int_orig->Draw("hist");
-        fitFunc6->SetParameters(1e4 * h1_d_int->GetBinWidth(1), 200);
+        fitFunc6->SetParameters(1e4, 200);
         h1_d_int_orig->Fit(fitFunc6,"QSR");  
         fitFunc6->Draw("same");
         h1_d_inl->SetLineColor(kBlue);

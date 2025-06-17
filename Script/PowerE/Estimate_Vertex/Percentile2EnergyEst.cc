@@ -186,7 +186,7 @@ void Percentile2EnergyEst()
     hist_p_2->Write();
     hist_d_2->Write();
     Energy_Mid_p->Write();
-    Energy_Mid_p->Write();
+    Energy_Mid_d->Write();
     write_file->Close();
     mean_file->Close();
 }
