@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
 {
 	double  energy;
 	double weight;
+    double energy_res;
     TBranch *newBranch[6];
     TRandom *rand = new TRandom2(1);
     string file_name   = argv[1];
@@ -26,6 +27,7 @@ int main(int argc, char *argv[])
 	Long64_t nentries = B4->GetEntries();
     double total_weight = 0.0;
 	newBranch[0] = B4->Branch("weight",&weight,"weight/D");
+    newBranch[1] = B4->Branch("energy_res",&energy_res,"energy_res/D");
 	for(Long64_t i=0;i<nentries; i++) 
 	{
         B4->GetEntry(i);
@@ -39,7 +41,9 @@ int main(int argc, char *argv[])
     for (Long64_t i = 0; i < nentries; i++) {
         B4->GetEntry(i);
         weight = pow(energy, -1.7) * norm_factor;
+        energy_res = rand->Gaus(energy, 0.1 * energy);
         newBranch[0]->Fill();
+        newBranch[1]->Fill();
     }
 	B4->Write("", TObject::kOverwrite); // save only the new version of the tree
 	file->Close();

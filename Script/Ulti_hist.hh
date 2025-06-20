@@ -316,105 +316,39 @@ double langaufun(double *x, double *par) {
        }
   
        return (par[2] * step * sum * invsq2pi / par[3]);
- }
-    
- int langaupro(double *params, double &maxx, double &FWHM) {
-  
-    // Searches for the location (x value) at the maximum of the
-    // Landau-Gaussian convolute and its full width at half-maximum.
-    //
-    // The search is probably not very efficient, but it's a first try.
-  
-    double p,x,fy,fxr,fxl;
-    double step;
-    double l,lold;
-    int i = 0;
-    int MAXCALLS = 10000;
-  
-    // Search for maximum
-  
-    p = params[1] - 0.1 * params[0];
-    step = 0.05 * params[0];
-    lold = -2.0;
-    l    = -1.0;
-  
-  
-    while ( (l != lold) && (i < MAXCALLS) ) {
-       i++;
-  
-       lold = l;
-       x = p + step;
-       l = langaufun(&x,params);
-  
-       if (l < lold)
-          step = -step/10;
-  
-       p += step;
+}
+
+double conv_powerlaw_gaus(double *x, double *par) {
+    double emeas = x[0];
+    double norm = par[0];
+    double gamma = par[1];
+    double alpha = par[2]; // 分辨率比例，例如 0.4
+
+    double result = 0;
+    const int N = 100;
+    double Emin = 1e1;
+    double Emax = 1e4;
+    double step = (Emax - Emin) / N;
+    for (int i = 0; i < N; ++i) {
+        double Etrue = Emin + step * i + 0.5 * step;
+        double weight = norm * TMath::Power(Etrue, -gamma);
+        double sigma = alpha * Etrue;
+        double gaus = TMath::Gaus(emeas, Etrue, sigma, true);
+        result += weight * gaus * step;
     }
-  
-    if (i == MAXCALLS)
-       return (-1);
-  
-    maxx = x;
-  
-    fy = l/2;
-  
-  
-    // Search for right x location of fy
-  
-    p = maxx + params[0];
-    step = params[0];
-    lold = -2.0;
-    l    = -1e300;
-    i    = 0;
-  
-  
-    while ( (l != lold) && (i < MAXCALLS) ) {
-       i++;
-  
-       lold = l;
-       x = p + step;
-       l = TMath::Abs(langaufun(&x,params) - fy);
-  
-       if (l > lold)
-          step = -step/10;
-  
-       p += step;
-    }
-  
-    if (i == MAXCALLS)
-       return (-2);
-  
-    fxr = x;
-  
-  
-    // Search for left x location of fy
-  
-    p = maxx - 0.5 * params[0];
-    step = -params[0];
-    lold = -2.0;
-    l    = -1e300;
-    i    = 0;
-  
-    while ( (l != lold) && (i < MAXCALLS) ) {
-       i++;
-  
-       lold = l;
-       x = p + step;
-       l = TMath::Abs(langaufun(&x,params) - fy);
-  
-       if (l > lold)
-          step = -step/10;
-  
-       p += step;
-    }
-  
-    if (i == MAXCALLS)
-       return (-3);
-  
-  
-    fxl = x;
-  
-    FWHM = fxr - fxl;
-    return (0);
- }
+    return result;
+}
+
+
+Double_t lognormal(Double_t *x, Double_t *par) {
+    Double_t A     = par[0]; // normalization
+    Double_t mu    = par[1];
+    Double_t sigma = par[2];
+
+    Double_t xx = x[0];
+    if (xx <= 0) return 0;
+
+    Double_t val = A / (xx * sigma * TMath::Sqrt(2 * TMath::Pi())) *
+                   TMath::Exp(-0.5 * TMath::Power((TMath::Log(xx) - mu) / sigma, 2));
+    return val;
+}

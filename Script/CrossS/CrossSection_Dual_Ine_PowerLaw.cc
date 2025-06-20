@@ -1,20 +1,20 @@
 void CrossSection_Dual_Ine_PowerLaw()
 {
-    auto file_p  = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Proton_PowerLaw.root");
+    auto file_p  = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
     auto tree_p  = (TTree*)file_p->Get("B4");
     auto h_p_tot = new TH1D("h_p_tot","h_p_tot",15,-25.5,357);  h_p_tot->Sumw2();
     auto h_p_int = new TH1D("h_p_int","h_p_int",14,0,357);      h_p_int->Sumw2();
     auto h_p_sur = new TH1D("h_p_sur","h_p_sur",14,0,357);      
-    tree_p->Draw("First_Ine_Depth>>h_p_tot","(Total_E>40 && Total_E<49)","");
-    tree_p->Draw("First_Ine_Depth>>h_p_int","(Total_E>40 && Total_E<49)","");
+    tree_p->Draw("First_Ine_Depth>>h_p_tot","(energy_res>43 && energy_res<100)","");
+    tree_p->Draw("First_Ine_Depth>>h_p_int","(energy_res>43 && energy_res<100)","");
 
-    auto file_d  = TFile::Open("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_PowerLaw.root");
+    auto file_d  = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
     auto tree_d  = (TTree*)file_d->Get("B4");
     auto h_d_tot = new TH1D("h_d_tot","h_d_tot",15,-25.5,357);  h_d_tot->Sumw2();
     auto h_d_int = new TH1D("h_d_int","h_d_int",14,0,357);      h_d_int->Sumw2();
     auto h_d_sur = new TH1D("h_d_sur","h_d_sur",14,0,357);     
-    tree_d->Draw("First_Ine_Depth>>h_d_tot"," (Total_E>40 && Total_E<49 )","");
-    tree_d->Draw("First_Ine_Depth>>h_d_int"," (Total_E>40 && Total_E<49 )","");
+    tree_d->Draw("First_Ine_Depth>>h_d_tot"," (energy_res>43 && energy_res<100)","");
+    tree_d->Draw("First_Ine_Depth>>h_d_int"," (energy_res>43 && energy_res<100)","");
 
     // h_p_int->Scale(0.5);    h_p_tot->Scale(0.5);
     // h_d_int->Scale(0.5);    h_d_tot->Scale(0.5);
