@@ -1,13 +1,13 @@
 #include "/Users/xiongzheng/software/B4/B4e/Script/Ulti_hist.hh"
 // 比较拟合差距 \hat{x_ine} =  - 4.789 * sigma + x_mid
 
-void Percentile2DepthEst()
+void Percentile2DepthEst_Dep()
 {
     double Ratio[18] = {0};
     double Ratio_Edge[19];
     double Energy_Dep[8] = {8,19,43,100,320,1e3,3.2e3,1e4};
 
-    auto mean_file    = TFile::Open("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/EnergyEst.root");
+    auto mean_file    = TFile::Open("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/EnergyEst_Dep.root");
     auto hist_p_2     = (TH1D*)mean_file->Get("hist_p_2");
     auto Energy_Mid_p = (TH1D*)mean_file->Get("Energy_Mid_p");
 
@@ -50,8 +50,8 @@ void Percentile2DepthEst()
     auto gre7 = new TGraph(Nbins,KN_Energy, KN_Deuteron);   gre7->SetLineColor(kBlue);
     auto line_Ntot = new TGraph();
 
-    int p_FH_Lay; int p_FH_Type; double p_Total_E;  double p_Energy;    int p_Nhits;std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_L_EnergyVec = nullptr;   std::vector<double>* p_EnergyVec = nullptr;   std::vector<double>* p_Efrac = nullptr; double p_weight;
-    int d_FH_Lay; int d_FH_Type; double d_Total_E;  double d_Energy;    int d_Nhits;std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_L_EnergyVec = nullptr;   std::vector<double>* d_EnergyVec = nullptr;   std::vector<double>* d_Efrac = nullptr; double d_weight;
+    int p_FH_Lay; int p_FH_Type; double p_energy_res;  double p_Energy;  double p_Total_E;    int p_Nhits;std::vector<double>* p_RMSVec = nullptr;    std::vector<double>* p_L_EnergyVec = nullptr;   std::vector<double>* p_EnergyVec = nullptr;   std::vector<double>* p_Efrac = nullptr; double p_weight;
+    int d_FH_Lay; int d_FH_Type; double d_energy_res;  double d_Energy;  double d_Total_E;    int d_Nhits;std::vector<double>* d_RMSVec = nullptr;    std::vector<double>* d_L_EnergyVec = nullptr;   std::vector<double>* d_EnergyVec = nullptr;   std::vector<double>* d_Efrac = nullptr; double d_weight;
     int p_FI_Lay;    double p_FI_Dep;    int p_particle;
     int d_FI_Lay;    double d_FI_Dep;    int d_particle;
 
@@ -66,6 +66,7 @@ void Percentile2DepthEst()
     proton_tree->SetBranchAddress("First_Had_Type"   ,&p_FH_Type);
     proton_tree->SetBranchAddress("First_Ine_Depth", &p_FI_Dep);
     proton_tree->SetBranchAddress("First_Ine_Layer", &p_FI_Lay);
+    proton_tree->SetBranchAddress("energy_res"     ,&p_energy_res);
     proton_tree->SetBranchAddress("Total_E"         ,&p_Total_E);
     proton_tree->SetBranchAddress("Energy"         , &p_Energy);
     proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
@@ -82,10 +83,11 @@ void Percentile2DepthEst()
     deuteron_tree->SetBranchAddress("First_Had_Type"   ,&d_FH_Type);
     deuteron_tree->SetBranchAddress("First_Ine_Depth", &d_FI_Dep);
     deuteron_tree->SetBranchAddress("First_Ine_Layer", &d_FI_Lay);
-    deuteron_tree->SetBranchAddress("Total_E"          ,&d_Total_E);
+    deuteron_tree->SetBranchAddress("energy_res"     ,&d_energy_res);
+    deuteron_tree->SetBranchAddress("Total_E"         ,&d_Total_E);
     deuteron_tree->SetBranchAddress("Energy"         , &d_Energy);
     deuteron_tree->SetBranchAddress("Nhits"          , &d_Nhits);
-    deuteron_tree->SetBranchAddress("weight"         ,&d_weight);
+    deuteron_tree->SetBranchAddress("weight"           ,&d_weight);
 
     TGraphErrors* gre_p_int = new TGraphErrors(); TGraphErrors* grN_p_int = new TGraphErrors();
     TGraphErrors* gre_p_sur = new TGraphErrors(); TGraphErrors* grN_p_sur = new TGraphErrors();
@@ -538,7 +540,7 @@ void Percentile2DepthEst()
 
         line_Ntot->SetPoint(j,Energy_Mid_p->GetBinContent(j+1), h2_p_int[j]->Integral());
 
-        auto write_file = new TFile(Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/DepthEst_%d.root",j), "RECREATE");
+        auto write_file = new TFile(Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/DepthEst_Dep_%d.root",j), "RECREATE");
         write_file->cd();
         h2_p_int[j]->Write();
         h2_d_int[j]->Write();

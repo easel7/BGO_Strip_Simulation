@@ -318,37 +318,47 @@ double langaufun(double *x, double *par) {
        return (par[2] * step * sum * invsq2pi / par[3]);
 }
 
-double conv_powerlaw_gaus(double *x, double *par) {
-    double emeas = x[0];
-    double norm = par[0];
-    double gamma = par[1];
-    double alpha = par[2]; // 分辨率比例，例如 0.4
+double conv_powerlaw_gaus(Double_t *x, Double_t *par) {
+    // par[0] = gamma   : Power-law 指数
+    // par[1] = norm    : 归一化因子
+    // par[2] = alpha   : 相对误差 (sigma = alpha * Etrue)
 
-    double result = 0;
-    const int N = 100;
-    double Emin = 1e1;
-    double Emax = 1e4;
-    double step = (Emax - Emin) / N;
-    for (int i = 0; i < N; ++i) {
-        double Etrue = Emin + step * i + 0.5 * step;
-        double weight = norm * TMath::Power(Etrue, -gamma);
-        double sigma = alpha * Etrue;
-        double gaus = TMath::Gaus(emeas, Etrue, sigma, true);
-        result += weight * gaus * step;
+    // ====== 固定的真实能量范围（根据你的模拟或MC决定）======
+    const double Emin = 1e1;   // GeV，例如
+    const double Emax = 1e4; // GeV，例如
+    // =========================================================
+
+    const double invsq2pi = 0.3989422804014;
+    const int np = 100;
+    const double sc = 5.0;
+
+    double sum = 0.0;
+    double step, xx, sigma, fplaw;
+
+    double gamma = par[0];
+    double norm  = par[1];
+    double alpha = par[2];
+
+    double xmeas = x[0];
+
+    // 积分区间，限制在卷积核的有效范围
+    double Elow = std::max(Emin, xmeas / (1 + sc * alpha));
+    double Eup  = std::min(Emax, xmeas / (1 - sc * alpha));
+    if (Eup <= Elow || alpha <= 0) return 0;
+
+    step = (Eup - Elow) / np;
+
+    for (int i = 1; i <= np / 2; ++i) {
+        for (int side = 0; side < 2; ++side) {
+            xx = (side == 0)
+                   ? Elow + (i - 0.5) * step
+                   : Eup - (i - 0.5) * step;
+
+            sigma = alpha * xx;
+            fplaw = TMath::Power(xx, -gamma);
+            sum += fplaw * TMath::Gaus(xmeas, xx, sigma);
+        }
     }
-    return result;
-}
 
-
-Double_t lognormal(Double_t *x, Double_t *par) {
-    Double_t A     = par[0]; // normalization
-    Double_t mu    = par[1];
-    Double_t sigma = par[2];
-
-    Double_t xx = x[0];
-    if (xx <= 0) return 0;
-
-    Double_t val = A / (xx * sigma * TMath::Sqrt(2 * TMath::Pi())) *
-                   TMath::Exp(-0.5 * TMath::Power((TMath::Log(xx) - mu) / sigma, 2));
-    return val;
+    return norm * step * sum * invsq2pi;
 }

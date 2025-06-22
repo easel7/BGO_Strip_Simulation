@@ -300,7 +300,6 @@ void Percentile2DepthEst_Mono()
             h1_d_sur->SetBinContent(ii, (h2_d_tot->Integral() - h1_d_int->Integral(1,ii) ));
             h1_p_lea->SetBinContent(ii, (h2_p_tot->Integral() - h1_p_inl->Integral(1,ii) ));
             h1_d_lea->SetBinContent(ii, (h2_d_tot->Integral() - h1_d_inl->Integral(1,ii) ));
-                cout << ii << " , " << hC_p_sur->GetBinContent(ii) << endl;
         }
         hC_p_sur->Sumw2();
 
@@ -314,7 +313,7 @@ void Percentile2DepthEst_Mono()
         auto h1_d_sur_orig = (TH1D*)h1_d_sur->Clone("h1_d_sur_orig");
 
 
-        for (int i =0; i < 27; i++)
+        for (int i =0; i < 27; i++) // Ratio
         // for (int i =18; i < 19; i++)
         {
             if      (i < 10)          Ratio[i] = (i + 1) * 0.001;     
