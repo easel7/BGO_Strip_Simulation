@@ -24,12 +24,6 @@ void CrossSection_Dual_Ine_Mono()
     auto lamb_int = new TH2D("lamb_int","lamb_int",28,Energy_Edge,28,Ratio_Edge);
     auto lamb_sur = new TH2D("lamb_sur","lamb_sur",28,Energy_Edge,28,Ratio_Edge);
 
-    hist_int->SetTitle("N_{int};Incident Energy (GeV);True r_{d}; Fitted r_{d}");
-    hist_sur->SetTitle("N_{sur};Incident Energy (GeV);True r_{d}; Fitted r_{d}");
-
-    lamb_int->SetTitle("N_{int};Incident Energy (GeV);True r_{d}; Fitted #lambda_{d}");
-    lamb_sur->SetTitle("N_{sur};Incident Energy (GeV);True r_{d}; Fitted #lambda_{d}");
-
     for (int k =18; k < 19; k++)
     // for (int k =0; k < 28; k++)
     {

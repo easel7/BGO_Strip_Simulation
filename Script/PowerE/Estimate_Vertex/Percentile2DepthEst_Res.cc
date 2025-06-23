@@ -321,7 +321,7 @@ void Percentile2DepthEst_Res()
         h1_d_inl[BEST_FIT_MEAN_BIN-1]->Fill(d_FI_Dep, d_weight*1e4);
     }
 
-    // for(int j=4 ;j< 5 ; j++)
+    // for(int j=6 ;j< 7 ; j++)
     for(int j=0 ;j< 7 ; j++)
     {
         CL95_Sur[j]=1e-3; int Sur_95_Tag = -1;
@@ -337,15 +337,6 @@ void Percentile2DepthEst_Res()
         auto gre_d_sur = new TGraphErrors();
         auto chi2_int = new TGraph();
         auto chi2_sur = new TGraph();
-        // Fit for Survive
-        TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-(x+12.75)/[1])", 80,270); fitFunc1->SetParameters(1e4,200); fitFunc1->SetLineColor(kRed);  
-        TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-(x+12.75)/[1])", 80,270); fitFunc2->SetParameters(1e4,200); fitFunc2->SetLineColor(kBlue); 
-        TF1 *fitFunc3 = new TF1("fitFunc3", "[0]*exp(-(x+12.75)/[1])", 80,270); fitFunc3->SetParameters(1e4,200); fitFunc3->SetLineColor(kBlack);
-
-        // Fit for Interaction 
-        TF1 *fitFunc5 = new TF1("fitFunc5", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc5->SetParameters(1e4,200); fitFunc5->SetLineColor(kRed);  
-        TF1 *fitFunc6 = new TF1("fitFunc6", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc6->SetParameters(1e4,170); fitFunc6->SetLineColor(kBlue); 
-        TF1 *fitFunc4 = new TF1("fitFunc4", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc4->SetParameters(1e4,170); fitFunc4->SetLineColor(kBlack);
 
         for(int ii = 1  ; ii<= h1_p_int[j]->GetNbinsX(); ii++)
         {
@@ -365,12 +356,22 @@ void Percentile2DepthEst_Res()
         auto h1_d_sur_orig = (TH1D*)h1_d_sur[j]->Clone("h1_d_sur_orig");
 
         for (int i =0; i < 27; i++) // Ratio
-        // for (int i =18; i < 19; i++)
+        // for (int i =26; i < 27; i++)
         {
             if      (i < 10)          Ratio[i] = (i + 1) * 0.001;     
             else if (i < 19)          Ratio[i] = (i - 9 + 1) * 0.01;
             else                      Ratio[i] = (i - 18 + 1) * 0.1;  
             cout << Ratio[i] << " , " << 1-Ratio[i] <<  endl;
+
+            // Fit for Survive
+            TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-(x+12.75)/[1])", 80,270);fitFunc1->SetLineColor(kRed);  
+            TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-(x+12.75)/[1])", 80,270);fitFunc2->SetLineColor(kBlue); 
+            TF1 *fitFunc3 = new TF1("fitFunc3", "[0]*exp(-(x+12.75)/[1])", 80,270);fitFunc3->SetLineColor(kBlack);
+
+            // Fit for Interaction 
+            TF1 *fitFunc5 = new TF1("fitFunc5", "25.5*[0]/[1]*exp(-x/[1])", 80,270);fitFunc5->SetLineColor(kRed);  
+            TF1 *fitFunc6 = new TF1("fitFunc6", "25.5*[0]/[1]*exp(-x/[1])", 80,270);fitFunc6->SetLineColor(kBlue); 
+            TF1 *fitFunc4 = new TF1("fitFunc4", "25.5*[0]/[1]*exp(-x/[1])", 80,270);fitFunc4->SetLineColor(kBlack);
             // 每次循环开始时重置成原始副本的样子
             *h1_p_int[j] = *h1_p_int_orig;
             *h2_p_tot[j] = *h2_p_tot_orig;
@@ -415,12 +416,12 @@ void Percentile2DepthEst_Res()
             h_2_sur->Draw("hist");
             h1_p_sur[j]->Draw("histsame");
             h1_d_sur[j]->Draw("histsame");
-            fitFunc1->SetParameters(h2_p_tot[j]->Integral()                       , 200);
-            fitFunc2->SetParameters(h2_d_tot[j]->Integral()                       , 200);
+            fitFunc1->SetParameters(h2_p_tot[j]->Integral() , 200);
+            fitFunc2->SetParameters(h2_d_tot[j]->Integral() , 200);
             fitFunc3->SetParameters((h2_p_tot[j]->Integral()+h2_d_tot[j]->Integral()), 200);
-            h1_p_sur[j]->Fit(fitFunc1, "R"); 
+            h1_p_sur[j]->Fit(fitFunc1, "RS"); 
             h1_d_sur[j]->Fit(fitFunc2, "QSR"); 
-            h_2_sur->Fit(fitFunc3, "R"); 
+            h_2_sur->Fit(fitFunc3, "RS"); 
             fitFunc1->Draw("same");
             fitFunc2->Draw("same");
             fitFunc3->Draw("same");
@@ -435,7 +436,16 @@ void Percentile2DepthEst_Res()
             latex.DrawLatex(0,h_2_sur->GetMaximum()-2000,Form("Fitted #lambda_{d}: %.2f#pm %.2f mm",mixture_length , mixture_length_err ));
             latex.DrawLatex(0,h_2_sur->GetMaximum()-4000,Form("#color[2]{Fitted #lambda_{p} alone: %.2f#pm %.2f mm}",lambda1 , lambda1_err));
             latex.DrawLatex(0,h_2_sur->GetMaximum()-5000,Form("#color[4]{Fitted #lambda_{d} alone: %.2f#pm %.2f mm}",lambda2 , lambda2_err));
-            
+
+            TFitResultPtr r1 = h1_p_sur[j]->Fit(fitFunc1, "RS");
+            if (r1.Get() && r1->IsValid()) {
+                std::cout << "p0 = " << fitFunc1->GetParameter(0)
+                        << ", p1 = " << fitFunc1->GetParameter(1) << std::endl;
+                fitFunc1->Draw("same");
+            } else {
+                std::cerr << "Fit1 failed!" << std::endl;
+            }
+                        
             auto data_sur = ROOT::Fit::BinData(opt, range);
             ROOT::Fit::FillData(data_sur, hC_p_sur[j]); 
             ROOT::Fit::FillData(data_sur, h_2_sur); 
@@ -655,6 +665,16 @@ void Percentile2DepthEst_Res()
         cout << "Survival   90 CL " << CL90_Sur[j] << " , 95 CL = " << CL95_Sur[j] << endl;
         cout << "Interaction 90 CL " << CL90_Int[j] << " , 95 CL = " << CL95_Int[j] << endl;
 
+        // Fit for Survive
+        TF1 *fitFunc1_out = new TF1("fitFunc1_out", "[0]*exp(-(x+12.75)/[1])", 80,270); fitFunc1_out->SetParameters(1e4,200); fitFunc1_out->SetLineColor(kRed);  
+        TF1 *fitFunc2_out = new TF1("fitFunc2_out", "[0]*exp(-(x+12.75)/[1])", 80,270); fitFunc2_out->SetParameters(1e4,200); fitFunc2_out->SetLineColor(kBlue); 
+        TF1 *fitFunc3_out = new TF1("fitFunc3_out", "[0]*exp(-(x+12.75)/[1])", 80,270); fitFunc3_out->SetParameters(1e4,200); fitFunc3_out->SetLineColor(kBlack);
+
+        // Fit for Interaction 
+        TF1 *fitFunc5_out = new TF1("fitFunc5_out", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc5_out->SetParameters(1e4,200); fitFunc5_out->SetLineColor(kRed);  
+        TF1 *fitFunc6_out = new TF1("fitFunc6_out", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc6_out->SetParameters(1e4,170); fitFunc6_out->SetLineColor(kBlue); 
+        TF1 *fitFunc4_out = new TF1("fitFunc4_out", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc4_out->SetParameters(1e4,170); fitFunc4_out->SetLineColor(kBlack);
+
         auto c3 = new TCanvas("c3","c3",2400,1600);
         gStyle->SetOptFit(1111);
         c3->cd();
@@ -671,15 +691,15 @@ void Percentile2DepthEst_Res()
         h1_p_int_orig->SetLineColor(kBlack);
         h1_p_int_orig->SetTitle("Proton N_{inteaction};Depth (mm);Counts");
         h1_p_int_orig->Draw("hist");
-        h1_p_int_orig->Fit(fitFunc5,"QSR");  
-        fitFunc5->Draw("same");
+        h1_p_int_orig->Fit(fitFunc5_out,"QSR");  
+        fitFunc5_out->Draw("same");
         h1_p_inl[j]->SetLineColor(kRed);
         h1_p_inl[j]->Draw("histsame");
         
         auto lg1 = new TLegend(0.3,0.7,0.6,0.88);
         lg1->AddEntry(h1_p_int_orig,"Estimate Depth","l");
         lg1->AddEntry(h1_p_inl[j],"Inelastic Depth","l");
-        lg1->AddEntry(fitFunc5,"Fit on Estimated","l");
+        lg1->AddEntry(fitFunc5_out,"Fit on Estimated","l");
         lg1->Draw();
 
         c3->cd(3);
@@ -688,12 +708,11 @@ void Percentile2DepthEst_Res()
         h1_p_sur_orig->SetLineColor(kBlack);
         h1_p_sur_orig->SetTitle("Proton N_{Survive};Depth (mm);Counts");
         h1_p_sur_orig->Draw("hist");
-        h1_p_sur_orig->Fit(fitFunc1,"QSR");  
-        fitFunc1->Draw("same");
+        h1_p_sur_orig->Fit(fitFunc1_out,"QSR");  
+        fitFunc1_out->Draw("same");
         h1_p_lea[j]->SetLineColor(kRed);
         h1_p_lea[j]->Draw("histsame");
         lg1->Draw();
-
 
         c3->cd(4);
         h2_d_tot_orig->SetTitle(Form("Deuteron Deposit %.f - %.f GeV;True Inelastic Depth (mm);Estimate Depth (mm)", Energy_Dep[j],Energy_Dep[j+1]));
@@ -707,15 +726,15 @@ void Percentile2DepthEst_Res()
         h1_d_int_orig->SetLineColor(kBlack);
         h1_d_int_orig->SetTitle("Deuteron N_{inteaction};Depth (mm);Counts");
         h1_d_int_orig->Draw("hist");
-        h1_d_int_orig->Fit(fitFunc6,"QSR");  
-        fitFunc6->Draw("same");
+        h1_d_int_orig->Fit(fitFunc6_out,"QSR");  
+        fitFunc6_out->Draw("same");
         h1_d_inl[j]->SetLineColor(kBlue);
         h1_d_inl[j]->Draw("histsame");
 
         auto lg2 = new TLegend(0.3,0.7,0.6,0.88);
         lg2->AddEntry(h1_d_int_orig,"Estimate Depth","l");
         lg2->AddEntry(h1_d_inl[j],"Inelastic Depth","l");
-        lg2->AddEntry(fitFunc6,"Fit on Estimated","l");
+        lg2->AddEntry(fitFunc6_out,"Fit on Estimated","l");
         lg2->Draw();
 
         c3->cd(6);
@@ -724,8 +743,8 @@ void Percentile2DepthEst_Res()
         h1_d_sur_orig->SetLineColor(kBlack);
         h1_d_sur_orig->SetTitle("Deuteron N_{Survive};Depth (mm);Counts");
         h1_d_sur_orig->Draw("hist");
-        h1_d_sur_orig->Fit(fitFunc2,"QSR");  
-        fitFunc2->Draw("same");
+        h1_d_sur_orig->Fit(fitFunc2_out,"QSR");  
+        fitFunc2_out->Draw("same");
         h1_d_lea[j]->SetLineColor(kBlue);
         h1_d_lea[j]->Draw("histsame");
         lg2->Draw();
@@ -822,29 +841,29 @@ void Percentile2DepthEst_Res()
         gre_d_reso[j]->Draw("PSAME");
         lg5->Draw();
 
-        grL_p_int->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc5->GetParameter(1));
-        grL_p_int->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc5->GetParError(1));
+        grL_p_int->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc5_out->GetParameter(1));
+        grL_p_int->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc5_out->GetParError(1));
 
-        grL_p_sur->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc1->GetParameter(1));
-        grL_p_sur->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc1->GetParError(1));
+        grL_p_sur->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc1_out->GetParameter(1));
+        grL_p_sur->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc1_out->GetParError(1));
 
-        grL_d_int->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc6->GetParameter(1));
-        grL_d_int->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc6->GetParError(1));
+        grL_d_int->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc6_out->GetParameter(1));
+        grL_d_int->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc6_out->GetParError(1));
 
-        grL_d_sur->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc2->GetParameter(1));
-        grL_d_sur->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc2->GetParError(1));
+        grL_d_sur->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc2_out->GetParameter(1));
+        grL_d_sur->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc2_out->GetParError(1));
 
-        grN_p_int->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc5->GetParameter(0) /  h1_p_int[j]->GetBinWidth(1));
-        grN_p_int->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc5->GetParError(0) /  h1_p_int[j]->GetBinWidth(1));
+        grN_p_int->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc5_out->GetParameter(0) /  h1_p_int[j]->GetBinWidth(1));
+        grN_p_int->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc5_out->GetParError(0) /  h1_p_int[j]->GetBinWidth(1));
 
-        grN_p_sur->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc1->GetParameter(0));
-        grN_p_sur->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc1->GetParError(0));
+        grN_p_sur->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc1_out->GetParameter(0));
+        grN_p_sur->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc1_out->GetParError(0));
 
-        grN_d_int->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc6->GetParameter(0) /  h1_d_int[j]->GetBinWidth(1));
-        grN_d_int->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc6->GetParError(0) /  h1_d_int[j]->GetBinWidth(1));
+        grN_d_int->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc6_out->GetParameter(0) /  h1_d_int[j]->GetBinWidth(1));
+        grN_d_int->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc6_out->GetParError(0) /  h1_d_int[j]->GetBinWidth(1));
 
-        grN_d_sur->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc2->GetParameter(0));
-        grN_d_sur->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc2->GetParError(0));
+        grN_d_sur->SetPoint(j,Energy_Mid_p->GetBinContent(j+1),fitFunc2_out->GetParameter(0));
+        grN_d_sur->SetPointError(j,Energy_Mid_p->GetBinError(j+1),fitFunc2_out->GetParError(0));
 
         line_Ntot->SetPoint(j,Energy_Mid_p->GetBinContent(j+1), h2_p_tot_orig->Integral());
 
