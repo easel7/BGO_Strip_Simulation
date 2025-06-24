@@ -25,8 +25,8 @@ void CrossSection_Dual_Ine_Ratio()
     lamb_int->SetTitle("N_{int};Incident Energy (GeV);True r_{d}; Fitted #lambda_{d}");
     lamb_sur->SetTitle("N_{sur};Incident Energy (GeV);True r_{d}; Fitted #lambda_{d}");
 
-    // for (int k =18; k < 19; k++)
-    for (int k =0; k < 28; k++)
+    for (int k =18; k < 19; k++) // Energy
+    // for (int k =0; k < 28; k++)
     {
         if (k < 10)      {Energy_Name[k] = (k + 1) * 10;        }       // 10 ~ 100
         else if (k < 19) {Energy_Name[k] = (k - 9 + 1) * 100;   }        // 200 ~ 1000
@@ -47,8 +47,8 @@ void CrossSection_Dual_Ine_Ratio()
         auto gre_lambda_d_int = new TGraphErrors();  
         auto gre_lambda_d_sur = new TGraphErrors();
 
-        // for (int i =5; i < 6; i++)
-        for (int i =0; i < 27; i++)
+        for (int i =5; i < 6; i++) // Ratio
+        // for (int i =0; i < 27; i++)
         {
             if      (i < 10)          Ratio[i] = (i + 1) * 0.001;     
             else if (i < 19)          Ratio[i] = (i - 9 + 1) * 0.01;
@@ -92,11 +92,25 @@ void CrossSection_Dual_Ine_Ratio()
             // Fit for Survive
             TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-(x+12.75)/[1])", 0,300); fitFunc1->SetParameters(1e4, 200); fitFunc1->SetLineColor(kRed);  fitFunc1->FixParameter(0,h_p_tot->Integral());
             TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-(x+12.75)/[1])", 0,300); fitFunc2->SetParameters(1e4, 200); fitFunc2->SetLineColor(kBlue); fitFunc2->FixParameter(0,h_d_tot->Integral());
-
+            TF1 *fitFunc3 = new TF1("fitFunc3", "[0]*(1-[1])*exp(-(x+12.75)/[2])+ [0]*[1]*exp(-(x+12.75)/ [3] )", 0,300); fitFunc3->SetParameters(2e4,Ratio[i],200,170); fitFunc3->SetLineColor(kBlack); 
+            fitFunc3->FixParameter(0,(h_p_tot->Integral()+h_d_tot->Integral()));
+            fitFunc3->FixParameter(2,fitFunc1->GetParameter(1));
+            // fitFunc3->FixParameter(3,fitFunc2->GetParameter(1));
+            fitFunc3->SetParLimits(1,1e-3,1);
+            // fitFunc3->SetParLimits(2,fitFunc1->GetParameter(1)/2,fitFunc1->GetParameter(1)*2);
+            fitFunc3->SetParLimits(3,fitFunc1->GetParameter(1)/2,fitFunc1->GetParameter(1));
+            // fitFunc3->SetParLimits(3,-100,0);
             // Fit for Interaction 
-            TF1 *fitFunc5 = new TF1("fitFunc5", "[0]/[1]*exp(-x/[1])", 50,300); fitFunc5->SetParameters(1e5,200); fitFunc5->SetLineColor(kRed);  fitFunc5->FixParameter(0,(h_p_tot->Integral()*h_p_int->GetBinWidth(1)));
-            TF1 *fitFunc6 = new TF1("fitFunc6", "[0]/[1]*exp(-x/[1])", 50,300); fitFunc6->SetParameters(1e5,200); fitFunc6->SetLineColor(kBlue); fitFunc6->FixParameter(0,(h_d_tot->Integral()*h_d_int->GetBinWidth(1)));
-            
+            TF1 *fitFunc5 = new TF1("fitFunc5", "[0]*25.5/[1]*exp(-x/[1])", 50,300); fitFunc5->SetParameters(1e5,200); fitFunc5->SetLineColor(kRed);  fitFunc5->FixParameter(0,(h_p_tot->Integral()));
+            TF1 *fitFunc6 = new TF1("fitFunc6", "[0]*25.5/[1]*exp(-x/[1])", 50,300); fitFunc6->SetParameters(1e5,200); fitFunc6->SetLineColor(kBlue); fitFunc6->FixParameter(0,(h_d_tot->Integral()));
+            TF1 *fitFunc4 = new TF1("fitFunc4", "[0]*25.5*(1-[1]) /[2] *exp(-x/[2])+ [0]*25.5*[1]/[3] *exp(-x/ [3] )", 50,300); fitFunc4->SetParameters(1e5, Ratio[i],200,170); fitFunc4->SetLineColor(kBlack); 
+            fitFunc4->FixParameter(0,(h_p_tot->Integral()+h_d_tot->Integral()));
+            fitFunc4->FixParameter(2,fitFunc5->GetParameter(1));
+            // fitFunc4->FixParameter(3,fitFunc6->GetParameter(1));
+            fitFunc4->SetParLimits(1,1e-3,1);
+            // fitFunc4->SetParLimits(2,fitFunc5->GetParameter(1)/2,fitFunc5->GetParameter(1)*2);
+            fitFunc4->SetParLimits(3,fitFunc5->GetParameter(1)/2,fitFunc5->GetParameter(1));
+            // fitFunc4->SetParLimits(3,-100,0);
             TLatex latex;
             latex.SetTextSize(0.04);
             latex.SetTextFont(72);
@@ -114,18 +128,9 @@ void CrossSection_Dual_Ine_Ratio()
             h_2_sur->Draw("hist");
             h_p_sur->Draw("histsame");
             h_d_sur->Draw("histsame");
-            h_p_sur->Fit(fitFunc1, "R"); 
-            h_d_sur->Fit(fitFunc2, "R"); 
-
-            TF1 *fitFunc3 = new TF1("fitFunc3", "[0]*(1-[1])*exp(-(x+12.75)/[2])+ [0]*[1]*exp(-(x+12.75)/ [3] )", 0,300); fitFunc3->SetParameters(2e4,Ratio[i],200,170); fitFunc3->SetLineColor(kBlack); 
-            fitFunc3->FixParameter(0,(h_p_tot->Integral()+h_d_tot->Integral()));
-            fitFunc3->FixParameter(2,fitFunc1->GetParameter(1));
-            // fitFunc3->FixParameter(3,fitFunc2->GetParameter(1));
-            fitFunc3->SetParLimits(1,1e-3,1);
-            // fitFunc3->SetParLimits(2,fitFunc1->GetParameter(1)/2,fitFunc1->GetParameter(1)*2);
-            fitFunc3->SetParLimits(3,fitFunc1->GetParameter(1)/2,fitFunc1->GetParameter(1));
-            // fitFunc3->SetParLimits(3,-100,0);
-            h_2_sur->Fit(fitFunc3, "R"); 
+            h_p_sur->Fit(fitFunc1, "SR"); 
+            h_d_sur->Fit(fitFunc2, "SR"); 
+            h_2_sur->Fit(fitFunc3, "SR"); 
             fitFunc1->Draw("same");
             fitFunc2->Draw("same");
             fitFunc3->Draw("same");
@@ -157,14 +162,6 @@ void CrossSection_Dual_Ine_Ratio()
             h_d_int->Draw("histsame");
             h_p_int->Fit(fitFunc5,"R");
             h_d_int->Fit(fitFunc6,"R");
-            TF1 *fitFunc4 = new TF1("fitFunc4", "[0]*(1-[1]) /[2] *exp(-x/[2])+ [0]*[1] /[3] *exp(-x/ [3] )", 50,300); fitFunc4->SetParameters(1e5, Ratio[i],200,170); fitFunc4->SetLineColor(kBlack); 
-            fitFunc4->FixParameter(0,(h_p_tot->Integral()+h_d_tot->Integral())*h_p_int->GetBinWidth(1));
-            fitFunc4->FixParameter(2,fitFunc5->GetParameter(1));
-            // fitFunc4->FixParameter(3,fitFunc6->GetParameter(1));
-            fitFunc4->SetParLimits(1,1e-3,1);
-            // fitFunc4->SetParLimits(2,fitFunc5->GetParameter(1)/2,fitFunc5->GetParameter(1)*2);
-            fitFunc4->SetParLimits(3,fitFunc5->GetParameter(1)/2,fitFunc5->GetParameter(1));
-            // fitFunc4->SetParLimits(3,-100,0);
             h_2_int->Fit(fitFunc4,"R"); 
             fitFunc4->Draw("same");
             fitFunc5->Draw("same");
@@ -219,12 +216,12 @@ void CrossSection_Dual_Ine_Ratio()
         gre_int->SetMarkerStyle(20);
         gre_sur->SetMarkerStyle(21);
 
-        auto line_ref = new TLine(5e-3,5e-3,2,2);
+        auto line_ref = new TLine(5e-4,5e-4,2,2);
         line_ref->SetLineColor(kBlack);
         line_ref->SetLineWidth(2);
         line_ref->SetLineStyle(2);
 
-        auto line_vet = new TLine(0.5,5e-3,0.5,2);
+        auto line_vet = new TLine(0.5,5e-4,0.5,2);
         line_vet->SetLineColor(kOrange-3);
         line_vet->SetLineWidth(2);
         line_vet->SetLineStyle(2);
@@ -233,8 +230,8 @@ void CrossSection_Dual_Ine_Ratio()
         gPad->SetGrid(1,1);
         gPad->SetLogx();
         gPad->SetLogy();
-        gre_int->GetXaxis()->SetLimits(5e-3,2);
-        gre_int->GetYaxis()->SetRangeUser(5e-3,2);
+        gre_int->GetXaxis()->SetLimits(5e-4,2);
+        gre_int->GetYaxis()->SetRangeUser(5e-4,2);
         gre_int->SetTitle(";True r_{d};Fitted r_{d}");
         gre_int->Draw("AP");
         gre_sur->Draw("PSAME");
@@ -262,7 +259,8 @@ void CrossSection_Dual_Ine_Ratio()
         c3->cd();
         gPad->SetGrid(1,1);
         gPad->SetLogx();
-        gre_lambda_d_int->GetYaxis()->SetRangeUser(0,200);
+        gre_lambda_d_int->GetXaxis()->SetLimits(5e-4,2e0);
+        gre_lambda_d_int->GetYaxis()->SetRangeUser(0,300);
         gre_lambda_d_int->SetTitle(";True r_{d};Fitted #lambda_{d} (mm)");
         gre_lambda_d_int->Draw("AP");
         gre_lambda_d_sur->Draw("PSAME");
@@ -307,7 +305,7 @@ void CrossSection_Dual_Ine_Ratio()
 
     c4->Divide(2,2);
     c4->cd(1);
-    mg1->GetYaxis()->SetRangeUser(5e-3,2);
+    mg1->GetYaxis()->SetRangeUser(5e-4,2);
     mg1->GetXaxis()->SetLimits(9e0,1.1e4);
     mg1->GetYaxis()->SetTitleSize(0.05);
     mg1->GetXaxis()->SetTitleSize(0.05);
@@ -317,7 +315,7 @@ void CrossSection_Dual_Ine_Ratio()
     mg1->Draw("AL");
 
     c4->cd(2);
-    mg2->GetYaxis()->SetRangeUser(5e-3,2);
+    mg2->GetYaxis()->SetRangeUser(5e-4,2);
     mg2->GetXaxis()->SetLimits(9e0,1.1e4);
     mg2->GetYaxis()->SetTitleSize(0.05);
     mg2->GetXaxis()->SetTitleSize(0.05);

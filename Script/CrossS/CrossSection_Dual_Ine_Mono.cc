@@ -127,9 +127,9 @@ void CrossSection_Dual_Ine_Mono()
             TF1 *fitFunc3 = new TF1("fitFunc3", "[0]*exp(-(x+12.75)/[1])", 60,300); fitFunc3->SetParameters(1e4,200); fitFunc3->SetLineColor(kBlack); fitFunc3->FixParameter(0,(h_p_tot->Integral()+h_d_tot->Integral()));
 
             // Fit for Interaction 
-            TF1 *fitFunc5 = new TF1("fitFunc5", "[0]/[1]*exp(-x/[1])", 60,300); fitFunc5->SetParameters(1e5,200); fitFunc5->SetLineColor(kRed);  fitFunc5->FixParameter(0,(h_p_tot->Integral()*h_p_int->GetBinWidth(1)));
-            TF1 *fitFunc6 = new TF1("fitFunc6", "[0]/[1]*exp(-x/[1])", 60,300); fitFunc6->SetParameters(1e5,200); fitFunc6->SetLineColor(kBlue); fitFunc6->FixParameter(0,(h_d_tot->Integral()*h_d_int->GetBinWidth(1)));
-            TF1 *fitFunc4 = new TF1("fitFunc4", "[0]/[1]*exp(-x/[1])", 60,300); fitFunc4->SetParameters(1e5,200); fitFunc4->SetLineColor(kBlack); fitFunc4->FixParameter(0,(h_p_tot->Integral()+h_d_tot->Integral())*h_p_int->GetBinWidth(1));
+            TF1 *fitFunc5 = new TF1("fitFunc5", "[0]*25.5/[1]*exp(-x/[1])", 60,300); fitFunc5->SetParameters(1e5,200); fitFunc5->SetLineColor(kRed);  fitFunc5->FixParameter(0,(h_p_tot->Integral()));
+            TF1 *fitFunc6 = new TF1("fitFunc6", "[0]*25.5/[1]*exp(-x/[1])", 60,300); fitFunc6->SetParameters(1e5,200); fitFunc6->SetLineColor(kBlue); fitFunc6->FixParameter(0,(h_d_tot->Integral()));
+            TF1 *fitFunc4 = new TF1("fitFunc4", "[0]*25.5/[1]*exp(-x/[1])", 60,300); fitFunc4->SetParameters(1e5,200); fitFunc4->SetLineColor(kBlack); fitFunc4->FixParameter(0,(h_p_tot->Integral()+h_d_tot->Integral()));
 
             TLatex latex;
             latex.SetTextSize(0.04);
