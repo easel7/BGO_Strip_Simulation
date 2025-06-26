@@ -31,7 +31,7 @@ void CrossSection_Dual_Ine_Ratio()
         if (k < 10)      {Energy_Name[k] = (k + 1) * 10;        }       // 10 ~ 100
         else if (k < 19) {Energy_Name[k] = (k - 9 + 1) * 100;   }        // 200 ~ 1000
         else             {Energy_Name[k] = (k - 18 + 1) * 1000; }        // 2000 ~ 10000
-
+        cout << Energy_Name[k] << " GeV " << endl;
         TCut HI  = "First_Ine_Depth>=0 && Nhits >= 10";
         auto file_p  = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Proton_%dGeV.root",Energy_Name[k]));
         auto tree_p  = (TTree*)file_p->Get("B4");
@@ -47,7 +47,7 @@ void CrossSection_Dual_Ine_Ratio()
         auto gre_lambda_d_int = new TGraphErrors();  
         auto gre_lambda_d_sur = new TGraphErrors();
 
-        for (int i =22; i < 23; i++) // Ratio
+        for (int i =12; i < 13; i++) // Ratio
         // for (int i =0; i < 27; i++)
         {
             if      (i < 10)          Ratio[i] = (i + 1) * 0.001;     
@@ -94,16 +94,9 @@ void CrossSection_Dual_Ine_Ratio()
             TF1 *fitFunc2 = new TF1("fitFunc2", Form("%.2f*exp(-(x+12.75)/[0])", h_d_tot->Integral()),50,300); fitFunc2->SetParameters(170); fitFunc2->SetLineColor(kBlue); 
 
             // Fit for Interaction 
-            // TF1 *fitFunc5 = new TF1("fitFunc5", "[0]*25.5/[1]*exp(-x/[1])", 50,300); fitFunc5->SetParameters(1e5,200); fitFunc5->SetLineColor(kRed);  fitFunc5->FixParameter(0,(h_p_tot->Integral()));
-            // TF1 *fitFunc6 = new TF1("fitFunc6", "[0]*25.5/[1]*exp(-x/[1])", 50,300); fitFunc6->SetParameters(1e5,200); fitFunc6->SetLineColor(kBlue); fitFunc6->FixParameter(0,(h_d_tot->Integral()));
-            // TF1 *fitFunc4 = new TF1("fitFunc4", "[0]*25.5*(1-[1]) /[2] *exp(-x/[2])+ [0]*25.5*[1]/[3] *exp(-x/[3] )", 50,300); fitFunc4->SetParameters(1e5, Ratio[i],200,170); fitFunc4->SetLineColor(kBlack); 
-            // fitFunc4->FixParameter(0,(h_p_tot->Integral()+h_d_tot->Integral()));
-            // fitFunc4->FixParameter(2,fitFunc5->GetParameter(1));
-            // // fitFunc4->FixParameter(3,fitFunc6->GetParameter(1));
-            // fitFunc4->SetParLimits(1,1e-4,1);
-            // // fitFunc4->SetParLimits(2,fitFunc5->GetParameter(1)/2,fitFunc5->GetParameter(1)*2);
-            // fitFunc4->SetParLimits(3,fitFunc5->GetParameter(1)/2,fitFunc5->GetParameter(1));
-            // fitFunc4->SetParLimits(3,-100,0);
+            TF1 *fitFunc5 = new TF1("fitFunc5", Form("%.2f*25.5/[0]*exp(-x/[0])", h_p_tot->Integral()), 50,300); fitFunc5->SetParameters(1e5,200); fitFunc5->SetLineColor(kRed); 
+            TF1 *fitFunc6 = new TF1("fitFunc6", Form("%.2f*25.5/[0]*exp(-x/[0])", h_d_tot->Integral()), 50,300); fitFunc6->SetParameters(1e5,200); fitFunc6->SetLineColor(kBlue);
+            
 
             TLatex latex;
             latex.SetTextSize(0.04);
@@ -114,7 +107,7 @@ void CrossSection_Dual_Ine_Ratio()
             TVirtualFitter::SetDefaultFitter("Minuit");
 
             auto c0 = new TCanvas("c0","c0",2400,1000);
-            c0->Divide(3,1);
+            c0->Divide(2,1);
             c0->cd(1);
             gStyle->SetOptStat(0);
             h_p_sur->SetLineColor(kRed);     h_p_sur->SetLineWidth(2);
@@ -125,72 +118,93 @@ void CrossSection_Dual_Ine_Ratio()
             h_2_sur->Draw("hist");
             h_p_sur->Draw("histsame");
             h_d_sur->Draw("histsame");
-            h_p_sur->Fit(fitFunc1, "R"); 
-            h_d_sur->Fit(fitFunc2, "R"); 
-            // TF1 *fitFunc3 = new TF1("fitFunc3", Form("(%.2f-[0])*exp(-(x+12.75)/([2]+[1]))+[0]*exp(-(x+12.75)/[2])",(h_p_tot->Integral()+h_d_tot->Integral())), 50,300); 
-            // fitFunc3->SetParameters(Ratio[i]*(h_p_tot->Integral()+h_d_tot->Integral()),170,30); 
-            // fitFunc3->SetLineColor(kBlack); 
-            // fitFunc3->SetParNames("N_D","lambda_p-lambda_D");
-            // fitFunc3->SetParLimits(0,0,(h_p_tot->Integral()+h_d_tot->Integral()));
-            // fitFunc3->SetParLimits(1,0,200);
-            // fitFunc3->SetParLimits(2,150,250);
-            cout << (h_p_tot->Integral()+h_d_tot->Integral()) << endl;
-            cout << fitFunc1->GetParameter(0) << endl;
+            h_p_sur->Fit(fitFunc1, "QSR"); 
+            h_d_sur->Fit(fitFunc2, "QSR"); 
+            double lambda1     = fitFunc1->GetParameter(0);
+            double lambda1_err = fitFunc1->GetParError(0);
+            double lambda2     = fitFunc2->GetParameter(0);
+            double lambda2_err = fitFunc2->GetParError(0);
+            double Ntotal=h_p_tot->Integral()+h_d_tot->Integral();
+            TF1 *fitFunc3 = new TF1("fitFunc3", Form("(%.6f-[0])*exp(-(x+12.75)*%.6f)+[0]*exp(-(x+12.75)*(%.6f+[1]))",Ntotal,1/lambda1,1/lambda1),50,300); 
+            fitFunc3->SetParameters(Ratio[i]*Ntotal,1/170.-1/200.); 
+            fitFunc3->SetLineColor(kBlack); 
+            fitFunc3->SetParNames("N_D","Delta");
+            // fitFunc3->SetParLimits(0,0.9*Ratio[i]*Ntotal,1.1*Ratio[i]*Ntotal);
+            fitFunc3->SetParLimits(1,1e-8,1e-1);
 
-            for(int ii=0 ; ii < h_2_sur->GetNbinsX(); ii++)
-            {
-                cout << ii << " , x = " << h_p_sur->GetBinCenter(ii+1) + 12.75 << " , y = " << h_2_sur->GetBinContent(ii+1) << " , y_err "<< h_2_sur->GetBinError(ii+1)<< endl;
-            }
+            cout << Ntotal << endl;
+            cout << fitFunc1->GetParameter(0) << endl;
+            // for(int ii=0 ; ii < h_2_sur->GetNbinsX(); ii++)
+            // {
+            //     cout << ii << " , x = " << h_p_sur->GetBinCenter(ii+1) + 12.75 << " , y = " << h_2_sur->GetBinContent(ii+1) << " , y_err "<< h_2_sur->GetBinError(ii+1)<< endl;
+            // }
             h_2_sur->Fit(fitFunc3, "R");
-            // auto gr3 = (TGraph*)gMinuit->Contour(50, 0, 2); 
+            gMinuit->SetErrorDef(2.3);  // 对于 1 sigma 区域
+            // auto gr3 = (TGraph*)gMinuit->Contour(50, 0, 1); 
             // gr3->SetLineColor(kBlack);
             fitFunc1->Draw("same");
             fitFunc2->Draw("same");
             fitFunc3->Draw("same");
             c0->Update();
+            latex.DrawLatex(0,h_2_sur->GetMaximum()-1000,"Function: N_{sur} = N_{tot} #upoint [ (1-^{}r^{}_{d}) #upoint e^{-x/#lambda_{p}} + r_{d} #upoint e^{-x/#lambda_{d}} ] ");
+            // latex.DrawLatex(0,h_2_sur->GetMaximum()-2000,Form("Fitted r_{d}: %.2f#pm %.2f",deuteron_ratio , deuteron_ratio_err ));
+            // latex.DrawLatex(0,h_2_sur->GetMaximum()-3000,Form("Fitted #lambda_{d}: %.2f#pm %.2f mm",deuteron_lambda , deuteron_lambda_err ));
+            latex.DrawLatex(0,h_2_sur->GetMaximum()-4000,Form("#color[2]{Fitted #lambda_{p} alone: %.2f#pm %.2f mm}",lambda1 , lambda1_err));
+            latex.DrawLatex(0,h_2_sur->GetMaximum()-5000,Form("#color[4]{Fitted #lambda_{d} alone: %.2f#pm %.2f mm}",lambda2 , lambda2_err));
 
             c0->cd(2);
-            gPad->SetLogy();
-
-            c0->cd(3);
-            gPad->SetLogy();
+            // gPad->SetLogy();
             // gr3->SetTitle("Fitting Contour Plot for Mixture;#lambda (mm);r_D");
             // gr3->GetYaxis()->SetRangeUser(1e3,2e5);
             // gr3->GetXaxis()->SetLimits(150,250);
             // gr3->Draw("AL");
-
             // double proton_lambda       = fitFunc3->GetParameter(2);
             // double proton_lambda_err   = fitFunc3->GetParError(2);
             // double deuteron_lambda     = fitFunc3->GetParameter(3);
             // double deuteron_lambda_err = fitFunc3->GetParError(3);
             // double deuteron_ratio      = fitFunc3->GetParameter(1);
             // double deuteron_ratio_err  = fitFunc3->GetParError(1);
-            double lambda1     = fitFunc1->GetParameter(0);
-            double lambda1_err = fitFunc1->GetParError(0);
-            double lambda2     = fitFunc2->GetParameter(0);
-            double lambda2_err = fitFunc2->GetParError(0);
-            // latex.DrawLatex(0,h_2_sur->GetMaximum()-1000,"Function: N_{sur} = N_{tot} #upoint [ (1-^{}r^{}_{d}) #upoint e^{-x/#lambda_{p}} + r_{d} #upoint e^{-x/#lambda_{d}} ] ");
-            // latex.DrawLatex(0,h_2_sur->GetMaximum()-2000,Form("Fitted r_{d}: %.2f#pm %.2f",deuteron_ratio , deuteron_ratio_err ));
-            // latex.DrawLatex(0,h_2_sur->GetMaximum()-3000,Form("Fitted #lambda_{d}: %.2f#pm %.2f mm",deuteron_lambda , deuteron_lambda_err ));
-            // latex.DrawLatex(0,h_2_sur->GetMaximum()-4000,Form("#color[2]{Fitted #lambda_{p} alone: %.2f#pm %.2f mm}",lambda1 , lambda1_err));
-            // latex.DrawLatex(0,h_2_sur->GetMaximum()-5000,Form("#color[4]{Fitted #lambda_{d} alone: %.2f#pm %.2f mm}",lambda2 , lambda2_err));
 
-            // c0->cd(2);
-            // h_p_int->SetLineColor(kRed);     h_p_int->SetLineWidth(2);
-            // h_d_int->SetLineColor(kBlue);    h_d_int->SetLineWidth(2);
-            // h_2_int->SetLineColor(kBlack);   h_2_int->SetLineWidth(2);
-            // h_2_int->SetTitle("N_{interaction};Depth(mm);Counts");
-            // h_2_int->GetYaxis()->SetRangeUser(0,1.2*h_2_int->GetMaximum());
-            // h_2_int->Draw("hist");
-            // h_p_int->Draw("histsame");
-            // h_d_int->Draw("histsame");
-            // h_p_int->Fit(fitFunc5,"QR");
-            // h_d_int->Fit(fitFunc6,"QR");
-            // h_2_int->Fit(fitFunc4,"R"); 
-            // // TGraph *gr4 = (TGraph*)gMinuit->Contour(20,1,3);
-            // fitFunc4->Draw("same");
-            // fitFunc5->Draw("same");
-            // fitFunc6->Draw("same");
+            auto c4 = new TCanvas("c4","c4",2500,2500);
+            c4->Divide(2,1);
+            c4->cd(1);
+            h_p_int->SetLineColor(kRed);     h_p_int->SetLineWidth(2);
+            h_d_int->SetLineColor(kBlue);    h_d_int->SetLineWidth(2);
+            h_2_int->SetLineColor(kBlack);   h_2_int->SetLineWidth(2);
+            h_2_int->SetTitle("N_{interaction};Depth(mm);Counts");
+            h_2_int->GetYaxis()->SetRangeUser(0,1.2*h_2_int->GetMaximum());
+            h_2_int->Draw("hist");
+            h_p_int->Draw("histsame");
+            h_d_int->Draw("histsame");
+            h_p_int->Fit(fitFunc5,"QSR");
+            h_d_int->Fit(fitFunc6,"QSR");
+            fitFunc5->Draw("same");
+            fitFunc6->Draw("same");
+            TF1 *fitFunc4 = new TF1("fitFunc4", Form("(%.6f-[0])*%.6f*exp(-x*%.6f)*25.5+[0]*(%.6f+[1])*exp(-x*(%.6f+[1]))*25.5",Ntotal,1/lambda1,1/lambda1,1/lambda1,1/lambda1),50,300); 
+            fitFunc4->SetLineColor(kBlack); 
+            fitFunc4->SetParameters(Ratio[i]*Ntotal,1/170.-1/200.); 
+            // fitFunc4->SetParLimits(0,0.9*Ratio[i]*Ntotal,1.1*Ratio[i]*Ntotal);
+            fitFunc4->SetParLimits(1,1e-8,1e-1);
+            h_2_int->Fit(fitFunc4, "R");
+
+            cout << "xdata = np.array([ " ;
+            for(int ii=0 ; ii < h_2_int->GetNbinsX(); ii++)
+            {
+                cout << h_2_int->GetBinCenter(ii+1)<< " , ";
+            }
+            cout << "]) " << endl;
+            cout << "ydata = np.array([ " ;
+            for(int ii=0 ; ii < h_2_int->GetNbinsX(); ii++)
+            {
+                cout << h_2_int->GetBinContent(ii+1) << " , ";
+            }
+            cout << "]) " << endl;
+            cout << "yerr = np.array([ " ;
+            for(int ii=0 ; ii < h_2_int->GetNbinsX(); ii++)
+            {
+                cout << h_2_int->GetBinError(ii+1)<< " , ";
+            }
+            cout << "]) " << endl;
 
             // double proton_lambda1       = fitFunc4->GetParameter(2);
             // double proton_lambda1_err   = fitFunc4->GetParError(2);
@@ -198,15 +212,15 @@ void CrossSection_Dual_Ine_Ratio()
             // double deuteron_lambda1_err = fitFunc4->GetParError(3);
             // double deuteron_ratio1      = fitFunc4->GetParameter(1);
             // double deuteron_ratio1_err  = fitFunc4->GetParError(1);
-            // double lambda3     = fitFunc5->GetParameter(1);
-            // double lambda3_err = fitFunc5->GetParError(1);
-            // double lambda4     = fitFunc6->GetParameter(1);
-            // double lambda4_err = fitFunc6->GetParError(1);
-            // latex.DrawLatex(0,h_2_int->GetMaximum()-50,"Function: N_{int} = N_{tot} #upoint [  #frac{ 1-^{}r^{}_{d} }{#lambda_{p} } #upoint e^{-x/#lambda_{p} } + #frac{r_{d}}{#lambda_{d}} #upoint e^{-x/#lambda_{d}} ]");
+            double lambda3     = fitFunc5->GetParameter(0);
+            double lambda3_err = fitFunc5->GetParError(0);
+            double lambda4     = fitFunc6->GetParameter(0);
+            double lambda4_err = fitFunc6->GetParError(0);
+            latex.DrawLatex(0,h_2_int->GetMaximum()-50,"Function: N_{int} = N_{tot} #upoint [  #frac{ 1-^{}r^{}_{d} }{#lambda_{p} } #upoint e^{-x/#lambda_{p} } + #frac{r_{d}}{#lambda_{d}} #upoint e^{-x/#lambda_{d}} ]");
             // latex.DrawLatex(0,h_2_int->GetMaximum()-200,Form("Fitted r_{d}: %.2f#pm %.2f",deuteron_ratio1 , deuteron_ratio1_err ));
             // latex.DrawLatex(0,h_2_int->GetMaximum()-300,Form("Fitted #lambda_{d}: %.2f#pm %.2f mm",deuteron_lambda1 , deuteron_lambda1_err ));
-            // latex.DrawLatex(0,h_2_int->GetMaximum()-400,Form("#color[2]{Fitted #lambda_{p} alone: %.2f#pm %.2f mm}",lambda3 , lambda3_err));
-            // latex.DrawLatex(0,h_2_int->GetMaximum()-500,Form("#color[4]{Fitted #lambda_{d} alone: %.2f#pm %.2f mm}",lambda4 , lambda4_err));
+            latex.DrawLatex(0,h_2_int->GetMaximum()-400,Form("#color[2]{Fitted #lambda_{p} alone: %.2f#pm %.2f mm}",lambda3 , lambda3_err));
+            latex.DrawLatex(0,h_2_int->GetMaximum()-500,Form("#color[4]{Fitted #lambda_{d} alone: %.2f#pm %.2f mm}",lambda4 , lambda4_err));
 
             // gre_lambda_d_int->SetPoint(i,0.99*Ratio[i],deuteron_lambda);
             // gre_lambda_d_int->SetPointError(i,0,deuteron_lambda_err);
@@ -227,14 +241,9 @@ void CrossSection_Dual_Ine_Ratio()
             // lamb_sur->SetBinError(k+1,i+1, deuteron_lambda_err);
             // lamb_int->SetBinError(k+1,i+1, deuteron_lambda1_err);
 
-            // auto c4 = new TCanvas("c4","c4",2500,2500);
-            // c4->Divide(2,1);
-            // c4->cd(1);
 
-            // c4->cd(2);
-            // // TVirtualFitter::SetFitter((TVirtualFitter*)minuit4);
-            // // TGraph *gr4 = (TGraph*)gMinuit->Contour(40,1,3);
-            // gr4->Draw("alp");
+
+
 
             // c0->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/CrossS/RatioEnergySearch/Ratio_%.2f_%dGeV.pdf",Ratio[i],Energy_Name[k]));
         } // i Ratio

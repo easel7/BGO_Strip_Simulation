@@ -6,7 +6,7 @@ from scipy.optimize import minimize
 def biexp_model(x, b, p1, delta):
     p2 = p1 + delta
     c = 10000 - b
-    return b * np.exp(p1 * x) + c * np.exp(p2 * x)
+    return 25.5 * (b * (-p1) * np.exp(p1 * x) + c * (-p2) * np.exp(p2 * x))
 
 def objective(params, x, y, yerr):
     b, p1, delta = params
@@ -15,9 +15,9 @@ def objective(params, x, y, yerr):
     return np.sum(residual**2)
 
 # ==== 数据 ====
-xdata = np.array([25.5, 51, 76.5, 102, 127.5, 153, 178.5, 204, 229.5, 255, 280.5, 306, 331.5, 357])
-ydata = np.array([8721.5, 7603.5, 6627, 5819.5, 5068, 4432.5, 3876.5, 3402.5, 2979.5, 2611, 2287, 2015, 1752, 1523])
-yerr  = np.array([93.389, 87.1981, 81.4064, 76.2856, 71.1899, 66.577, 62.2615, 58.331, 54.5848, 51.0979, 47.8226, 44.8888, 41.8569, 39.0256])
+xdata = np.array([ 12.75 , 38.25 , 63.75 , 89.25 , 114.75 , 140.25 , 165.75 , 191.25 , 216.75 , 242.25 , 267.75 , 293.25 , 318.75 , 344.25 ]) 
+ydata = np.array([ 1278.5 , 1118 , 976.5 , 807.5 , 751.5 , 635.5 , 556 , 474 , 423 , 368.5 , 324 , 272 , 263 , 229 ]) 
+yerr = np.array([ 25.2834 , 23.6432 , 22.0964 , 20.0935 , 19.3843 , 17.8255 , 16.6733 , 15.3948 , 14.543 , 13.5739 , 12.7279 , 11.6619 , 11.4673 , 10.7005 ])
 
 # ==== 拟合 ====
 # b, p1, delta
@@ -62,6 +62,7 @@ for i in range(L1.shape[0]):
 
 # ==== 2. λp vs b/10000 轮廓图 ====
 frac_vals = np.linspace(0.3, 0.7, 100)   # b/10000 的比例
+# frac_vals = np.linspace(1e-3, 1, 100)
 L1_, F = np.meshgrid(λ1_vals, frac_vals)
 
 chi2_l1f = np.full_like(L1_, np.nan)
@@ -86,7 +87,7 @@ axs[0].errorbar(xdata, ydata, yerr=yerr, fmt='o', label='MC', capsize=3)
 axs[0].plot(x_fit, y_fit, 'r-', label='Fit')
 axs[0].set_title("Data + Fit")
 axs[0].set_xlabel("Depth (mm)")
-axs[0].set_ylabel("$N_{sur}$")
+axs[0].set_ylabel("$N_{int}$")
 axs[0].legend()
 axs[0].grid(True)
 
@@ -105,7 +106,8 @@ cs2 = axs[2].contourf(L1_, F, chi2_l1f, levels=30, cmap='plasma')
 axs[2].contour(L1_, F, chi2_l1f, levels=[chi2_min + 2.3, chi2_min + 6.18], colors='blue', linestyles='--')
 axs[2].plot(lambda1, frac_fit, 'r*', label='Best Fit')
 axs[2].set_xlabel("λp (mm)")
-axs[2].set_ylabel("Np / 10000")
+# axs[2].set_yscale('log')
+axs[2].set_ylabel("Np/10000")
 axs[2].set_title("χ^2 vs λp, Np / 10000 = r_p")
 axs[2].legend()
 fig.colorbar(cs2, ax=axs[2], label='χ^2')

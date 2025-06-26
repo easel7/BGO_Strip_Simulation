@@ -4,13 +4,13 @@ from scipy.optimize import minimize
 
 # ==== 固定参数 ====
 total_strength = 10000
-p1_fixed = -1 / 207.321  # λ₁ ≈ 200 mm
+p1_fixed = -1 / 205.76  # λ₁ ≈ 200 mm
 
 # ==== 模型 ====
 def biexp_fixed(x, b, delta):
     p2 = p1_fixed + delta
     c = total_strength - b
-    return b * np.exp(p1_fixed * x) + c * np.exp(p2 * x)
+    return  25.5*(- b * p1_fixed * np.exp(p1_fixed * x)  - c * p2 * np.exp(p2 * x))
 
 # ==== 目标函数 ====
 def objective_fixed(params, x, y, yerr):
@@ -20,36 +20,17 @@ def objective_fixed(params, x, y, yerr):
     return np.sum(residual**2)
 
 # ==== 数据 ====
-# 1000 GeV 0.5
-# xdata = np.array([25.5, 51, 76.5, 102, 127.5, 153, 178.5, 204,
-#                   229.5, 255, 280.5, 306, 331.5, 357])
-# ydata = np.array([8721.5, 7603.5, 6627, 5819.5, 5068, 4432.5,
-#                   3876.5, 3402.5, 2979.5, 2611, 2287, 2015,
-#                   1752, 1523])
-# yerr = np.array([93.389, 87.1981, 81.4064, 76.2856, 71.1899,
-#                  66.577, 62.2615, 58.331, 54.5848, 51.0979,
-#                  47.8226, 44.8888, 41.8569, 39.0256])
+# # 1000 GeV 0.5
+# xdata = np.array([ 12.75 , 38.25 , 63.75 , 89.25 , 114.75 , 140.25 , 165.75 , 191.25 , 216.75 , 242.25 , 267.75 , 293.25 , 318.75 , 344.25 ]) 
+# ydata = np.array([ 1278.5 , 1118 , 976.5 , 807.5 , 751.5 , 635.5 , 556 , 474 , 423 , 368.5 , 324 , 272 , 263 , 229 ]) 
+# yerr = np.array([ 25.2834 , 23.6432 , 22.0964 , 20.0935 , 19.3843 , 17.8255 , 16.6733 , 15.3948 , 14.543 , 13.5739 , 12.7279 , 11.6619 , 11.4673 , 10.7005 ])
 
 # 1000 GeV 0.04
-xdata = np.array([
-    25.5, 51, 76.5, 102, 127.5, 153, 178.5, 204,
-    229.5, 255, 280.5, 306, 331.5, 357
-])
-
-ydata = np.array([
-    8840.64, 7764.04, 6859.76, 6069.28, 5346.76, 4719.08,
-    4183.32, 3716.68, 3285.4, 2905.4, 2563.92,
-    2302.96, 2022.48, 1768.64
-])
-
-yerr = np.array([
-    94.0247, 88.1138, 82.8237, 77.9056, 73.1215, 68.6956,
-    64.6786, 60.9646, 57.3184, 53.9018, 50.6352,
-    47.9892, 44.9720, 42.0552
-])
-
+xdata = np.array([ 12.75 , 38.25 , 63.75 , 89.25 , 114.75 , 140.25 , 165.75 , 191.25 , 216.75 , 242.25 , 267.75 , 293.25 , 318.75 , 344.25 ]) 
+ydata = np.array([ 1159.36 , 1076.6 , 904.28 , 790.48 , 722.52 , 627.68 , 535.76 , 466.64 , 431.28 , 380 , 341.48 , 260.96 , 280.48 , 253.84 ]) 
+yerr = np.array([ 32.5756 , 31.476 , 28.7973 , 26.9901 , 25.7838 , 24.0598 , 22.2049 , 20.7422 , 19.9698 , 18.7536 , 17.7932 , 15.4942 , 16.1332 , 15.3705  ])
 # ==== 初始值 & 边界 ====
-initial_guess = [4000,  1/200-1/170]
+initial_guess = [6000,  1/200-1/170]
 bounds = [(0, total_strength), (-1e-1, -1e-6)]
 
 # ==== 拟合 ====
@@ -70,6 +51,7 @@ lambda2 = -1 / p2_fit
 frac_fit = b_fit / total_strength
 chi2_min = objective_fixed([b_fit, delta_fit], xdata, ydata, yerr)
 
+print(f"Delta = {delta_fit:.2f}")
 print(f"✅ 拟合成功：b = {b_fit:.2f} (比例 {frac_fit:.3f})")
 print(f"λ₁ (固定) = {lambda1:.2f} mm")
 print(f"λ₂ = {lambda2:.2f} mm")
@@ -82,7 +64,7 @@ y_fit = biexp_fixed(x_fit, *result.x)
 # ==== λ₂ vs b/10000 contour 图 ====
 lambda2_vals = np.linspace(lambda2 * 0.8, lambda2 * 1.3, 100)
 # frac_vals = np.linspace(0.3, 0.7, 100)
-frac_vals = np.linspace(1e-3, 0.9, 100)
+frac_vals = np.linspace(1e-3, 1, 100)
 L2, F = np.meshgrid(lambda2_vals, frac_vals)
 
 chi2_map = np.full_like(L2, np.nan)
@@ -98,17 +80,21 @@ for i in range(L2.shape[0]):
         chi2_map[i, j] = objective_fixed([b, delta], xdata, ydata, yerr)
 
 # ==== 画图 ====
-fig, axs = plt.subplots(1, 2, figsize=(14, 5))
+fig, axs = plt.subplots(1, 2, figsize=(13, 6))
 
 # 🎯 子图1：数据点和拟合曲线
 axs[0].errorbar(xdata, ydata, yerr=yerr, fmt='o', label='MC data', capsize=3)
 axs[0].plot(x_fit, y_fit, 'r-', label='Fitted')
 axs[0].set_xlabel("Depth (mm)")
-axs[0].set_ylabel("Counts")
+axs[0].set_ylabel("N_{int}")
 axs[0].set_title("Fit with Fixed λ₁ and Total Strength")
 axs[0].legend()
 axs[0].grid(True)
 
+# 修改 contourf：限制 χ² 范围
+# vmin = chi2_min
+# vmax = chi2_min + 10  # 只关注低 χ² 区域
+# levels = np.linspace(vmin, vmax, 30)
 # 🎯 子图2：Contour 图 (λ₂ vs b/10000)
 cs = axs[1].contourf(L2, F, chi2_map, levels=30, cmap='viridis', extend='both')
 axs[1].contour(L2, F, chi2_map, levels=[chi2_min + 2.3, chi2_min + 6.18], colors='red', linestyles='--')
