@@ -1,17 +1,19 @@
 void EnergyMatrix()
 {
-    std::vector<double>* p_EnergyVec = nullptr;    double p_Total_E; double p_Energy; std::vector<double>* p_RMSVec = nullptr;
-    std::vector<double>* d_EnergyVec = nullptr;    double d_Total_E; double d_Energy; std::vector<double>* d_RMSVec = nullptr;
-    std::vector<double>* e_EnergyVec = nullptr;    double e_Total_E; double e_Energy; std::vector<double>* e_RMSVec = nullptr;
-    std::vector<double>* h_EnergyVec = nullptr;    double h_Total_E; double h_Energy; std::vector<double>* h_RMSVec = nullptr;
-    std::vector<double>* H_EnergyVec = nullptr;    double H_Total_E; double H_Energy; std::vector<double>* H_RMSVec = nullptr;
-    std::vector<double>* c_EnergyVec = nullptr;    double c_Total_E; double c_Energy; std::vector<double>* c_RMSVec = nullptr;
+    std::vector<double>* p_EnergyVec = nullptr;    double p_weight; double p_Total_E; double p_Energy; std::vector<double>* p_RMSVec = nullptr;
+    std::vector<double>* d_EnergyVec = nullptr;    double d_weight; double d_Total_E; double d_Energy; std::vector<double>* d_RMSVec = nullptr;
+    std::vector<double>* e_EnergyVec = nullptr;    double e_weight; double e_Total_E; double e_Energy; std::vector<double>* e_RMSVec = nullptr;
+    std::vector<double>* h_EnergyVec = nullptr;    double h_weight; double h_Total_E; double h_Energy; std::vector<double>* h_RMSVec = nullptr;
+    std::vector<double>* H_EnergyVec = nullptr;    double H_weight; double H_Total_E; double H_Energy; std::vector<double>* H_RMSVec = nullptr;
+    std::vector<double>* c_EnergyVec = nullptr;    double c_weight; double c_Total_E; double c_Energy; std::vector<double>* c_RMSVec = nullptr;
 
     auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Proton_PowerLaw.root");
     auto proton_tree = (TTree*)proton_file->Get("B4");
     proton_tree->SetBranchAddress("LayerEnergyVector",&p_EnergyVec);
     proton_tree->SetBranchAddress("Total_E",&p_Total_E);
     proton_tree->SetBranchAddress("Energy",&p_Energy);
+    proton_tree->SetBranchAddress("weight",&p_weight);
+
     proton_tree->SetBranchAddress("RMS",&p_RMSVec);
     auto deuteron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Deuteron_PowerLaw.root");
     auto deuteron_tree = (TTree*)deuteron_file->Get("B4");
@@ -19,33 +21,43 @@ void EnergyMatrix()
     deuteron_tree->SetBranchAddress("Total_E",&d_Total_E);
     deuteron_tree->SetBranchAddress("Energy",&d_Energy);
     deuteron_tree->SetBranchAddress("RMS",&d_RMSVec);
+    deuteron_tree->SetBranchAddress("weight",&d_weight);
+
     auto electron_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Electron_PowerLaw.root");
     auto electron_tree = (TTree*)electron_file->Get("B4");
     electron_tree->SetBranchAddress("LayerEnergyVector",&e_EnergyVec);
     electron_tree->SetBranchAddress("Total_E",&e_Total_E);
     electron_tree->SetBranchAddress("Energy",&e_Energy);
     electron_tree->SetBranchAddress("RMS",&e_RMSVec);
+    electron_tree->SetBranchAddress("weight",&e_weight);
+
     auto helium4_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Helium4_PowerLaw.root");
     auto helium4_tree = (TTree*)helium4_file->Get("B4");
     helium4_tree->SetBranchAddress("LayerEnergyVector",&h_EnergyVec);
     helium4_tree->SetBranchAddress("Total_E",&h_Total_E);
     helium4_tree->SetBranchAddress("Energy",&h_Energy);
     helium4_tree->SetBranchAddress("RMS",&h_RMSVec);
+    helium4_tree->SetBranchAddress("weight",&h_weight);
+
     auto helium3_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Helium3_PowerLaw.root");
     auto helium3_tree = (TTree*)helium3_file->Get("B4");
     helium3_tree->SetBranchAddress("LayerEnergyVector",&H_EnergyVec);
     helium3_tree->SetBranchAddress("Total_E",&H_Total_E);
     helium3_tree->SetBranchAddress("Energy",&H_Energy);
     helium3_tree->SetBranchAddress("RMS",&H_RMSVec);
+    helium3_tree->SetBranchAddress("weight",&H_weight);
+
     auto carbon_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/Carbon_PowerLaw.root");
     auto carbon_tree = (TTree*)carbon_file->Get("B4");
     carbon_tree->SetBranchAddress("LayerEnergyVector",&c_EnergyVec);
     carbon_tree->SetBranchAddress("Total_E",&c_Total_E);
     carbon_tree->SetBranchAddress("Energy",&c_Energy);
     carbon_tree->SetBranchAddress("RMS",&c_RMSVec);
+    carbon_tree->SetBranchAddress("weight",&c_weight);
+
     
     // TCut UBT = "weight*(L0_E>0.0092 && L1_E>0.0092)";
-    TCut HET = "weight*(L0_E>0.23 && L1_E >0.23 && L2_E>0.23 && L3_E>0.046)";
+    // TCut HET = "weight*(L0_E>0.23 && L1_E >0.23 && L2_E>0.23 && L3_E>0.046)";
     // TCut HET = "weight";
 
     auto *h2_p = new TH2D("h2_p","h2_p",40,0,4.0,40,0,4.0); auto *h1_p = new TH2D("h1_p","h1_p",40,0,4.0,40,0,4.0);
@@ -57,12 +69,12 @@ void EnergyMatrix()
 
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     {
-            proton_tree->GetEntry(entry);   h2_p->Fill(log10(p_Energy),log10(p_Total_E));
-            deuteron_tree->GetEntry(entry); h2_d->Fill(log10(d_Energy),log10(d_Total_E));
-            electron_tree->GetEntry(entry); h2_e->Fill(log10(e_Energy),log10(e_Total_E));
-            helium4_tree->GetEntry(entry);  h2_h->Fill(log10(h_Energy),log10(h_Total_E));
-            helium3_tree->GetEntry(entry);  h2_H->Fill(log10(H_Energy),log10(H_Total_E));
-            carbon_tree->GetEntry(entry);   h2_c->Fill(log10(c_Energy),log10(c_Total_E));           
+            proton_tree->GetEntry(entry);   h2_p->Fill(log10(p_Energy),log10(p_Total_E), p_weight);
+            deuteron_tree->GetEntry(entry); h2_d->Fill(log10(d_Energy),log10(d_Total_E), d_weight);
+            electron_tree->GetEntry(entry); h2_e->Fill(log10(e_Energy),log10(e_Total_E), e_weight);
+            helium4_tree->GetEntry(entry);  h2_h->Fill(log10(h_Energy),log10(h_Total_E), h_weight);
+            helium3_tree->GetEntry(entry);  h2_H->Fill(log10(H_Energy),log10(H_Total_E), H_weight);
+            carbon_tree->GetEntry(entry);   h2_c->Fill(log10(c_Energy),log10(c_Total_E), c_weight);           
     }
 
     auto tex = new TLatex(3.8,4.1,"log_{10} Entries");
