@@ -35,7 +35,7 @@ void Percentile2Depth()
         proton_tree->SetBranchAddress("First_Ine_Depth", &p_FI_Dep);
         proton_tree->SetBranchAddress("First_Ine_Layer", &p_FI_Lay);
         proton_tree->SetBranchAddress("Total_E"         ,&p_Total_E);
-        // proton_tree->SetBranchAddress("weight"          ,&p_weight);
+        proton_tree->SetBranchAddress("weight"          ,&p_weight);
         proton_tree->SetBranchAddress("Nhits"          , &p_Nhits);
 
         auto deuteron_file = TFile::Open(Form("/Users/xiongzheng/software/B4/B4e/Root/Deuteron_%dGeV.root",Energy_Name[k]));
@@ -50,7 +50,7 @@ void Percentile2Depth()
         deuteron_tree->SetBranchAddress("First_Ine_Depth", &d_FI_Dep);
         deuteron_tree->SetBranchAddress("First_Ine_Layer", &d_FI_Lay);
         deuteron_tree->SetBranchAddress("Total_E"          ,&d_Total_E);
-        // deuteron_tree->SetBranchAddress("weight"           ,&d_weight);
+        deuteron_tree->SetBranchAddress("weight"           ,&d_weight);
         deuteron_tree->SetBranchAddress("Nhits"          , &d_Nhits);
 
         double Energy[15]={0};

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include "TTree.h"
+#include "TF1.h"
 #include "TFile.h"
 #include "TStyle.h"
 #include "TRandom2.h"
@@ -17,17 +18,28 @@ int main(int argc, char *argv[])
 	double  energy;
 	double weight;
     double energy_res;
+    double energy_new;
+    double Total_E;
     TBranch *newBranch[6];
     TRandom *rand = new TRandom2(1);
     string file_name   = argv[1];
+
+    auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/RecE.root");
+    auto fit_p = (TF1*)proton_file->Get("fit_p");
+    std::cout << "fit_p: a=" << fit_p->GetParameter(0) 
+          << ", b=" << fit_p->GetParameter(1) << std::endl;
+
 	TFile *file = new TFile(file_name.c_str(),"update");
 	TTree *B4 = (TTree*)file->Get("B4");
 	B4->SetBranchAddress("Energy"             , &energy);
+	B4->SetBranchAddress("Total_E"             , &Total_E);
 
 	Long64_t nentries = B4->GetEntries();
     double total_weight = 0.0;
 	newBranch[0] = B4->Branch("weight",&weight,"weight/D");
     newBranch[1] = B4->Branch("energy_res",&energy_res,"energy_res/D");
+    newBranch[2] = B4->Branch("energy_new",&energy_new,"energy_new/D");
+
 	for(Long64_t i=0;i<nentries; i++) 
 	{
         B4->GetEntry(i);
@@ -42,8 +54,10 @@ int main(int argc, char *argv[])
         B4->GetEntry(i);
         weight = pow(energy, -1.7) * norm_factor;
         energy_res = rand->Gaus(energy, 0.1 * energy);
+        energy_new = pow(10, log10(Total_E)*fit_p->GetParameter(1) + fit_p->GetParameter(0) );
         newBranch[0]->Fill();
         newBranch[1]->Fill();
+        newBranch[2]->Fill();
     }
 	B4->Write("", TObject::kOverwrite); // save only the new version of the tree
 	file->Close();
