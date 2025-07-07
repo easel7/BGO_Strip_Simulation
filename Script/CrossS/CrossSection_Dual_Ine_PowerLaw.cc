@@ -35,7 +35,7 @@ void CrossSection_Dual_Ine_PowerLaw()
     auto lamb_int = new TH2D("lamb_int","lamb_int",7,Energy_Bin,28,Ratio_Edge);
     auto lamb_sur = new TH2D("lamb_sur","lamb_sur",7,Energy_Bin,28,Ratio_Edge);
 
-    for(int j=0 ;j< 7 ; j++) // Energy
+    for(int j=2 ;j< 3 ; j++) // Energy
     {
         auto gre_int = new TGraphErrors();  
         auto gre_sur = new TGraphErrors();
@@ -55,7 +55,7 @@ void CrossSection_Dual_Ine_PowerLaw()
         range.SetRange(60, 300);
         auto opt = ROOT::Fit::DataOptions();
 
-        // for (int k =18; k < 19; k++) // Ratio
+        // for (int k =22; k < 23; k++) // Ratio
         for (int k =0; k < 27; k++)
         {
             if      (k < 10)          Ratio[k] = (k + 1) * 0.001;     

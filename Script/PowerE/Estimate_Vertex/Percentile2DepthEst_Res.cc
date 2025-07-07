@@ -1032,7 +1032,7 @@ void Percentile2DepthEst_Res()
     gre_95_int->Draw("LPSAME");
     lg8->Draw();
 
-    auto write_file2 = new TFile("/Users/xiongzheng/software/B4/B4e/Script/MonoE/Estimate_Vertex/DepthEst_Energy.root", "RECREATE");
+    auto write_file2 = new TFile("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/DepthEst_Energy.root", "RECREATE");
     write_file2->cd();
     c6->Write();
     c7->Write();

@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
-# ==== 模型（无 a 项） ====
+# ==== Biexponential ====
 def biexp_model(x, b, p1, delta):
     p2 = p1 + delta
     c = 10000 - b
@@ -14,20 +14,20 @@ def objective(params, x, y, yerr):
     residual = (y - y_fit) / yerr
     return np.sum(residual**2)
 
-# ==== 数据 ====
+# ==== Data ====
 xdata = np.array([ 12.75 , 38.25 , 63.75 , 89.25 , 114.75 , 140.25 , 165.75 , 191.25 , 216.75 , 242.25 , 267.75 , 293.25 , 318.75 , 344.25 ]) 
 ydata = np.array([ 1278.5 , 1118 , 976.5 , 807.5 , 751.5 , 635.5 , 556 , 474 , 423 , 368.5 , 324 , 272 , 263 , 229 ]) 
 yerr = np.array([ 25.2834 , 23.6432 , 22.0964 , 20.0935 , 19.3843 , 17.8255 , 16.6733 , 15.3948 , 14.543 , 13.5739 , 12.7279 , 11.6619 , 11.4673 , 10.7005 ])
 
-# ==== 拟合 ====
+# ==== Fit ====
 # b, p1, delta
 initial_guess = [5000, -1/200, 1/200-1/170]
 bounds = [(0, 10000), (-1e-1, -1e-5), (-1e-1, -1e-10)]
 result = minimize(objective, initial_guess, args=(xdata, ydata, yerr), method='L-BFGS-B', bounds=bounds)
 
-# ==== 提取拟合结果 ====
+# ==== Fit Result ====
 if not result.success:
-    print("❌ 拟合失败：", result.message)
+    print("❌ Fail：", result.message)
     exit()
 
 b_fit, p1_fit, delta_fit = result.x
@@ -37,13 +37,13 @@ lambda2 = -1 / p2_fit
 chi2_min = objective([b_fit, p1_fit, delta_fit], xdata, ydata, yerr)
 frac_fit = b_fit / 10000
 
-print(f"✅ 拟合成功：b = {b_fit:.2f} (比例 {frac_fit:.3f}), λp = {lambda1:.2f}, λd = {lambda2:.2f}, χ^2 = {chi2_min:.2f}")
+print(f"✅ Success：b = {b_fit:.2f} (Ratio {frac_fit:.3f}), λp = {lambda1:.2f}, λd = {lambda2:.2f}, χ^2 = {chi2_min:.2f}")
 
-# ==== 准备画图 ====
+# ==== Prepare ====
 x_fit = np.linspace(min(xdata), max(xdata), 300)
 y_fit = biexp_model(x_fit, b_fit, p1_fit, delta_fit)
 
-# ==== 1. λp vs λd 轮廓图 ====
+# ==== 1. λp vs λd  ====
 λ1_vals = np.linspace(lambda1 * 0.7, lambda1 * 1.3, 100)
 λ2_vals = np.linspace(lambda2 * 0.7, lambda2 * 1.3, 100)
 L1, L2 = np.meshgrid(λ1_vals, λ2_vals)
@@ -60,8 +60,8 @@ for i in range(L1.shape[0]):
         delta = p2 - p1
         chi2_l1l2[i, j] = objective([b_fit, p1, delta], xdata, ydata, yerr)
 
-# ==== 2. λp vs b/10000 轮廓图 ====
-frac_vals = np.linspace(0.3, 0.7, 100)   # b/10000 的比例
+# ==== 2. λp vs b/10000  ====
+frac_vals = np.linspace(0.3, 0.7, 100)   # b/10000 的Ratio
 # frac_vals = np.linspace(1e-3, 1, 100)
 L1_, F = np.meshgrid(λ1_vals, frac_vals)
 
@@ -74,15 +74,15 @@ for i in range(L1_.shape[0]):
         if b <= 0 or b >= 10000:
             continue
         p1 = -1 / l1
-        delta = p2_fit - p1  # 固定 p2
+        delta = p2_fit - p1  # Fix p2
         # if delta <= 0:
         #     continue
         chi2_l1f[i, j] = objective([b, p1, delta], xdata, ydata, yerr)
 
-# ==== 绘图 ====
+# ==== Plot ====
 fig, axs = plt.subplots(1, 3, figsize=(18, 5))
 
-# 1️⃣ 数据与拟合图
+# 1️⃣ Data & Fit
 axs[0].errorbar(xdata, ydata, yerr=yerr, fmt='o', label='MC', capsize=3)
 axs[0].plot(x_fit, y_fit, 'r-', label='Fit')
 axs[0].set_title("Data + Fit")
