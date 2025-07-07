@@ -86,7 +86,7 @@ void Percentile2EnergyEst_New()
         proton_tree->GetEntry(entry);
         if (entry%10000==0) cout << " Proton : " << entry << endl;
         int p_energy_index = int(floor((log10(p_energy_new) ) / 0.2));
-        if (p_energy_index < 0 || p_energy_index > 20) continue;
+        if (p_energy_index < 4 || p_energy_index > 20) continue;
         if (p_FI_Dep < 0) {p_FI_Lay = 14;}
         if (p_Nhits < 10 ) continue;
         h_DepE_p->Fill(p_Energy,p_energy_new,p_weight);
@@ -98,7 +98,7 @@ void Percentile2EnergyEst_New()
         deuteron_tree->GetEntry(entry);
         if (entry%10000==0) cout << " Deuteron : " << entry << endl;
         int d_energy_index = int(floor((log10(d_energy_new) ) / 0.2));
-        if (d_energy_index < 0 || d_energy_index > 20) continue;
+        if (d_energy_index < 4 || d_energy_index > 20) continue;
         if (d_FI_Dep < 0) {d_FI_Lay = 14;}
         if (d_Nhits < 10 ) continue;
         h_DepE_d->Fill(d_Energy,d_energy_new,d_weight);
@@ -146,20 +146,38 @@ void Percentile2EnergyEst_New()
 
 
         c0->cd(3); 
+        langaus_p[j] = new TF1(Form("langaus_p[%d]",j) ,langaufun, Energy_Dep[j]  , 7*Energy_Dep[j+1], 4); 
+        langaus_p[j]->SetLineColor(j+1); 
+        langaus_p[j]->SetParameters(E_br_p[j]->GetStdDev(),E_br_p[j]->GetMean(),E_br_p[j]->Integral(),0.01);
+        langaus_p[j]->SetParLimits(0,0,E_br_p[j]->GetStdDev()*3);
+        langaus_p[j]->SetParLimits(1,0,E_br_p[j]->GetMean()*3);
+        langaus_p[j]->SetParLimits(2,0,1e4);
+        langaus_p[j]->SetParLimits(3,0,1e1);
         if(j==0) E_br_p[j]->Draw("hist");
         else E_br_p[j]->Draw("histsame");
+        E_br_p[j]->Fit(langaus_p[j],"R");        
+        langaus_p[j]->Draw("lsame");
+        Energy_Mid_p->SetBinContent(j+1,langaus_p[j]->GetParameter(1)); //  Get True Energy Peak
+        Energy_Mid_p->SetBinError(j+1,  langaus_p[j]->GetParameter(0)); //  Get True Energy Width
         mean_file->cd();
-        Energy_Mid_p->SetBinContent(j+1,E_br_p[j]->GetMean()); //  Get True Energy Peak
-        Energy_Mid_p->SetBinError(j+1,  E_br_p[j]->GetStdDev()); //  Get True Energy Width
-        hist_p_2->SetBinContent(j+1, gre_p->Eval(E_br_p[j]->GetMean()));
+        hist_p_2->SetBinContent(j+1, gre_p->Eval(langaus_p[j]->GetParameter(1)));
 
         c0->cd(4); 
+        langaus_d[j] = new TF1(Form("langaus_d[%d]",j) , langaufun, Energy_Dep[j]  , 7*Energy_Dep[j+1],4);
+        langaus_d[j]->SetLineColor(j+1); 
+        langaus_d[j]->SetParameters(E_br_d[j]->GetStdDev(),E_br_d[j]->GetMean(),E_br_d[j]->Integral(),0.01);
+        langaus_d[j]->SetParLimits(0,0,E_br_d[j]->GetStdDev()*3);
+        langaus_d[j]->SetParLimits(1,0,E_br_d[j]->GetMean()*3);
+        langaus_d[j]->SetParLimits(2,0,1e4);
+        langaus_d[j]->SetParLimits(3,0,1e1);
         if(j==0) E_br_d[j]->Draw("hist");
         else E_br_d[j]->Draw("histsame");
+        E_br_d[j]->Fit(langaus_d[j],"R");        
+        langaus_d[j]->Draw("lsame");
+        Energy_Mid_d->SetBinContent(j+1, langaus_d[j]->GetParameter(1)); //  Get True Energy Peak
+        Energy_Mid_d->SetBinError(j+1,   langaus_d[j]->GetParameter(0)); //  Get True Energy Width
         mean_file->cd();
-        Energy_Mid_d->SetBinContent(j+1,E_br_d[j]->GetMean()); //  Get True Energy Peak
-        Energy_Mid_d->SetBinError(j+1,  E_br_d[j]->GetStdDev()); //  Get True Energy Width
-        hist_d_2->SetBinContent(j+1, gre_d->Eval(E_br_d[j]->GetMean()));
+        hist_d_2->SetBinContent(j+1, gre_d->Eval(langaus_d[j]->GetParameter(1)));
     }
     
     c0->cd(3); lg0->Draw();

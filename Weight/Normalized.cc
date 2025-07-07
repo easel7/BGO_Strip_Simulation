@@ -25,9 +25,9 @@ int main(int argc, char *argv[])
     string file_name   = argv[1];
 
     auto proton_file = TFile::Open("/Users/xiongzheng/software/B4/B4e/Weight/RecE.root");
-    auto fit_p = (TF1*)proton_file->Get("fit_p");
-    std::cout << "fit_p: a=" << fit_p->GetParameter(0) 
-          << ", b=" << fit_p->GetParameter(1) << std::endl;
+    auto fit_d = (TF1*)proton_file->Get("fit_d");
+    std::cout << "fit_d: a=" << fit_d->GetParameter(0) 
+          << ", b=" << fit_d->GetParameter(1) << std::endl;
 
 	TFile *file = new TFile(file_name.c_str(),"update");
 	TTree *B4 = (TTree*)file->Get("B4");
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
         B4->GetEntry(i);
         weight = pow(energy, -1.7) * norm_factor;
         energy_res = rand->Gaus(energy, 0.1 * energy);
-        energy_new = pow(10, log10(Total_E)*fit_p->GetParameter(1) + fit_p->GetParameter(0) );
+        energy_new = pow(10, log10(Total_E)*fit_d->GetParameter(1) + fit_d->GetParameter(0) );
         newBranch[0]->Fill();
         newBranch[1]->Fill();
         newBranch[2]->Fill();

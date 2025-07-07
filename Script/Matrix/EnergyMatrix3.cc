@@ -7,6 +7,7 @@ void EnergyMatrix3()
 
     int ii;
     double Energy[30]             = {0.};
+    double Energy_Err[30]         = {0.};
     double P_Bias[30]             = {0.};    
     double P_Reso[30]             = {0.};    
     double D_Bias[30]             = {0.};      
@@ -45,42 +46,58 @@ void EnergyMatrix3()
     auto *hR_p = new TH2D("hR_p","hR_p",30,1,4.0,30,-1.5,1.5);  auto *hr_p = new TH2D("hr_p","hr_p",30,1,4.0,30,-1.5,1.5); 
     auto *hR_d = new TH2D("hR_d","hR_d",30,1,4.0,30,-1.5,1.5);  auto *hr_d = new TH2D("hr_d","hr_d",30,1,4.0,30,-1.5,1.5);
 
-    auto *prof_p = new TProfile("prof_p","prof_p",30,1,4,1,4,"s");
-    auto *prof_d = new TProfile("prof_d","prof_d",30,1,4,1,4,"s");
+    auto *prof_p = new TGraphErrors(30);
+    auto *prof_d = new TGraphErrors(30);
 
 
-    TH1D *h0_p[30];
-    TH1D *h0_d[30];
+    TH1D *h0_p[30];     TH1D *hE_p[30]; 
+    TH1D *h0_d[30];     TH1D *hE_d[30]; 
+
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     {
         proton_tree->GetEntry(entry); 
         if (entry%100000==0) cout << " Proton : " << entry << endl;
         int p_energy_index = int(floor((log10(p_Total_E) ) / 0.2));
-        if(p_energy_index < 0 || p_energy_index > 20) continue;
+        if(p_energy_index < 3 || p_energy_index > 20) continue;
         if(p_FI_Dep < 0) continue;
         if (p_Nhits < 10 ) continue;
         h2_p->Fill(  log10(p_Total_E), log10(p_Energy), p_weight); 
-        // hR_p->Fill( log10(p_Energy) , (p_Total_E-p_Energy)/p_Energy ,p_weight);
-        prof_p->Fill( log10(p_Total_E), log10(p_Energy), p_weight);
     }
     for (Long64_t entry = 0; entry < deuteron_tree->GetEntries(); ++entry)
     {
         deuteron_tree->GetEntry(entry); 
         if (entry%100000==0) cout << " Deuteron : " << entry << endl;
         int d_energy_index = int(floor((log10(d_Total_E) ) / 0.2));
-        if(d_energy_index < 0 || d_energy_index > 20) continue;
+        if(d_energy_index < 3 || d_energy_index > 20) continue;
         if(d_FI_Dep < 0) continue;
         if (d_Nhits < 10 ) continue;
         h2_d->Fill( log10(d_Total_E), log10(d_Energy), d_weight); 
-        // hR_d->Fill( log10(d_Energy) , (d_Total_E-d_Energy)/d_Energy ,d_weight);
-        prof_d->Fill(log10(d_Total_E), log10(d_Energy), d_weight);
     }
+    for (int ii=0;ii<30;ii++)
+    {
+        for(int jj=0;jj<30;jj++)
+        {   
+            h1_p->SetBinContent(ii+1,jj+1,log10(h2_p->GetBinContent(ii+1,jj+1)));
+            h1_d->SetBinContent(ii+1,jj+1,log10(h2_d->GetBinContent(ii+1,jj+1)));
+        }
+        Energy[ii]     = 1.05 + 0.1 * ii;
+        Energy_Err[ii] = 0.05;
+        hE_p[ii] = h2_p->ProjectionY(Form("hE_p[%d]",ii),ii+1,ii+2,"");
+        hE_d[ii] = h2_d->ProjectionY(Form("hE_d[%d]",ii),ii+1,ii+2,"");
+        // Use the mode approximation as the bin center of the maximum bin
+        double y_p = hE_p[ii]->GetBinCenter(hE_p[ii]->GetMaximumBin());
+        double y_d = hE_d[ii]->GetBinCenter(hE_d[ii]->GetMaximumBin());
+        prof_p->SetPoint(ii, Energy[ii], y_p);
+        prof_p->SetPointError(ii, Energy_Err[ii], hE_p[ii]->GetStdDev());
+        prof_d->SetPoint(ii, Energy[ii], y_d);
+        prof_d->SetPointError(ii, Energy_Err[ii], hE_d[ii]->GetStdDev());
+    }
+
     auto tex = new TLatex(3.8,4.1,"log_{10} Entries");
     tex->SetTextSize(0.03);
 
-    auto c2 = new TCanvas("c2","c2",2500,1200); c2->Divide(8,5);
-    auto c3 = new TCanvas("c3","c3",2500,1200); c3->Divide(8,5);
-
+    auto c2 = new TCanvas("c2","c2",2500,1200); c2->Divide(6,5);
+    auto c3 = new TCanvas("c3","c3",2500,1200); c3->Divide(6,5);
 
     TF1 *fit_d = new TF1("fit_d", "pol1", 1, 3.5);
     prof_d->Fit(fit_d, "R");
@@ -92,13 +109,14 @@ void EnergyMatrix3()
     fit_p->SetLineWidth(2);
     std::cout << "Proton fit (pol1): " << fit_p->GetParameter(0) << ", "  << fit_p->GetParameter(1) <<  std::endl;
     std::cout << "Deuteron fit (pol1): " << fit_d->GetParameter(0) << ", " << fit_d->GetParameter(1) <<  std::endl;
+    
     for (Long64_t entry = 0; entry < proton_tree->GetEntries(); ++entry)
     {
         proton_tree->GetEntry(entry); 
         if (entry%100000==0) cout << " Proton : " << entry << endl;
         int p_energy_index = int(floor((log10(p_Total_E) ) / 0.2));
         double energy_rec_p =  pow(10, log10(p_Total_E) * fit_p->GetParameter(1) + fit_p->GetParameter(0)) ;
-        if(p_energy_index < 0 || p_energy_index > 20) continue;
+        if(p_energy_index < 3 || p_energy_index > 20) continue;
         if(p_FI_Dep < 0) continue;
         if (p_Nhits < 10 ) continue;
         hR_p->Fill( log10(p_Energy) , (energy_rec_p-p_Energy)/p_Energy ,p_weight);
@@ -109,8 +127,8 @@ void EnergyMatrix3()
         if (entry%100000==0) cout << " Deuteron : " << entry << endl;
         int d_energy_index = int(floor((log10(d_Total_E) ) / 0.2));
         double energy_rec_d =  pow(10, log10(d_Total_E) * fit_d->GetParameter(1) + fit_d->GetParameter(0)) ;
-        if(d_energy_index < 0 || d_energy_index > 20) continue;
-        if(d_FI_Dep < 0) continue;
+        if(d_energy_index < 3 || d_energy_index > 20) continue;
+        if(d_FI_Dep < 0  ) continue;
         if (d_Nhits < 10 ) continue;
         hR_d->Fill( log10(d_Energy) , (energy_rec_d-d_Energy)/d_Energy ,d_weight);
     }
@@ -119,13 +137,10 @@ void EnergyMatrix3()
     {
         for(int jj=0;jj<30;jj++)
         {   
-            h1_p->SetBinContent(ii+1,jj+1,log10(h2_p->GetBinContent(ii+1,jj+1)));
-            h1_d->SetBinContent(ii+1,jj+1,log10(h2_d->GetBinContent(ii+1,jj+1)));
             hr_p->SetBinContent(ii+1,jj+1,log10(hR_p->GetBinContent(ii+1,jj+1)));
             hr_d->SetBinContent(ii+1,jj+1,log10(hR_d->GetBinContent(ii+1,jj+1)));
         }
 
-        Energy[ii]     = 1.05 + 0.1 * ii;
         h0_p[ii] = hR_p->ProjectionY(Form("h0_p[%d]",ii),ii,ii+1,"");
         c2->cd(ii+1);
         h0_p[ii]->Scale(1./h0_p[ii]->Integral());
