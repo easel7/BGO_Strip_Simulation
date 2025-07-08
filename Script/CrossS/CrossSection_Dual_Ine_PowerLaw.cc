@@ -35,7 +35,8 @@ void CrossSection_Dual_Ine_PowerLaw()
     auto lamb_int = new TH2D("lamb_int","lamb_int",7,Energy_Bin,28,Ratio_Edge);
     auto lamb_sur = new TH2D("lamb_sur","lamb_sur",7,Energy_Bin,28,Ratio_Edge);
 
-    for(int j=2 ;j< 3 ; j++) // Energy
+    for(int j=0 ;j< 7 ; j++) // Energy
+    // for(int j=4 ;j< 5 ; j++) // Energy
     {
         auto gre_int = new TGraphErrors();  
         auto gre_sur = new TGraphErrors();
@@ -353,7 +354,7 @@ void CrossSection_Dual_Ine_PowerLaw()
         chi2_sur->GetYaxis()->SetRangeUser(0,20);
         chi2_sur->SetTitle("Fitted From N_{sur};True r_{d};#Delta#chi^{2}");
         chi2_sur->Draw("AL");
-        c2->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/CrossS/RatioEnergySearch/FittedRatio_Res_%dGeV.pdf",Energy_Dep[j]));
+        c2->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/CrossS/RatioEnergySearch/FittedRatio_Res_%dGeV.pdf",int(Energy_Dep[j])));
 
         cout << "Survival   90 CL " << CL90_Sur[j] << " , 95 CL = " << CL95_Sur[j] << endl;
         cout << "Interaction 90 CL " << CL90_Int[j] << " , 95 CL = " << CL95_Int[j] << endl;

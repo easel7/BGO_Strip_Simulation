@@ -155,8 +155,8 @@ void Percentile2DepthEst_New()
             h1_d_Lay[j][i] =new TH1D(Form("h1_d_Lay[%d][%d]",j,i),Form("h1_d_Lay[%d][%d]",j,i),30,-3,3); h1_d_Lay[j][i]->Sumw2();
             if (i<14)
             {
-                fitFunc_p[j][i] = new TF1(Form("fitFunc_p[%d][%d]",j, i), "gaus", -2, 2); // 注意替换范围
-                fitFunc_d[j][i] = new TF1(Form("fitFunc_d[%d][%d]",j, i), "gaus", -2, 2); // 注意替换范围
+                fitFunc_p[j][i] = new TF1(Form("fitFunc_p[%d][%d]",j, i), "gaus", -1, 1); // 注意替换范围
+                fitFunc_d[j][i] = new TF1(Form("fitFunc_d[%d][%d]",j, i), "gaus", -1, 1); // 注意替换范围
             }
         }
     }
@@ -364,14 +364,14 @@ void Percentile2DepthEst_New()
             cout << Ratio[i] << " , " << 1-Ratio[i] <<  endl;
 
             // Fit for Survive
-            TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-(x+12.75)/[1])", 80,270);fitFunc1->SetLineColor(kRed);  
-            TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-(x+12.75)/[1])", 80,270);fitFunc2->SetLineColor(kBlue); 
-            TF1 *fitFunc3 = new TF1("fitFunc3", "[0]*exp(-(x+12.75)/[1])", 80,270);fitFunc3->SetLineColor(kBlack);
+            TF1 *fitFunc1 = new TF1("fitFunc1", "[0]*exp(-(x+12.75)/[1])", 55,200);fitFunc1->SetLineColor(kRed);  
+            TF1 *fitFunc2 = new TF1("fitFunc2", "[0]*exp(-(x+12.75)/[1])", 55,200);fitFunc2->SetLineColor(kBlue); 
+            TF1 *fitFunc3 = new TF1("fitFunc3", "[0]*exp(-(x+12.75)/[1])", 55,200);fitFunc3->SetLineColor(kBlack);
 
             // Fit for Interaction 
-            TF1 *fitFunc5 = new TF1("fitFunc5", "25.5*[0]/[1]*exp(-x/[1])", 80,270);fitFunc5->SetLineColor(kRed);  
-            TF1 *fitFunc6 = new TF1("fitFunc6", "25.5*[0]/[1]*exp(-x/[1])", 80,270);fitFunc6->SetLineColor(kBlue); 
-            TF1 *fitFunc4 = new TF1("fitFunc4", "25.5*[0]/[1]*exp(-x/[1])", 80,270);fitFunc4->SetLineColor(kBlack);
+            TF1 *fitFunc5 = new TF1("fitFunc5", "25.5*[0]/[1]*exp(-x/[1])", 55,200);fitFunc5->SetLineColor(kRed);  
+            TF1 *fitFunc6 = new TF1("fitFunc6", "25.5*[0]/[1]*exp(-x/[1])", 55,200);fitFunc6->SetLineColor(kBlue); 
+            TF1 *fitFunc4 = new TF1("fitFunc4", "25.5*[0]/[1]*exp(-x/[1])", 55,200);fitFunc4->SetLineColor(kBlack);
             // 每次循环开始时重置成原始副本的样子
             *h1_p_int[j] = *h1_p_int_orig;
             *h2_p_tot[j] = *h2_p_tot_orig;
@@ -449,7 +449,7 @@ void Percentile2DepthEst_New()
             auto data_sur = ROOT::Fit::BinData(opt, range);
             ROOT::Fit::FillData(data_sur, hC_p_sur[j]); 
             ROOT::Fit::FillData(data_sur, h_2_sur); 
-            auto *f1_sur = new TF1("f1_sur","[1]*exp(-(x+12.75)/[0])",80,270);
+            auto *f1_sur = new TF1("f1_sur","[1]*exp(-(x+12.75)/[0])",55,200);
             f1_sur->SetParameters(200, (h2_p_tot[j]->Integral()+h2_d_tot[j]->Integral()) );
             f1_sur->SetParLimits(0, 0, 500 );
             auto wf_sur = ROOT::Math::WrappedTF1(*f1_sur);
@@ -523,7 +523,7 @@ void Percentile2DepthEst_New()
             auto data_int = ROOT::Fit::BinData(opt, range);
             ROOT::Fit::FillData(data_int, hC_p_int[j]); // NDF = 13
             ROOT::Fit::FillData(data_int, h_2_int); //
-            auto *f1_int = new TF1("f1_int","25.5*[1]/[0]*exp(-x/[0])",80,270);
+            auto *f1_int = new TF1("f1_int","25.5*[1]/[0]*exp(-x/[0])",55,200);
             f1_int->SetParameters(200 , (h2_p_tot[j]->Integral()+h2_d_tot[j]->Integral()));
             f1_int->SetParLimits(0, 0, 500 );
             auto wf_int = ROOT::Math::WrappedTF1(*f1_int);
@@ -666,14 +666,14 @@ void Percentile2DepthEst_New()
         cout << "Interaction 90 CL " << CL90_Int[j] << " , 95 CL = " << CL95_Int[j] << endl;
 
         // Fit for Survive
-        TF1 *fitFunc1_out = new TF1("fitFunc1_out", "[0]*exp(-(x+12.75)/[1])", 80,270); fitFunc1_out->SetParameters(1e4,200); fitFunc1_out->SetLineColor(kRed);  
-        TF1 *fitFunc2_out = new TF1("fitFunc2_out", "[0]*exp(-(x+12.75)/[1])", 80,270); fitFunc2_out->SetParameters(1e4,200); fitFunc2_out->SetLineColor(kBlue); 
-        TF1 *fitFunc3_out = new TF1("fitFunc3_out", "[0]*exp(-(x+12.75)/[1])", 80,270); fitFunc3_out->SetParameters(1e4,200); fitFunc3_out->SetLineColor(kBlack);
+        TF1 *fitFunc1_out = new TF1("fitFunc1_out", "[0]*exp(-(x+12.75)/[1])", 55,200); fitFunc1_out->SetParameters(1e4,200); fitFunc1_out->SetLineColor(kRed);  
+        TF1 *fitFunc2_out = new TF1("fitFunc2_out", "[0]*exp(-(x+12.75)/[1])", 55,200); fitFunc2_out->SetParameters(1e4,200); fitFunc2_out->SetLineColor(kBlue); 
+        TF1 *fitFunc3_out = new TF1("fitFunc3_out", "[0]*exp(-(x+12.75)/[1])", 55,200); fitFunc3_out->SetParameters(1e4,200); fitFunc3_out->SetLineColor(kBlack);
 
         // Fit for Interaction 
-        TF1 *fitFunc5_out = new TF1("fitFunc5_out", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc5_out->SetParameters(1e4,200); fitFunc5_out->SetLineColor(kRed);  
-        TF1 *fitFunc6_out = new TF1("fitFunc6_out", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc6_out->SetParameters(1e4,170); fitFunc6_out->SetLineColor(kBlue); 
-        TF1 *fitFunc4_out = new TF1("fitFunc4_out", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc4_out->SetParameters(1e4,170); fitFunc4_out->SetLineColor(kBlack);
+        TF1 *fitFunc5_out = new TF1("fitFunc5_out", "25.5*[0]/[1]*exp(-x/[1])", 55,200); fitFunc5_out->SetParameters(1e4,200); fitFunc5_out->SetLineColor(kRed);  
+        TF1 *fitFunc6_out = new TF1("fitFunc6_out", "25.5*[0]/[1]*exp(-x/[1])", 55,200); fitFunc6_out->SetParameters(1e4,170); fitFunc6_out->SetLineColor(kBlue); 
+        TF1 *fitFunc4_out = new TF1("fitFunc4_out", "25.5*[0]/[1]*exp(-x/[1])", 55,200); fitFunc4_out->SetParameters(1e4,170); fitFunc4_out->SetLineColor(kBlack);
 
         auto c3 = new TCanvas("c3","c3",2400,1600);
         gStyle->SetOptFit(1111);

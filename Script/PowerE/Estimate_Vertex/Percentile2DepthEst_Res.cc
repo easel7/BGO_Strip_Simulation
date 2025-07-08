@@ -155,8 +155,8 @@ void Percentile2DepthEst_Res()
             h1_d_Lay[j][i] =new TH1D(Form("h1_d_Lay[%d][%d]",j,i),Form("h1_d_Lay[%d][%d]",j,i),30,-3,3); h1_d_Lay[j][i]->Sumw2();
             if (i<14)
             {
-                fitFunc_p[j][i] = new TF1(Form("fitFunc_p[%d][%d]",j, i), "gaus", -2, 2); // 注意替换范围
-                fitFunc_d[j][i] = new TF1(Form("fitFunc_d[%d][%d]",j, i), "gaus", -2, 2); // 注意替换范围
+                fitFunc_p[j][i] = new TF1(Form("fitFunc_p[%d][%d]",j, i), "gaus", -1, 1); // 注意替换范围
+                fitFunc_d[j][i] = new TF1(Form("fitFunc_d[%d][%d]",j, i), "gaus", -1, 1); // 注意替换范围
             }
         }
     }
@@ -660,7 +660,7 @@ void Percentile2DepthEst_Res()
         chi2_sur->GetYaxis()->SetRangeUser(0,20);
         chi2_sur->SetTitle("Fitted From N_{sur};True r_{d};#Delta#chi^{2}");
         chi2_sur->Draw("AL");
-        c2->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/Poewr/Estimate_Vertex/FittedRatio_%dGeV_%dGeV.pdf",int(Energy_Dep[j]),int(Energy_Dep[j+1])));
+        c2->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/FittedRatio_%dGeV_%dGeV.pdf",int(Energy_Dep[j]),int(Energy_Dep[j+1])));
 
         cout << "Survival   90 CL " << CL90_Sur[j] << " , 95 CL = " << CL95_Sur[j] << endl;
         cout << "Interaction 90 CL " << CL90_Int[j] << " , 95 CL = " << CL95_Int[j] << endl;
@@ -909,6 +909,7 @@ void Percentile2DepthEst_Res()
     grL_d_int->SetMarkerStyle(21);    grN_d_int->SetMarkerStyle(21);
     grL_d_sur->SetMarkerStyle(25);    grN_d_sur->SetMarkerStyle(25);
 
+    auto write_file2 = new TFile("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/DepthEst_Energy.root", "RECREATE");
     auto c6 = new TCanvas("c6","c6",2500,1200);
     c6->Divide(2,1);
     c6->cd(1);
@@ -1032,7 +1033,7 @@ void Percentile2DepthEst_Res()
     gre_95_int->Draw("LPSAME");
     lg8->Draw();
 
-    auto write_file2 = new TFile("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/DepthEst_Energy.root", "RECREATE");
+
     write_file2->cd();
     c6->Write();
     c7->Write();
