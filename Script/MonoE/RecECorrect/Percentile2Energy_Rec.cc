@@ -44,11 +44,11 @@ void Percentile2Energy_Rec()
     double Layer_Err[14]={0};
 
     //
-    auto h2_p = new TH2D("h2_p","Proton;SSP-exit distance/BGO L;Energy Deposit Ratio",28,0,1,25,0,1);
-    auto h2_d = new TH2D("h2_d","Deuteron;SSP-exit distance/BGO L;Energy Deposit Ratio",28,0,1,25,0,1); 
+    auto h2_p = new TH2D("h2_p","Proton;SSP-exit distance/BGO L;Energy Deposit Ratio",200,-20,380,50,0,1);
+    auto h2_d = new TH2D("h2_d","Deuteron;SSP-exit distance/BGO L;Energy Deposit Ratio",200,-20,380,50,0,1); 
 
-    auto h1_p = new TH2D("h1_p","Proton;End Fraction;Energy Deposit Ratio",28,0,1,25,0,1);
-    auto h1_d = new TH2D("h1_d","Deuteron;End Fraction;Energy Deposit Ratio",28,0,1,25,0,1); 
+    auto h1_p = new TH2D("h1_p","Proton;End Fraction;Energy Deposit Ratio",50,0,1,50,0,1);
+    auto h1_d = new TH2D("h1_d","Deuteron;End Fraction;Energy Deposit Ratio",50,0,1,50,0,1); 
 
     for(int i =0 ; i<15 ; i++)  // Deposit Energy Bin
     {
@@ -66,7 +66,7 @@ void Percentile2Energy_Rec()
         if(p_FI_Dep < 0) continue;
         // if (p_Nhits < 10 ) continue;
         // if(p_Total_E / p_energy < 0.2 ) continue;
-        h2_p->Fill((355-p_FI_Dep)/355, p_Total_E / p_energy);
+        h2_p->Fill((p_FI_Dep), p_Total_E / p_energy);
         h1_p->Fill((*p_Efrac)[13], p_Total_E / p_energy);
 
     }
@@ -80,7 +80,7 @@ void Percentile2Energy_Rec()
         if(d_FI_Dep < 0) continue;
         // if (d_Nhits < 10 ) continue;
         // if(d_Total_E / d_energy < 0.2 ) continue;
-        h2_d->Fill((355-d_FI_Dep)/355, d_Total_E / d_energy);
+        h2_d->Fill((d_FI_Dep), d_Total_E / d_energy);
         h1_d->Fill((*d_Efrac)[13], d_Total_E / d_energy);
     }
 
