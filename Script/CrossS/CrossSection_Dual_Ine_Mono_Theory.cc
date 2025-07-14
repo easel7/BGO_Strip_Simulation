@@ -2,21 +2,18 @@ void CrossSection_Dual_Ine_Mono_Theory()
 {
     int Energy_Name[28]={0};
     int Energy_Name_Err[28]={0};
-    double Ratio[28] = {0};
+    double Ratio[50] = {0};
     double CL95_Sur[28]  = {0};    double CL95_Sur_Err[28]  = {0};    
     double CL90_Sur[28]  = {0};    double CL90_Sur_Err[28]  = {0};    
     double CL95_Int[28]  = {0};    double CL95_Int_Err[28]  = {0};    
     double CL90_Int[28]  = {0};    double CL90_Int_Err[28]  = {0};    
     double Energy[28]= {0};    double Energy_Err[28]= {0};
-
-    double Ratio_Edge[29];
     double Energy_Edge[29];
-
     for (int j = 0; j < 29; j++)
     {
-        if (j <= 10)                 { Energy_Edge[j] = 5 + 10 * j;             Ratio_Edge[j] = 0.0005 + 0.001 * j;     }   // Center: 10~100 → edges: 5~105
-        else if (j > 10 && j <= 19)  { Energy_Edge[j] = 150 + 100 * (j - 10);   Ratio_Edge[j] = 0.015 + 0.01 * (j - 10);      }   // Center: 10~100 → edges: 5~105  
-        else                         { Energy_Edge[j] = 1500 + 1000 * (j - 19); Ratio_Edge[j] = 0.15 + 0.1 * (j - 19); } // Center: 2000~10000 → edges: 1500~10500     
+        if (j <= 10)                 { Energy_Edge[j] = 5 + 10 * j;             }   // Center: 10~100 → edges: 5~105
+        else if (j > 10 && j <= 19)  { Energy_Edge[j] = 150 + 100 * (j - 10);   }   // Center: 10~100 → edges: 5~105  
+        else                         { Energy_Edge[j] = 1500 + 1000 * (j - 19); } // Center: 2000~10000 → edges: 1500~10500     
     }
 
     auto file1 = TFile::Open("/Users/xiongzheng/software/Hadr00/build/proton_BGO.root");
@@ -39,12 +36,12 @@ void CrossSection_Dual_Ine_Mono_Theory()
     auto gre6 = new TGraph(Nbins,KN_Energy, KN_Proton);     gre6->SetLineColor(kRed);
     auto gre7 = new TGraph(Nbins,KN_Energy, KN_Deuteron);   gre7->SetLineColor(kBlue);
 
-    auto hist_int = new TH2D("hist_int","hist_int",28,Energy_Edge,28,Ratio_Edge);
-    auto hist_sur = new TH2D("hist_sur","hist_sur",28,Energy_Edge,28,Ratio_Edge);
-    auto lamb_int = new TH2D("lamb_int","lamb_int",28,Energy_Edge,28,Ratio_Edge);
-    auto lamb_sur = new TH2D("lamb_sur","lamb_sur",28,Energy_Edge,28,Ratio_Edge);
+    auto hist_int = new TH2D("hist_int","hist_int",28,Energy_Edge,40,0,0.8);
+    auto hist_sur = new TH2D("hist_sur","hist_sur",28,Energy_Edge,40,0,0.8);
+    auto lamb_int = new TH2D("lamb_int","lamb_int",28,Energy_Edge,40,0,0.8);
+    auto lamb_sur = new TH2D("lamb_sur","lamb_sur",28,Energy_Edge,40,0,0.8);
 
-    // for (int k =18; k < 19; k++)
+    // for (int k =26; k < 27; k++)
     for (int k =0; k < 28; k++)
     {
         if (k < 10)      {Energy_Name[k] = (k + 1) * 10;         Energy[k] = (k + 1) * 10.;       }       // 10 ~ 100
@@ -81,12 +78,9 @@ void CrossSection_Dual_Ine_Mono_Theory()
         auto opt = ROOT::Fit::DataOptions();
 
         // for (int i =6; i < 7; i++)
-        for (int i =0; i < 27; i++)
+        for (int i =0; i < 40; i++)
         {
-            if      (i < 9)           Ratio[i] = 0.9 - i * 0.1;          // 0.9 → 0.1
-            else if (i < 18)          Ratio[i] = 0.09 - (i - 9) * 0.01;    // 0.09 → 0.01
-            else                      Ratio[i] = 0.009 - (i - 18) * 0.001; // 0.009 → 0.001
-
+            Ratio[i] = 0.8 - 0.02*i - 0.01;
             cout << Ratio[i] << " , " << 1-Ratio[i] <<  endl;
             if (gDirectory->FindObject("c0")) delete gDirectory->FindObject("c0");
 
@@ -191,7 +185,7 @@ void CrossSection_Dual_Ine_Mono_Theory()
             auto *f1_sur = new TF1("f1_sur",Form("%.2f*exp(-(x+12.75)/[0])", (h_p_tot->Integral()+h_d_tot->Integral()) ),60,300);
             f1_sur->SetLineColor(kOrange-3);
             f1_sur->FixParameter(0,gre6->Eval(Energy[k]));
-            h_p_sur->Fit(f1_sur,"R");
+            h_2_sur->Fit(f1_sur,"R");
             double Chi2_proton_sur    = f1_sur->GetChisquare();
             double Chi2_mixture_sur   = fitFunc3->GetChisquare();
 
@@ -215,9 +209,9 @@ void CrossSection_Dual_Ine_Mono_Theory()
             h_2_int->SetLineColor(kBlack);   h_2_int->SetLineWidth(2);
             h_2_int->SetTitle("N_{interaction};Depth(mm);Counts");
             h_2_int->GetYaxis()->SetRangeUser(0,1.2*h_2_int->GetMaximum());
-            h_2_int->Draw("hist");
-            h_p_int->Draw("histsame");
-            h_d_int->Draw("histsame");
+            h_2_int->Draw("E");
+            h_p_int->Draw("Esame");
+            h_d_int->Draw("Esame");
             h_p_int->Fit(fitFunc5,"R");
             h_d_int->Fit(fitFunc6,"R");
             h_2_int->Fit(fitFunc4,"R"); 
@@ -239,7 +233,7 @@ void CrossSection_Dual_Ine_Mono_Theory()
             auto *f1_int = new TF1("f1_int",Form("%.2f/[0]*exp(-x/[0])", (h_p_tot->Integral()+h_d_tot->Integral())*h_p_int->GetBinWidth(1) ),60,300);
             f1_int->SetLineColor(kOrange-3);
             f1_int->FixParameter(0,gre6->Eval(Energy[k]));
-            h_p_int->Fit(f1_int,"R");
+            h_2_int->Fit(f1_int,"R");
             double Chi2_proton_int    = f1_int->GetChisquare();
             double Chi2_mixture_int   = fitFunc4->GetChisquare();
 
@@ -300,7 +294,7 @@ void CrossSection_Dual_Ine_Mono_Theory()
         gre_d_int->SetMarkerColor(kBlue);
         gre_d_int->SetMarkerStyle(20);
 
-        gre_int->GetXaxis()->SetLimits(5e-4,2);
+        gre_int->GetXaxis()->SetLimits(9e-3,0.9);
         gre_int->GetYaxis()->SetRangeUser(50,250);
         gre_int->SetTitle(Form("%d GeV Fitted From N_{int};True r_{d};#lambda (mm)",Energy_Name[k]));
         gre_int->Draw("AP");
@@ -331,7 +325,7 @@ void CrossSection_Dual_Ine_Mono_Theory()
         gre_d_sur->SetMarkerColor(kBlue);
         gre_d_sur->SetMarkerStyle(20);
 
-        gre_sur->GetXaxis()->SetLimits(5e-4,2);
+        gre_sur->GetXaxis()->SetLimits(9e-3,0.9);
         gre_sur->GetYaxis()->SetRangeUser(50,250);
         gre_sur->SetTitle(Form("%d GeV Fitted From N_{sur};True r_{d};#lambda (mm)",Energy_Name[k]));
         gre_sur->Draw("AP");
@@ -349,7 +343,7 @@ void CrossSection_Dual_Ine_Mono_Theory()
         gPad->SetLogx();
         chi2_int->SetLineColor(kRed);
         chi2_int->SetLineWidth(2);
-        chi2_int->GetXaxis()->SetLimits(5e-4,2);
+        chi2_int->GetXaxis()->SetLimits(9e-3,0.9);
         chi2_int->GetYaxis()->SetRangeUser(0,20);
         chi2_int->SetTitle("Fitted From N_{int};True r_{d};#Delta#chi^{2}");
         chi2_int->Draw("AL");
@@ -359,16 +353,14 @@ void CrossSection_Dual_Ine_Mono_Theory()
         gPad->SetLogx();
         chi2_sur->SetLineColor(kRed);
         chi2_sur->SetLineWidth(2);
-        chi2_sur->GetXaxis()->SetLimits(5e-4,2);
+        chi2_sur->GetXaxis()->SetLimits(9e-3,0.9);
         chi2_sur->GetYaxis()->SetRangeUser(0,20);
         chi2_sur->SetTitle("Fitted From N_{sur};True r_{d};#Delta#chi^{2}");
         chi2_sur->Draw("AL");
-        // // c2->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/CrossS/RatioEnergySearch/FittedRatio_%dGeV.pdf",Energy_Name[k]));
+        c2->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/CrossS/RatioEnergySearch/FittedRatio_%dGeV.pdf",Energy_Name[k]));
 
         // cout << "Survival   90 CL " << CL90_Sur[k] << " , 95 CL = " << CL95_Sur[k] << endl;
         // cout << "Interaction 90 CL " << CL90_Int[k] << " , 95 CL = " << CL95_Int[k] << endl;
-
-
     }// k Energy
     auto gre_90_sur = new TGraph(28,Energy,CL90_Sur); //,Energy_Name_Err,CL90_Sur_Err
     auto gre_95_sur = new TGraph(28,Energy,CL95_Sur); //,Energy_Name_Err,CL95_Sur_Err
@@ -392,7 +384,7 @@ void CrossSection_Dual_Ine_Mono_Theory()
     gPad->SetGrid(1,1);
     gPad->SetLogy();
     gPad->SetLogx();
-    gre_90_sur->GetYaxis()->SetRangeUser(9e-4,2);
+    gre_90_sur->GetYaxis()->SetRangeUser(9e-3,0.9);
     gre_90_sur->GetXaxis()->SetLimits(9e0,2e4);
     gre_90_sur->SetTitle("Sensitivity Curve from N_{sur};Energy(GeV); True r_{d}");
     gre_90_sur->Draw("ALP");
@@ -406,11 +398,11 @@ void CrossSection_Dual_Ine_Mono_Theory()
     gPad->SetGrid(1,1);
     gPad->SetLogy();
     gPad->SetLogx();
-    gre_90_int->GetYaxis()->SetRangeUser(9e-4,2);
+    gre_90_int->GetYaxis()->SetRangeUser(9e-3,0.9);
     gre_90_int->GetXaxis()->SetLimits(9e0,2e4);
     gre_90_int->SetTitle("Sensitivity Curve from N_{int};Energy(GeV); True r_{d}");
     gre_90_int->Draw("ALP");
     gre_95_int->Draw("LPSAME");
     lg4->Draw();
-
+    c4->SaveAs("/Users/xiongzheng/software/B4/B4e/Script/CrossS/RatioEnergySearch/FittedRatio_Mono_Theory.pdf");
 }
