@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 	TFile *file = new TFile(file_name.c_str(),"update");
 	TTree *B4 = (TTree*)file->Get("B4");
 	B4->SetBranchAddress("Energy"             , &energy);
-	B4->SetBranchAddress("Total_E"             , &Total_E);
+	B4->SetBranchAddress("Total_E"            , &Total_E);
 
 	Long64_t nentries = B4->GetEntries();
     double total_weight = 0.0;
@@ -53,8 +53,8 @@ int main(int argc, char *argv[])
     for (Long64_t i = 0; i < nentries; i++) {
         B4->GetEntry(i);
         weight = pow(energy, -1.7) * norm_factor;
-        // energy_res = rand->Gaus(energy, 0.3 * energy);
-        energy_res = rand->Gaus(0.6 * energy, 0);
+        energy_res = rand->Gaus(energy, 0.3 * energy);
+        // energy_res = rand->Gaus(0.6 * energy, 0);
         energy_new = pow(10, log10(Total_E)*fit_d->GetParameter(1) + fit_d->GetParameter(0) );
         newBranch[0]->Fill();
         newBranch[1]->Fill();

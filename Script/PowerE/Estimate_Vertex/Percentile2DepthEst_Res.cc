@@ -6,23 +6,15 @@ void Percentile2DepthEst_Res()
     double Energy_Dep[8] = {8,19,43,100,320,1e3,3.2e3,1e4};
     double Energy_Bin[7] = {0};
 
-    double Ratio[28] = {0};
+    double Ratio[50] = {0};
     double CL95_Sur[7]  = {0};    double CL95_Sur_Err[7]  = {0};    
     double CL90_Sur[7]  = {0};    double CL90_Sur_Err[7]  = {0};    
     double CL95_Int[7]  = {0};    double CL95_Int_Err[7]  = {0};    
     double CL90_Int[7]  = {0};    double CL90_Int_Err[7]  = {0};    
-    double Ratio_Edge[29];
 
     auto mean_file    = TFile::Open("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/EnergyEst_Res.root");
     auto hist_p_2     = (TH1D*)mean_file->Get("hist_p_2");
     auto Energy_Mid_p = (TH1D*)mean_file->Get("Energy_Mid_p");
-
-    for (int j = 0; j < 29; j++)
-    {
-        if (j <= 10)                 { Ratio_Edge[j] = 0.0005 + 0.001 * j;     }   // Center: 10~100 → edges: 5~105
-        else if (j > 10 && j <= 19)  { Ratio_Edge[j] = 0.015 + 0.01 * (j - 10);      }   // Center: 10~100 → edges: 5~105  
-        else                         { Ratio_Edge[j] = 0.15 + 0.1 * (j - 19); } // Center: 2000~10000 → edges: 1500~10500     
-    }
 
     int nbins = 60;
     double xmin = 1e1;
@@ -355,12 +347,10 @@ void Percentile2DepthEst_Res()
         auto h1_p_sur_orig = (TH1D*)h1_p_sur[j]->Clone("h1_p_sur_orig");
         auto h1_d_sur_orig = (TH1D*)h1_d_sur[j]->Clone("h1_d_sur_orig");
 
-        for (int i =0; i < 27; i++) // Ratio
+        for (int i =0; i < 50; i++) // Ratio
         // for (int i =26; i < 27; i++)
         {
-            if      (i < 10)          Ratio[i] = (i + 1) * 0.001;     
-            else if (i < 19)          Ratio[i] = (i - 9 + 1) * 0.01;
-            else                      Ratio[i] = (i - 18 + 1) * 0.1;  
+            Ratio[i] = 0.01 + i *0.02;
             cout << Ratio[i] << " , " << 1-Ratio[i] <<  endl;
 
             // Fit for Survive
@@ -660,7 +650,7 @@ void Percentile2DepthEst_Res()
         chi2_sur->GetYaxis()->SetRangeUser(0,20);
         chi2_sur->SetTitle("Fitted From N_{sur};True r_{d};#Delta#chi^{2}");
         chi2_sur->Draw("AL");
-        c2->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/FittedRatio_%dGeV_%dGeV.pdf",int(Energy_Dep[j]),int(Energy_Dep[j+1])));
+        // c2->SaveAs(Form("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/FittedRatio_%dGeV_%dGeV.pdf",int(Energy_Dep[j]),int(Energy_Dep[j+1])));
 
         cout << "Survival   90 CL " << CL90_Sur[j] << " , 95 CL = " << CL95_Sur[j] << endl;
         cout << "Interaction 90 CL " << CL90_Int[j] << " , 95 CL = " << CL95_Int[j] << endl;
@@ -909,7 +899,7 @@ void Percentile2DepthEst_Res()
     grL_d_int->SetMarkerStyle(21);    grN_d_int->SetMarkerStyle(21);
     grL_d_sur->SetMarkerStyle(25);    grN_d_sur->SetMarkerStyle(25);
 
-    auto write_file2 = new TFile("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/DepthEst_Energy.root", "RECREATE");
+    auto write_file2 = new TFile("/Users/xiongzheng/software/B4/B4e/Script/PowerE/Estimate_Vertex/DepthEst_Energy_Res.root", "RECREATE");
     auto c6 = new TCanvas("c6","c6",2500,1200);
     c6->Divide(2,1);
     c6->cd(1);
@@ -1006,13 +996,16 @@ void Percentile2DepthEst_Res()
     gre_90_int->SetLineWidth(2);
     gre_95_int->SetLineWidth(2);
 
+    gre_90_int->SetName("gre_90_int");
+    gre_95_int->SetName("gre_95_int");
+
     auto c8 = new TCanvas("c8","c8",2500,1200);
     c8->Divide(2,1);
     c8->cd(1);
     gPad->SetGrid(1,1);
     gPad->SetLogy();
     gPad->SetLogx();
-    gre_90_sur->GetYaxis()->SetRangeUser(9e-4,2);
+    gre_90_sur->GetYaxis()->SetRangeUser(9e-3,2);
     gre_90_sur->GetXaxis()->SetLimits(9e0,2e4);
     gre_90_sur->SetTitle("Sensitivity Curve from N_{sur};Energy(GeV); True r_{d}");
     gre_90_sur->Draw("ALP");
@@ -1026,7 +1019,7 @@ void Percentile2DepthEst_Res()
     gPad->SetGrid(1,1);
     gPad->SetLogy();
     gPad->SetLogx();
-    gre_90_int->GetYaxis()->SetRangeUser(9e-4,2);
+    gre_90_int->GetYaxis()->SetRangeUser(9e-3,2);
     gre_90_int->GetXaxis()->SetLimits(9e0,2e4);
     gre_90_int->SetTitle("Sensitivity Curve from N_{int};Energy(GeV); True r_{d}");
     gre_90_int->Draw("ALP");
@@ -1035,6 +1028,8 @@ void Percentile2DepthEst_Res()
 
 
     write_file2->cd();
+    gre_90_int->Write();
+    gre_95_int->Write();
     c6->Write();
     c7->Write();
     c8->Write();

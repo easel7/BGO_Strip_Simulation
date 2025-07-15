@@ -5,7 +5,7 @@ void Percentile2DepthEst_Mono_Theory()
 {
     int Energy_Name[28]={0};
     int Energy_Name_Err[28]={0};
-    double Ratio[28] = {0};
+    double Ratio[50] = {0};
     double CL95_Sur[28]  = {0};    double CL95_Sur_Err[28]  = {0};    
     double CL90_Sur[28]  = {0};    double CL90_Sur_Err[28]  = {0};    
     double CL95_Int[28]  = {0};    double CL95_Int_Err[28]  = {0};    
@@ -52,9 +52,9 @@ void Percentile2DepthEst_Mono_Theory()
     auto gre6 = new TGraph(Nbins,KN_Energy, KN_Proton);     gre6->SetLineColor(kRed);
     auto gre7 = new TGraph(Nbins,KN_Energy, KN_Deuteron);   gre7->SetLineColor(kBlue);
 
-    // for (int k =0; k < 28; k++) //. Energy
+    for (int k =0; k < 28; k++) //. Energy
     // for (int k =1; k < 2; k++)
-    for (int k =23; k < 24; k++)
+    // for (int k =23; k < 24; k++)
     {
         if (k < 10)      { Energy_Name[k] = (k + 1) * 10;            Energy[k] = (k + 1) * 10.;       }       // 10 ~ 100
         else if (k < 19) { Energy_Name[k] = (k - 9 + 1) * 100;       Energy[k] = (k - 9 + 1) * 100.;  }        // 200 ~ 1000
@@ -310,8 +310,8 @@ void Percentile2DepthEst_Mono_Theory()
 
         // Fit for Interaction 
         TF1 *fitFunc5 = new TF1("fitFunc5", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc5->SetParameters(1e4,200); fitFunc5->SetLineColor(kRed);  
-        TF1 *fitFunc6 = new TF1("fitFunc6", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc6->SetParameters(1e4,170); fitFunc6->SetLineColor(kBlue); 
-        TF1 *fitFunc4 = new TF1("fitFunc4", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc4->SetParameters(1e4,170); fitFunc4->SetLineColor(kBlack);
+        TF1 *fitFunc6 = new TF1("fitFunc6", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc6->SetParameters(1e4,200); fitFunc6->SetLineColor(kBlue); 
+        TF1 *fitFunc4 = new TF1("fitFunc4", "25.5*[0]/[1]*exp(-x/[1])", 80,270); fitFunc4->SetParameters(1e4,200); fitFunc4->SetLineColor(kBlack);
 
         for(int ii = 1 ; ii <= hC_p_int->GetNbinsX() ; ii++)
         {
@@ -333,13 +333,11 @@ void Percentile2DepthEst_Mono_Theory()
         auto h1_d_sur_orig = (TH1D*)h1_d_sur->Clone("h1_d_sur_orig");
 
 
-        for (int i =0; i < 27; i++) // Ratio
+        for (int i =0; i < 50; i++) // Ratio
         // for (int i =18; i < 19; i++)
         {
-            if      (i < 9)           Ratio[i] = 0.9 - i * 0.1;          // 0.9 → 0.1
-            else if (i < 18)          Ratio[i] = 0.09 - (i - 9) * 0.01;    // 0.09 → 0.01
-            else                      Ratio[i] = 0.009 - (i - 18) * 0.001; // 0.009 → 0.001
-            cout << Ratio[i] << " , " << 1-Ratio[i] <<  endl;
+            Ratio[i] = 1.0 - 0.02*i - 0.01;
+            // cout << Ratio[i] << " , " << 1-Ratio[i] <<  endl;
             // 每次循环开始时重置成原始副本的样子
             *h1_p_int = *h1_p_int_orig;
             *h2_p_tot = *h2_p_tot_orig;
@@ -384,9 +382,9 @@ void Percentile2DepthEst_Mono_Theory()
             h_2_sur->SetLineColor(kBlack);   h_2_sur->SetLineWidth(2);
             h_2_sur->SetTitle("N_{survive};Depth(mm);Counts");
             h_2_sur->GetYaxis()->SetRangeUser(0,1.2*h_2_sur->GetMaximum());
-            h_2_sur->Draw("hist");
-            h1_p_sur->Draw("histsame");
-            h1_d_sur->Draw("histsame");
+            h_2_sur->Draw("E");
+            h1_p_sur->Draw("Esame");
+            h1_d_sur->Draw("Esame");
             fitFunc1->SetParameters(h2_p_tot->Integral()                       , 200);
             fitFunc2->SetParameters(h2_d_tot->Integral()                       , 200);
             fitFunc3->SetParameters((h2_p_tot->Integral()+h2_d_tot->Integral()), 200);
@@ -408,15 +406,15 @@ void Percentile2DepthEst_Mono_Theory()
             latex.DrawLatex(0,h_2_sur->GetMaximum()-4000,Form("#color[2]{Fitted #lambda_{p} alone: %.2f#pm %.2f mm}",lambda1 , lambda1_err));
             latex.DrawLatex(0,h_2_sur->GetMaximum()-5000,Form("#color[4]{Fitted #lambda_{d} alone: %.2f#pm %.2f mm}",lambda2 , lambda2_err));
             
-            auto *f1_sur = new TF1("f1_sur",Form("%.2f*exp(-(x+12.75)/[0])", (h2_p_tot->Integral()+h2_d_tot->Integral()) ),60,300);
+            auto *f1_sur = new TF1("f1_sur","[0]*exp(-(x+12.75)/[1])", 80,270);
+            f1_sur->SetParameters((h2_p_tot->Integral()+h2_d_tot->Integral()), 200);
+            f1_sur->FixParameter(1,gre6->Eval(Energy[k]));
             f1_sur->SetLineColor(kOrange-3);
-            f1_sur->FixParameter(0,gre6->Eval(Energy[k]));
-            h_p_sur->Fit(f1_sur,"R");
+            h_2_sur->Fit(f1_sur,"QSR");
             double Chi2_proton_sur    = f1_sur->GetChisquare();
             double Chi2_mixture_sur   = fitFunc3->GetChisquare();
 
-            cout << Chi2_proton_sur << endl;
-            cout << Chi2_mixture_sur << endl;
+            cout << Ratio[i] << " ," << Chi2_proton_sur - Chi2_mixture_sur << endl;
 
             if( (Chi2_proton_sur - Chi2_mixture_sur ) <= 2.71 && Sur_90_Tag < 0) 
             { 
@@ -435,12 +433,12 @@ void Percentile2DepthEst_Mono_Theory()
             h_2_int->SetLineColor(kBlack);   h_2_int->SetLineWidth(2);
             h_2_int->SetTitle("N_{interaction};Depth(mm);Counts");
             h_2_int->GetYaxis()->SetRangeUser(0,1.2*h_2_int->GetMaximum());
-            h_2_int->Draw("hist");
-            h1_p_int->Draw("histsame");
-            h1_d_int->Draw("histsame");
-            fitFunc5->SetParameters((h2_p_tot->Integral())                     , 170);
-            fitFunc6->SetParameters((h2_d_tot->Integral())                     , 170);
-            fitFunc4->SetParameters((h2_p_tot->Integral()+h2_d_tot->Integral()), 170);
+            h_2_int->Draw("E");
+            h1_p_int->Draw("Esame");
+            h1_d_int->Draw("Esame");
+            fitFunc5->SetParameters((h2_p_tot->Integral())                     , 200);
+            fitFunc6->SetParameters((h2_d_tot->Integral())                     , 200);
+            fitFunc4->SetParameters((h2_p_tot->Integral()+h2_d_tot->Integral()), 200);
             h1_p_int->Fit(fitFunc5,"QSR");
             h1_d_int->Fit(fitFunc6,"QSR");
             h_2_int->Fit(fitFunc4,"QSR"); 
@@ -459,10 +457,11 @@ void Percentile2DepthEst_Mono_Theory()
             latex.DrawLatex(0,h_2_int->GetMaximum()-400,Form("#color[2]{Fitted #lambda_{p} alone: %.2f#pm %.2f mm}",lambda3 , lambda3_err));
             latex.DrawLatex(0,h_2_int->GetMaximum()-500,Form("#color[4]{Fitted #lambda_{d} alone: %.2f#pm %.2f mm}",lambda4 , lambda4_err));
 
-            auto *f1_int = new TF1("f1_int",Form("%.2f/[0]*exp(-x/[0])", (h2_p_tot->Integral()+h2_d_tot->Integral()) ),60,300);
+            auto *f1_int = new TF1("f1_int","25.5*[0]/[1]*exp(-x/[1])",80,270);
+            f1_int->SetParameters((h2_p_tot->Integral()+h2_d_tot->Integral()), 200);
             f1_int->SetLineColor(kOrange-3);
-            f1_int->FixParameter(0,gre6->Eval(Energy[k]));
-            h_p_int->Fit(f1_int,"R");
+            f1_int->FixParameter(1,gre6->Eval(Energy[k]));
+            h_2_int->Fit(f1_int,"QSR");
             double Chi2_proton_int    = f1_int->GetChisquare();
             double Chi2_mixture_int   = fitFunc4->GetChisquare();
 
@@ -477,29 +476,31 @@ void Percentile2DepthEst_Mono_Theory()
                 CL95_Int[k] = Ratio[i];
                 Int_95_Tag = 1;
             }
-            // if (Ratio[i] == 0.9 && Int_95_Tag < 0 )
-            // {
-            //     CL95_Int[k] = Ratio[i];
-            //     Int_95_Tag = 1;
-            // }
+            if (Ratio[i] == 0.01 && Int_95_Tag < 0 )
+            {
+                CL95_Int[k] = Ratio[i];
+                Int_95_Tag = 1;
+            }
 
-            chi2_int->SetPoint(i,Ratio[i],Chi2_proton_sur - Chi2_mixture_sur);
-            chi2_sur->SetPoint(i,Ratio[i],Chi2_proton_int - Chi2_mixture_int);
+            chi2_int->SetPoint(i,Ratio[i],Chi2_proton_int - Chi2_mixture_int);
+            chi2_sur->SetPoint(i,Ratio[i],Chi2_proton_sur - Chi2_mixture_sur);
 
             gre_sur->SetPoint(i,Ratio[i],mixture_length);
             gre_sur->SetPointError(i,0,mixture_length_err);
             gre_int->SetPoint(i,Ratio[i],mixture_length1);
             gre_int->SetPointError(i,0,mixture_length1_err);
 
-            gre_p_sur->SetPoint(i,Ratio[i],lambda1);
-            gre_p_sur->SetPointError(i,0,lambda1_err);
-            gre_p_int->SetPoint(i,Ratio[i],lambda3);
-            gre_p_int->SetPointError(i,0,lambda3_err);
 
-            gre_d_sur->SetPoint(i,Ratio[i],lambda2);
-            gre_d_sur->SetPointError(i,0,lambda2_err);
-            gre_d_int->SetPoint(i,Ratio[i],lambda4);
-            gre_d_int->SetPointError(i,0,lambda4_err);
+            gre_p_sur->SetPoint(i,Ratio[i],gre6->Eval(Energy[k]));
+            gre_p_sur->SetPointError(i,0,0);
+            gre_p_int->SetPoint(i,Ratio[i],gre6->Eval(Energy[k]));
+            gre_p_int->SetPointError(i,0,0);
+
+            gre_d_sur->SetPoint(i,Ratio[i],gre7->Eval(Energy[k]));
+            gre_d_sur->SetPointError(i,0,0);
+            gre_d_int->SetPoint(i,Ratio[i],gre7->Eval(Energy[k]));
+            gre_d_int->SetPointError(i,0,0);
+
 
         }
 
@@ -523,17 +524,17 @@ void Percentile2DepthEst_Mono_Theory()
         gre_d_int->SetMarkerColor(kBlue);
         gre_d_int->SetMarkerStyle(20);
 
-        gre_int->GetXaxis()->SetLimits(5e-4,2);
+        gre_int->GetXaxis()->SetLimits(9e-3,2);
         gre_int->GetYaxis()->SetRangeUser(50,250);
-        gre_int->SetTitle("Fitted From N_{int};True r_{d};#lambda (mm)");
+        gre_int->SetTitle(Form("%d GeV Fitted From N_{int};True r_{d};#lambda (mm)",Energy_Name[k]));
         gre_int->Draw("AP");
-        gre_p_int->Draw("PSAME");
-        gre_d_int->Draw("PSAME");
+        gre_p_int->Draw("LSAME");
+        gre_d_int->Draw("LSAME");
 
         auto lg2_1 = new TLegend(0.68,0.12,0.88,0.32);
         lg2_1->AddEntry(gre_int,"Mixture","ep");
-        lg2_1->AddEntry(gre_d_int,"Deuteron","ep");
-        lg2_1->AddEntry(gre_p_int,"Proton","ep");
+        lg2_1->AddEntry(gre_d_int,"Deuteron GEANT4","l");
+        lg2_1->AddEntry(gre_p_int,"Proton GEANT4","l");
         lg2_1->Draw();
 
         c2->cd(2);
@@ -554,17 +555,17 @@ void Percentile2DepthEst_Mono_Theory()
         gre_d_sur->SetMarkerColor(kBlue);
         gre_d_sur->SetMarkerStyle(20);
 
-        gre_sur->GetXaxis()->SetLimits(5e-4,2);
+        gre_sur->GetXaxis()->SetLimits(9e-3,2);
         gre_sur->GetYaxis()->SetRangeUser(50,250);
-        gre_sur->SetTitle("Fitted From N_{sur};True r_{d};#lambda (mm)");
+        gre_sur->SetTitle(Form("%d GeV Fitted From N_{sur};True r_{d};#lambda (mm)",Energy_Name[k]));
         gre_sur->Draw("AP");
-        gre_p_sur->Draw("PSAME");
-        gre_d_sur->Draw("PSAME");
+        gre_p_sur->Draw("LSAME");
+        gre_d_sur->Draw("LSAME");
 
         auto lg2_2 = new TLegend(0.68,0.12,0.88,0.32);
         lg2_2->AddEntry(gre_sur,"Mixture","ep");
-        lg2_2->AddEntry(gre_d_sur,"Deuteron","ep");
-        lg2_2->AddEntry(gre_p_sur,"Proton","ep");
+        lg2_2->AddEntry(gre_d_sur,"Deuteron GEANT4","l");
+        lg2_2->AddEntry(gre_p_sur,"Proton GEANT4","l");
         lg2_2->Draw();
 
         c2->cd(3);
@@ -572,7 +573,7 @@ void Percentile2DepthEst_Mono_Theory()
         gPad->SetLogx();
         chi2_int->SetLineColor(kRed);
         chi2_int->SetLineWidth(2);
-        chi2_int->GetXaxis()->SetLimits(5e-4,2);
+        chi2_int->GetXaxis()->SetLimits(9e-3,2);
         chi2_int->GetYaxis()->SetRangeUser(0,20);
         chi2_int->SetTitle("Fitted From N_{int};True r_{d};#Delta#chi^{2}");
         chi2_int->Draw("AL");
@@ -582,7 +583,7 @@ void Percentile2DepthEst_Mono_Theory()
         gPad->SetLogx();
         chi2_sur->SetLineColor(kRed);
         chi2_sur->SetLineWidth(2);
-        chi2_sur->GetXaxis()->SetLimits(5e-4,2);
+        chi2_sur->GetXaxis()->SetLimits(9e-3,2);
         chi2_sur->GetYaxis()->SetRangeUser(0,20);
         chi2_sur->SetTitle("Fitted From N_{sur};True r_{d};#Delta#chi^{2}");
         chi2_sur->Draw("AL");
@@ -867,9 +868,9 @@ void Percentile2DepthEst_Mono_Theory()
     gPad->SetGrid(1,1);
     gPad->SetLogy(0);
     gPad->SetLogx(1);
-    grN_p_int->GetYaxis()->SetRangeUser(8e3,2e4);
+    grN_p_int->GetYaxis()->SetRangeUser(0,1e3);
     grN_p_int->GetXaxis()->SetLimits(4,2e4);
-    grN_p_int->SetTitle("Fitted From N_{int};Energy(GeV);N_{0} Based on Estimated Interaction Depth");
+    grN_p_int->SetTitle("Fitted From N_{int};Energy(GeV);N_{0}/25.5 mm BGO thick Based on Estimated Interaction Depth");
     grN_p_int->Draw("AP");
     grN_d_int->Draw("PSAME");
     auto line_Ntot = new TLine(4,1e4,2e4,1e4);
@@ -920,7 +921,7 @@ void Percentile2DepthEst_Mono_Theory()
     gPad->SetGrid(1,1);
     gPad->SetLogy();
     gPad->SetLogx();
-    gre_90_sur->GetYaxis()->SetRangeUser(9e-4,2);
+    gre_90_sur->GetYaxis()->SetRangeUser(9e-3,2);
     gre_90_sur->GetXaxis()->SetLimits(9e0,2e4);
     gre_90_sur->SetTitle("Sensitivity Curve from N_{sur};Energy(GeV); True r_{d}");
     gre_90_sur->Draw("ALP");
@@ -934,7 +935,7 @@ void Percentile2DepthEst_Mono_Theory()
     gPad->SetGrid(1,1);
     gPad->SetLogy();
     gPad->SetLogx();
-    gre_90_int->GetYaxis()->SetRangeUser(9e-4,2);
+    gre_90_int->GetYaxis()->SetRangeUser(9e-3,2);
     gre_90_int->GetXaxis()->SetLimits(9e0,2e4);
     gre_90_int->SetTitle("Sensitivity Curve from N_{int};Energy(GeV); True r_{d}");
     gre_90_int->Draw("ALP");
