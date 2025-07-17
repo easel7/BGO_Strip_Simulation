@@ -85,8 +85,8 @@ void Percentile2DepthEst_Dep()
     deuteron_tree->SetBranchAddress("First_Ine_Layer", &d_FI_Lay);
     deuteron_tree->SetBranchAddress("energy_res"     ,&d_energy_res);
     deuteron_tree->SetBranchAddress("Total_E"         ,&d_Total_E);
-    deuteron_tree->SetBranchAddress("Energy"         , &d_Energy);
-    deuteron_tree->SetBranchAddress("Nhits"          , &d_Nhits);
+    deuteron_tree->SetBranchAddress("Energy"           ,&d_Energy);
+    deuteron_tree->SetBranchAddress("Nhits"            ,&d_Nhits);
     deuteron_tree->SetBranchAddress("weight"           ,&d_weight);
 
     TGraphErrors* gre_p_int = new TGraphErrors(); TGraphErrors* grN_p_int = new TGraphErrors();
