@@ -9,7 +9,8 @@ def f2(R):
     return 0.4544 * (R/45.)**(-2.849) * (1 + (R/340.)**(0.1333/0.024))**0.024 * R**2.7
 
 def E2R(E):
-    R =  sqrt((E + 0.938)**2 - 0.938 **2 )  
+    mp = 0.938  # proton mass in GeV
+    return np.sqrt((E + mp)**2 - mp**2)
 
 # 能量范围
 E = np.logspace(1, 4, 500)  # 从1e1到1e5，500个点
