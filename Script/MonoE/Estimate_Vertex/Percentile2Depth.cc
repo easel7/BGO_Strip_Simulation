@@ -240,8 +240,9 @@ void Percentile2Depth()
 
             // h1_d[d_energy_index][d_FI_Lay]->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
             // h1_d_inter[d_energy_index]->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3)) ;
-            if(d_FI_Lay>= 0 && d_FI_Lay <= 3 ) {h1_d_int_Sel->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));}
-            h1_d_int->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
+            if(d_FI_Lay>= 0 && d_FI_Lay <= 3 ) 
+            {h1_d_int_Sel     ->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));}
+            h1_d_int          ->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
             h1_d_Lay[d_FI_Lay]->Fill((d_FI_Dep/25.5 - sigmoid->GetParameter(2) )/sigmoid->GetParameter(3));
         }
 
