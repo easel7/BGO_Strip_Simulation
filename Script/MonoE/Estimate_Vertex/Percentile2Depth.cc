@@ -350,12 +350,14 @@ void Percentile2Depth()
     auto c0 = new TCanvas("c0","c0",1600,1200);
     c0->cd();
     gPad->SetLogx();
+    gre_p->SetName("gre_p");
     gre_p->SetTitle(";Energy(GeV);(Xine-Xmid)/Slope");
     gre_p->SetLineColor(kRed);
     gre_p->SetLineWidth(2);
     gre_p->SetMarkerColor(kRed);
     gre_p->SetMarkerStyle(20);
 
+    gre_d->SetName("gre_d");
     gre_d->SetTitle(";Energy(GeV);(Xine-Xmid)/Slope");
     gre_d->SetLineColor(kBlue);
     gre_d->SetLineWidth(2);
